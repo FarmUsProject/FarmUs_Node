@@ -3,19 +3,22 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+//var indexRouter = require('./routes/index');
+//var usersRouter = require('./routes/users');
 
 var app = express();
+const {connectRedis} = require('./config/redisMiddleware')
+
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+//app.use(connectRedis)
 //app.use('/', indexRouter);
 //app.use('/users', usersRouter);
 require('./components/user/userRoute')(app);
-require('./components/farm/farmRoute')(app);
+//require('./components/farm/farmRoute')(app);
 
 module.exports = app;
