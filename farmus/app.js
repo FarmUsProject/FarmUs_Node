@@ -7,8 +7,6 @@ var logger = require('morgan');
 //var usersRouter = require('./routes/users');
 
 var app = express();
-const {connectRedis} = require('./config/redisMiddleware')
-
 
 app.use(logger('dev'));
 app.use(express.json());

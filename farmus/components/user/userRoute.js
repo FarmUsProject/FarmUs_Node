@@ -7,4 +7,7 @@ module.exports = function(app){
 
     app.post('/user/signup/verification/code',user.userAuthentication)
     app.post('/user/signup/verification',user.vertifyCode)
+
+    //app.post('/user/find-account',user.userAuthentication,user.findAccount)
+    app.get('/user/find-password',user.findPassword)
 };

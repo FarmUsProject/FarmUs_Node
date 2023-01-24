@@ -6,9 +6,9 @@ const response = ({result, code, message}) => {
     }
    };
 
-   const errResponse = ({isSuccess, code, message}) => {
+   const errResponse = ({result, code, message}) => {
      return {
-         isSuccess: isSuccess,
+         result: result,
          code: code,
          message: message
        }

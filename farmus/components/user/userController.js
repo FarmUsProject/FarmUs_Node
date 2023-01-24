@@ -1,11 +1,13 @@
 const baseResponse = require('../../config/resStatus');
 const {response, errResponse} = require("../../config/response");
 const axios = require('axios')
-const {NCP_SENS} = require('../../config/secret')
+const {NCP_SENS, googleSecret, REDIS} = require('../../config/secret')
 const CryptoJS = require('crypto-js')
 //onst {client} = require('../../config/redisMiddleware')
 const redis = require('redis')
-const {REDIS} = require('../../config/secret')
+const userProvider = require('./userProvider')
+const userService = require('./userService')
+const nodemailer = require("nodemailer");
 /**
  * [GET] /app/test
  */
@@ -31,6 +33,7 @@ const connectRedis = async() => {
     }
 }
 connectRedis()
+
 
 exports.getTest = async function (req, res) {
     return res.send(response(baseResponse.SUCCESS))
@@ -102,4 +105,55 @@ exports.vertifyCode = async(req,res) => {
         console.log(code);
         return res.send(response(baseResponse.SIGNUP_SMS_CODE_WRONG))
     }
+}
+
+exports.findAccount = async(req,res) => {
+    const {name, phoneNumber} = req.body
+}
+
+exports.findPassword = async(req,res) => {
+    try {
+        let tempPw = Math.random().toString(36).substring(2, 12);
+        const  {userEmail}  = req.query;
+        console.log(userEmail);
+
+        if (!userEmail)
+            return res.send(errResponse(baseResponse.USER_USEREMAIL_EMPTY))
+
+        const user = await userProvider.retrieveUserEmail(userEmail)
+        if (!user) return res.send(errResponse(baseResponse.USER_USEREMAIL_NOT_EXIST))
+
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: "9659tig@gmail.com",
+          pass: googleSecret,
+        },
+      });
+
+
+      const setTempPw = await userService.editPassword(userEmail,tempPw)
+
+      const mailOptions = {
+        from: "9659tig@gmail.com",
+        to: userEmail,
+        subject: "<FarmUS> 임시 비밀번호",
+        text: `<FarmUs>\n임시 비밀번호는 ${tempPw} 입니다.\n 로그인 후 비밀번호를 수정해주세요.`,
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Email sent: " + info.response);
+          transporter.close();
+        }
+      });
+
+      return res.send(response(baseResponse.SUCCESS))
+    } catch (err) {
+      console.log(err);
+      return res.send(errResponse(baseResponse.DB_ERROR))
+    }
+
 }
