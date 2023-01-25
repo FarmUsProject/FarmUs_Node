@@ -187,19 +187,13 @@ exports.findPassword = async(req,res) => {
 }
 
 exports.editUserNickName = async(req,res) =>{
-    try{
-        const {userEmail}  = req.query;
-        const {nickname} = req.body
+    const {userEmail}  = req.query;
+    const {nickname} = req.body
 
-        if (!nickname) return res.send(response(baseResponse.USER_NICKNAME_EMPTY))
-        console.log("check");
-        const eidtUser = await userService.editNickName(userEmail, nickname)
+    if (!nickname) return res.send(response(baseResponse.USER_NICKNAME_EMPTY))
+    const eidtUser = await userService.editNickName(userEmail, nickname)
 
-        return res.send(eidtUser)
-    }catch(err){
-        console.log(err);
-    }
-
+    return res.send(eidtUser)
 }
 
 exports.editUserName = async(req,res) =>{
@@ -221,5 +215,14 @@ exports.editUserPhoneNumber = async(req,res) =>{
     const eidtUser = await userService.editPhoneNumber(userEmail, phoneNumber)
 
     return res.send(eidtUser)
+}
 
+exports.editUsePassword = async(req,res) =>{
+    const {userEmail}  = req.query;
+    const {password} = req.body
+
+    if (!password) return res.send(response(baseResponse.SIGNIN_PASSWORD_EMPTY))
+    const eidtUser = await userService.editPassword(userEmail, password)
+
+    return res.send(eidtUser)
 }

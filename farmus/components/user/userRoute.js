@@ -13,7 +13,7 @@ module.exports = function(app){
 
     app.patch('/mypage/editInfo/nickname',user.editUserNickName)
     app.patch('/mypage/editInfo/name',user.editUserName)
-    //app.patch('/mypage/editInfo/password')
+    app.patch('/mypage/editInfo/password',user.editUsePassword)
     app.patch('/mypage/editInfo/phoneNumber',user.editUserPhoneNumber)
 
 };
