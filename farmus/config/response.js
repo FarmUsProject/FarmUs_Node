@@ -1,15 +1,14 @@
-const response = ({isSuccess, code, message}, result) => {
+const response = ({result, code, message}) => {
     return {
-         isSuccess: isSuccess,
+         result: result,
          code: code,
          message: message,
-         result: result
     }
    };
 
-   const errResponse = ({isSuccess, code, message}) => {
+   const errResponse = ({result, code, message}) => {
      return {
-         isSuccess: isSuccess,
+         result: result,
          code: code,
          message: message
        }
