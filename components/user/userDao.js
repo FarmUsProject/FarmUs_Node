@@ -9,7 +9,18 @@ async function selectUserbyEmail(connection, email) {
     return userInfo;
 }
 
+async function insertUser(connection, newUserInfo) {
+    //newUserInfo [email, hashedPassword, salt, phoneNumber, nickName, name, role]
+    const insertUserQuery = `
+    INSERT INTO User(email, password, salt, phoneNumber, nickName, name, role)
+    VALUES (?, ?, ?, ?, ?, ?, ?);
+    `;
+    const insertUserResult = await connection.query(insertUserQuery, newUserInfo);
+
+    return insertUserResult;
+}
 
 module.exports = {
     selectUserbyEmail,
+    insertUser,
 }
