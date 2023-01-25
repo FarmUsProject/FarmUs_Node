@@ -143,7 +143,7 @@ exports.findPassword = async(req,res) => {
     try {
         let tempPw = Math.random().toString(36).substring(2, 12);
         const  {userEmail}  = req.query;
-        console.log(userEmail);
+        //console.log(userEmail);
 
         if (!userEmail)
             return res.send(errResponse(baseResponse.USER_USEREMAIL_EMPTY))
@@ -183,5 +183,43 @@ exports.findPassword = async(req,res) => {
       console.log(err);
       return res.send(errResponse(baseResponse.DB_ERROR))
     }
+
+}
+
+exports.editUserNickName = async(req,res) =>{
+    try{
+        const {userEmail}  = req.query;
+        const {nickname} = req.body
+
+        if (!nickname) return res.send(response(baseResponse.USER_NICKNAME_EMPTY))
+        console.log("check");
+        const eidtUser = await userService.editNickName(userEmail, nickname)
+
+        return res.send(eidtUser)
+    }catch(err){
+        console.log(err);
+    }
+
+}
+
+exports.editUserName = async(req,res) =>{
+    const {userEmail}  = req.query;
+    const {name} = req.body
+
+    if (!name) return res.send(response(baseResponse.USER_NAME_EMPTY))
+    const eidtUser = await userService.editName(userEmail, name)
+
+    return res.send(eidtUser)
+}
+
+exports.editUserPhoneNumber = async(req,res) =>{
+    const {userEmail}  = req.query;
+    const {phoneNumber} = req.body
+
+    if (!phoneNumber) return res.send(response(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
+    if (phoneNumber.length != 11) return res.send(response(baseResponse.SIGNUP_PHONENUMBER_LENGTH))
+    const eidtUser = await userService.editPhoneNumber(userEmail, phoneNumber)
+
+    return res.send(eidtUser)
 
 }

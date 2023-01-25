@@ -17,3 +17,45 @@ exports.editPassword = async (email,pw) =>{
         return errResponse(baseResponse.DB_ERROR)
     }
 }
+
+exports.editNickName = async (email,nickname) =>{
+    try{
+        const connection = await pool.getConnection(async (conn)=>conn)
+        const res = await userDao.updateNickName(connection, email, nickname)
+        connection.release()
+        if (res)
+            return response(baseResponse.SUCCESS)
+
+    }catch(err){
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR)
+    }
+}
+
+exports.editName = async (email,name) =>{
+    try{
+        const connection = await pool.getConnection(async (conn)=>conn)
+        const res = await userDao.updateName(connection, email, name)
+        connection.release()
+        if (res)
+            return response(baseResponse.SUCCESS)
+
+    }catch(err){
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR)
+    }
+}
+
+exports.editPhoneNumber = async (email,phoneNumber) =>{
+    try{
+        const connection = await pool.getConnection(async (conn)=>conn)
+        const res = await userDao.updatePhoneNum(connection, email, phoneNumber)
+        connection.release()
+        if (res)
+            return response(baseResponse.SUCCESS)
+
+    }catch(err){
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR)
+    }
+}

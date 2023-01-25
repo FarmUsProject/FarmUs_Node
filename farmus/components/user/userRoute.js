@@ -11,4 +11,9 @@ module.exports = function(app){
     app.get('/user/find-account',user.findAccount)
     app.get('/user/find-password',user.findPassword)
 
+    app.patch('/mypage/editInfo/nickname',user.editUserNickName)
+    app.patch('/mypage/editInfo/name',user.editUserName)
+    //app.patch('/mypage/editInfo/password')
+    app.patch('/mypage/editInfo/phoneNumber',user.editUserPhoneNumber)
+
 };

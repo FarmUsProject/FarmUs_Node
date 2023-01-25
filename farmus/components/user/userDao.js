@@ -27,8 +27,38 @@ async function updatePassword(connection, email, pw) {
     return updateUserRow[0];
 }
 
+async function updateNickName(connection, email, nickname) {
+    const updateUserQuery = `
+    UPDATE User
+    SET NickName = ?
+    WHERE Email = ?;`;
+    const updateUserRow = await connection.query(updateUserQuery, [nickname, email]);
+    return updateUserRow[0];
+}
+
+async function updateName(connection, email, name) {
+    const updateUserQuery = `
+    UPDATE User
+    SET Name = ?
+    WHERE Email = ?;`;
+    const updateUserRow = await connection.query(updateUserQuery, [name, email]);
+    return updateUserRow[0];
+}
+
+async function updatePhoneNum(connection, email, phoneNumber) {
+    const updateUserQuery = `
+    UPDATE User
+    SET PhoneNumber = ?
+    WHERE Email = ?;`;
+    const updateUserRow = await connection.query(updateUserQuery, [phoneNumber, email]);
+    return updateUserRow[0];
+}
+
 module.exports = {
     selectUserEmail,
     selectUser,
     updatePassword,
+    updateNickName,
+    updateName,
+    updatePhoneNum,
 }
