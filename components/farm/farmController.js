@@ -1,5 +1,6 @@
-const baseResponse = require("../../config/resStatus");
+const farmService = require('./farmService');
 const {response, errResponse} = require("../../config/response");
+const validator = require('./../../helpers/validator');
 
 
 /**
@@ -10,15 +11,35 @@ exports.getTest = async function (req, res) {
 }
 
 /**
- * [PUT] /farm/postings/:postid
+ * [POST] /farm/postings
  */
-exports.reserve = async function (req, res) {
+exports.newFarm = async function (req, res) {
+    try {
+        const { name, owner, picture_url, price, squaredMeters, location, description} = req.body;
+        const invalidation = await validator.newFarm(name, owner, picture_url, price, squaredMeters, location, description);
 
+        if (invalidation) return errResponse(invalidation)
+
+        const newFarmResponse = await farmService.newFarm(name, owner, picture_url, price, squaredMeters, location, description)
+
+        return res.send(newFarmResponse)
+
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 
 /**
- * [POST] /farm/postings
+ * [PUT] /farm/postings/:postid
  */
-exports.post = async function (req, res) {
+exports.bookedFarm = async function (req, res) {
+    try {
+        const postid = req.params.postid;
+
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 
 }

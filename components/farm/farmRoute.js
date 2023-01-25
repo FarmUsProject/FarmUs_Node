@@ -6,8 +6,8 @@ module.exports = function(app){
     app.get('/app/test', farm.getTest)
 
     // 3. 예약한 농장
-    app.put('/farm/postings/:postid', farm.reserve)
+    app.put('/farm/postings/:postid', farm.bookedFarm)
 
     // 6. 농장 등록
-    app.post('/farm/postings', farm.post)
+    app.post('/farm/postings', farm.newFarm)
 };

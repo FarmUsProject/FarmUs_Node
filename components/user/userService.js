@@ -4,7 +4,6 @@ const resStatus = require('../../config/resStatus');
 const encryptedPassword = require('../../helpers/encrypt');
 const jwtLogin = require('./../../config/jwtLogin');
 const { pool } = require('../../config/database');
-const { USER_ID_NOT_MATCH } = require('../../config/resStatus');
 
 async function login(email, password) {
 
@@ -34,6 +33,8 @@ async function signUp(email, password, phoneNumber, nickName, name, role) {
 
     const connection = await pool.getConnection(async conn => conn);
     const newUser = await userDao.insertUser(connection, newUserInfo);
+
+    connection.release();
 
     return response(true, 200, "회원가입이 완료되었습니다", null);
 };

@@ -33,7 +33,10 @@ const validator = {
     return false;
   },
 
-  farm: async () => {
+  newFarm: async (name, owner, picture_url, price, squaredMeters, location, description) => {
+    if (!name || !owner || !picture_url || !price || !squaredMeters || !location)
+      return { "isSuccess": false, "code": 2012, "message": "농장을 등록하는 데 필요한 정보를 모두 입력해주세요." };
+
     return false;
   },
 }
