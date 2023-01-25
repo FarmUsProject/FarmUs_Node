@@ -34,11 +34,48 @@ const connectRedis = async() => {
 }
 connectRedis()
 
+const sendSMS = async (phoneNum) =>{
+    let code = ''
+    for (let i = 0; i<6; i++)
+        code += Math.floor(Math.random()*10)
+
+    let authenticationData = await client.set(phoneNum, code, {EX: 180})
+
+    const date = Date.now()+''
+    const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, NCP_SENS.SECRET_KEY)
+    hmac.update("POST")
+    hmac.update(" ")
+    hmac.update(`/sms/v2/services/${NCP_SENS.SERVICEID}/messages`)
+    hmac.update("\n")
+    hmac.update(date)
+    hmac.update('\n')
+    hmac.update(NCP_SENS.ACCESS_KEY_ID)
+
+    const hash = hmac.finalize()
+    const signature = hash.toString(CryptoJS.enc.Base64)
+
+    const sendMessage = await axios({
+        method: 'POST',
+        url: `https://sens.apigw.ntruss.com/sms/v2/services/${NCP_SENS.SERVICEID}/messages`,
+        headers: {
+            "Contenc-type": "application/json; charset=utf-8",
+            "x-ncp-iam-access-key": NCP_SENS.ACCESS_KEY_ID,
+            "x-ncp-apigw-timestamp": date,
+            "x-ncp-apigw-signature-v2": signature,
+          },
+        data: {
+          type: "SMS",
+          countryCode: "82",
+          from: NCP_SENS.FROM,
+          content: `<FarmUS> 인증번호는 ${code} 입니다.`,
+          messages: [{ to: `${phoneNum}` }],
+        },
+    })
+}
 
 exports.getTest = async function (req, res) {
     return res.send(response(baseResponse.SUCCESS))
 }
-
 
 exports.userAuthentication = async function (req, res) {
     try{
@@ -51,42 +88,8 @@ exports.userAuthentication = async function (req, res) {
             return res.send(response(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
         }
 
-        let code = ''
-        for (let i = 0; i<6; i++)
-            code += Math.floor(Math.random()*10)
+        sendSMS(phoneNumber)
 
-        let authenticationData = await client.set(phoneNumber, code, {EX: 180})
-
-        const date = Date.now()+''
-        const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, NCP_SENS.SECRET_KEY)
-        hmac.update("POST")
-        hmac.update(" ")
-        hmac.update(`/sms/v2/services/${NCP_SENS.SERVICEID}/messages`)
-        hmac.update("\n")
-        hmac.update(date)
-        hmac.update('\n')
-        hmac.update(NCP_SENS.ACCESS_KEY_ID)
-
-        const hash = hmac.finalize()
-        const signature = hash.toString(CryptoJS.enc.Base64)
-
-        const sendMessage = await axios({
-            method: 'POST',
-            url: `https://sens.apigw.ntruss.com/sms/v2/services/${NCP_SENS.SERVICEID}/messages`,
-            headers: {
-                "Contenc-type": "application/json; charset=utf-8",
-                "x-ncp-iam-access-key": NCP_SENS.ACCESS_KEY_ID,
-                "x-ncp-apigw-timestamp": date,
-                "x-ncp-apigw-signature-v2": signature,
-              },
-            data: {
-              type: "SMS",
-              countryCode: "82",
-              from: NCP_SENS.FROM,
-              content: `<FarmUS> 인증번호는 ${code} 입니다.`,
-              messages: [{ to: `${phoneNumber}` }],
-            },
-        })
         return res.send(response(baseResponse.SUCCESS))
     }
     catch(err){
@@ -96,10 +99,18 @@ exports.userAuthentication = async function (req, res) {
 }
 
 exports.vertifyCode = async(req,res) => {
-    const {phoneNumber, usercode} = req.body
+    const {phoneNumber, usercode,name} = req.body
     const code = await client.get(phoneNumber)
     if (code == usercode){
+        console.log(code);
+        console.log(client);
         await client.del(phoneNumber)
+
+        if (name){
+            const email = await client.get(name)
+            await client.del(name)
+            return res.send({"name": name, "email": email})
+        }
         return res.send(response(baseResponse.SUCCESS))
     }else{
         console.log(code);
@@ -108,7 +119,24 @@ exports.vertifyCode = async(req,res) => {
 }
 
 exports.findAccount = async(req,res) => {
-    const {name, phoneNumber} = req.body
+    try{
+        const {name, phoneNumber} = req.query
+
+        if (!name) return res.send(errResponse(baseResponse.USER_NAME_EMPTY))
+        if (!phoneNumber) return res.send(errResponse(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
+
+        const user = await userProvider.retrieveUser(name, phoneNumber)
+        if (!user) return res.send(errResponse(baseResponse.USER_NOT_EXIST))
+
+        let userData = await client.set(name, user.Email, {EX: 185})
+        sendSMS(phoneNumber)
+        return res.send(response(baseResponse.SUCCESS))
+
+    }catch(err){
+        console.log(err);
+        return res.send(response(baseResponse.SIGNUP_SMS_WRONG))
+    }
+
 }
 
 exports.findPassword = async(req,res) => {

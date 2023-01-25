@@ -9,6 +9,15 @@ async function selectUserEmail(connection, userEmail) {
     return userRow;
 }
 
+async function selectUser(connection, name, phoneNumber){
+    const selectUserQuery = `
+    SELECT Name, Email
+    FROM User
+    WHERE Name = ? AND PhoneNumber = ?;`;
+    const [userRow] = await connection.query(selectUserQuery, [name, phoneNumber]);
+    return userRow;
+}
+
 async function updatePassword(connection, email, pw) {
     const updateUserQuery = `
     UPDATE User
@@ -20,5 +29,6 @@ async function updatePassword(connection, email, pw) {
 
 module.exports = {
     selectUserEmail,
+    selectUser,
     updatePassword,
 }
