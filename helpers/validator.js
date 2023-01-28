@@ -1,4 +1,5 @@
 const resStatus = require('../config/resStatus')
+const resStatus_5000 = require('../config/resStatus_5000')
 
 const validator = {
 
@@ -35,10 +36,24 @@ const validator = {
 
   newFarm: async (name, owner, picture_url, price, squaredMeters, location, description) => {
     if (!name || !owner || !picture_url || !price || !squaredMeters || !location)
-      return { "isSuccess": false, "code": 2012, "message": "농장을 등록하는 데 필요한 정보를 모두 입력해주세요." };
+      return resStatus_5000.FARM_NEW_DATA_SHORTAGE;
 
     return false;
   },
+
+  newReservation: async (userEmail, farmid) => {
+    if (!userEmail || !farmid)
+      return resStatus_5000.RESERVE_REQUEST_DATA_SHORTAGE;
+
+    return false;
+  },
+
+  oneParams : async (aParam) => {
+    if (!aParam)
+      return resStatus_5000.PARAMS_ONE_EMPTY
+
+    return false;
+  }
 }
 
 module.exports = validator;
