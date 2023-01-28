@@ -24,3 +24,23 @@ exports.request = async function (req, res) {
         res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
+
+/**
+ * [PUT] /reserve/farm/list/:farmid
+*/
+exports.clientsList = async function (req, res) {
+    try {
+        const farmid = req.params.farmid;
+        const invalidation = await validator.oneParams(farmid);
+
+        if (invalidation) return response(invalidation);
+
+        const clientsListResponse = await reserveService.clientsList(farmid);
+
+        return response(clientsListResponse)
+
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}

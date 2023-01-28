@@ -23,7 +23,15 @@ async function request(userEmail, farmid) {
     return response(resStatus_5000.RESERVE_REQUEST_SUCCESS, null);
 };
 
+async function clientsList(farmid) {
+    
+    const reservedClients = await reserveProvider.clientsbyFarmID(farmid);
+
+    return response(resStatus_5000.RESERVE_LIST_CLIENTS, reservedClients);
+};
+
 
 module.exports = {
     request,
+    clientsList,
 };
