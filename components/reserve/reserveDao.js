@@ -14,7 +14,6 @@ async function insertReservation(connection, newReservationInfo) {
     return insertUserResult;
 }
 
-
 async function selectReservedClients(connection, farmID) {
     const selectReservedClientsQuery = `
     SELECT *
@@ -27,7 +26,6 @@ async function selectReservedClients(connection, farmID) {
     return reservedClients;
 }
 
-
 async function selectReservedFarms(connection, userEmail) {
     const selectReservedFarmsQuery = `
     SELECT *
@@ -39,6 +37,7 @@ async function selectReservedFarms(connection, userEmail) {
 
     return reservedFarms;
 }
+
 
 module.exports = {
     insertReservation,

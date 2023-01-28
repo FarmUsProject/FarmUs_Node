@@ -30,8 +30,16 @@ async function clientsList(farmid) {
     return response(resStatus_5000.RESERVE_LIST_CLIENTS, reservedClients);
 };
 
+async function farmsList(userEmail) {
+
+    const reservedFarms = await reserveProvider.farmsbyEmail(userEmail);
+
+    return response(resStatus_5000.RESERVE_LIST_FARMS, reservedFarms);
+};
+
 
 module.exports = {
     request,
     clientsList,
+    farmsList,
 };

@@ -44,3 +44,24 @@ exports.clientsList = async function (req, res) {
         res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
+
+/**
+ * [PUT] /reserve/client/list/:email
+*/
+exports.farmsList = async function (req, res) {
+    try {
+
+        const userEmail = req.params.email;
+        const invalidation = await validator.oneParams(userEmail);
+
+        if (invalidation) return response(invalidation);
+
+        const farmsListResponse = await reserveService.farmsList(userEmail);
+
+        return response(farmsListResponse)
+
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}
