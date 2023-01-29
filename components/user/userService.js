@@ -1,6 +1,8 @@
-const userProvider = require('./../user/userProvider');
+const userProvider = require('./userProvider');
+const userDao = require('./userDao');
 const { response, errResponse } = require('../../config/response');
 const resStatus = require('../../config/resStatus');
+const resStatus_5000 = require('../../config/resStatus_5000');
 const encryptedPassword = require('../../helpers/encrypt');
 const jwtLogin = require('./../../config/jwtLogin');
 const { pool } = require('../../config/database');
@@ -10,20 +12,21 @@ async function login(email, password) {
     const userInfo = await userProvider.userbyEmail(email);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
 
-    const userPassword = userInfo[0].password;
-    const userSalt = userInfo[0].salt;
+    const userPassword = userInfo[0].Password;
+    const userSalt = userInfo[0].Salt;
+
     const verify = await encryptedPassword.verifyPassword(password, userSalt, userPassword);
 
-    if (!verify) return response(errResponse(resStatus.SIGNIN_PASSWORD_WRONG));
+    if (!verify) return errResponse(resStatus.SIGNIN_PASSWORD_WRONG);
 
     const jwtResponse = await jwtLogin(userInfo[0]);
 
-    return response(true, 200, "로그인이 완료되었습니다", jwtResponse);
+    return response(resStatus_5000.USER_LOGIN_SUCCESS, jwtResponse);
 };
 
 
 async function signUp(email, password, phoneNumber, nickName, name, role) {
-    const userInfo = await userProvider.userbyEmail(newUserInfo.email);
+    const userInfo = await userProvider.userbyEmail(email);
     if (userInfo.length >= 1) return errResponse(resStatus.SIGNUP_REDUNDANT_EMAIL);
 
     const encryptedData = await encryptedPassword.createHashedPassword(password);
@@ -36,7 +39,7 @@ async function signUp(email, password, phoneNumber, nickName, name, role) {
 
     connection.release();
 
-    return response(true, 200, "회원가입이 완료되었습니다", null);
+    return response(resStatus_5000.USER_SIGNUP_SUCCESS, {"email" : email, "role" : role});
 };
 
 module.exports = {

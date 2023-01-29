@@ -20,14 +20,14 @@ const validator = {
   },
 
   signUp: async (email, password, phoneNumber, nickName, name, role) => {
-    const invalidation = await this.login(email, password);
+    const invalidation = await validator.login(email, password);
     if (invalidation) return invalidation
 
     if (!phoneNumber) return resStatus.SIGNUP_PHONENUMBER_EMPTY
-    if (!nickName) return resStatus.SIGNUP_NICKNAME_EMPTY
+    // if (!nickName) return resStatus.SIGNUP_NICKNAME_EMPTY
     if (!name) return resStatus.SIGNUP_NICKNAME_EMPTY
     if (!role) return resStatus.USER_STATUS_EMPTY
-    if (nickName.length > 20) return resStatus.SIGNUP_NICKNAME_LENGTH
+    // if (nickName.length > 20) return resStatus.SIGNUP_NICKNAME_LENGTH
     if (name.length > 20) return resStatus.SIGNUP_NICKNAME_LENGTH
     if (role.length >= 2) return resStatus.USER_STATUS_EMPTY
 

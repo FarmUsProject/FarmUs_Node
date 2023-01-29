@@ -3,9 +3,9 @@ const {logger} = require('./winston');
 
 const pool = mysql.createPool({
     host: 'localhost',
-    user: 'farmus',
+    user: 'root',
     port: '3306',
-    password: 'farmus',
+    password: '0000',
     database: 'farmus'
 });
 

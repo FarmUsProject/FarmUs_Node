@@ -9,7 +9,7 @@ const userService = require("./userService")
  * [GET] /app/test
  */
 exports.getTest = async function (req, res) {
-    return res.send(response(baseResponse.SUCCESS))
+    return res.send(response(baseResponse.SUCCESS));
 }
 
 /**
@@ -18,13 +18,14 @@ exports.getTest = async function (req, res) {
 exports.login = async function (req, res) {
     try {
         const { email, password } = req.body;
+
         const invalidation = await validator.login(email, password);
 
-        if (invalidation) return errResponse(invalidation)
+        if (invalidation) return res.send(errResponse(invalidation));
 
-        const loginResponse = await userService.login(email, password)
+        const loginResponse = await userService.login(email, password);
 
-        return res.send(loginResponse)
+        return res.send(loginResponse);
 
     }
     catch (e) {
@@ -36,18 +37,18 @@ exports.login = async function (req, res) {
  * [POST] /user/signup
 */
 exports.signup = async function (req, res) {
-    try {
+    // try {
         const { email, password, phoneNumber, nickName, name, role } = req.body;
         const invalidation = await validator.signUp(email, password, phoneNumber, nickName, name, role);
 
-        if (invalidation) return errResponse(invalidation)
+        if (invalidation) return res.send(errResponse(invalidation));
 
-        const signUpResponse = await userService.signUp(email, password, phoneNumber, nickName, name, role)
+        const signUpResponse = await userService.signUp(email, password, phoneNumber, nickName, name, role);
 
-        return res.send(signUpResponse)
+        return res.send(signUpResponse);
 
-    }
-    catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
-    }
+    // }
+    // catch (e) {
+    //     res.send(errResponse(resStatus.SERVER_ERROR));
+    // }
 }
