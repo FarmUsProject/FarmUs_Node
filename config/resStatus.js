@@ -16,14 +16,13 @@ module.exports = {
     SIGNUP_PASSWORD_LENGTH : { "result": false, "code": 2005, "message":"비밀번호는 6~20자리를 입력해주세요." },
     SIGNUP_NICKNAME_EMPTY : { "result": false, "code": 2006, "message":"닉네임을 입력 해주세요." },
     SIGNUP_NICKNAME_LENGTH : { "result": false,"code": 2007,"message":"닉네임은 최대 20자리를 입력해주세요." },
+    SIGNUP_PHONENUMBER_EMPTY : { "result": false, "code": 2019, "message":"핸드폰번호를 입력 해주세요." },
 
-    SIGNUP_PHONENUMBER_EMPTY : { "result": false, "code": 2008, "message":"핸드폰 번호를 입력해주세요" },
-    SIGNUP_PHONENUMBER_LENGTH : { "result": false, "code": 2009, "message":"번호 입력 형식이 올바르지 않습니다."},
     SIGNIN_EMAIL_ERROR_TYPE : { "result": false, "code": 2010, "message":"이메일을 형식을 정확하게 입력해주세요." },
     SIGNIN_PASSWORD_EMPTY : { "result": false, "code": 2011, "message": "비밀번호를 입력 해주세요." },
 
-    USER_NAME_EMPTY : { "result": false, "code": 2012, "message": "이름을 입력해주세요." },
-    USER_NOT_EXIST : { "result": false, "code": 2013, "message": "해당 정보로 가입한 회원이 존재하지 않습니다." },
+    USER_USERID_EMPTY : { "result": false, "code": 2012, "message": "userId를 입력해주세요." },
+    USER_USERID_NOT_EXIST : { "result": false, "code": 2013, "message": "해당 회원이 존재하지 않습니다." },
 
     USER_USEREMAIL_EMPTY : { "result": false, "code": 2014, "message": "이메일을 입력해주세요." },
     USER_USEREMAIL_NOT_EXIST : { "result": false, "code": 2015, "message": "해당 이메일을 가진 회원이 존재하지 않습니다." },
@@ -41,12 +40,20 @@ module.exports = {
     SIGNIN_INACTIVE_ACCOUNT : { "result": false, "code": 3005, "message": "비활성화 된 계정입니다. 고객센터에 문의해주세요." },
     SIGNIN_WITHDRAWAL_ACCOUNT : { "result": false, "code": 3006, "message": "탈퇴 된 계정입니다. 고객센터에 문의해주세요." },
 
-    SIGNUP_SMS_WRONG : { "result": false, "code": 3007, "message": "SMS가 정상적으로 보내지지 않았습니다." },
-    SIGNUP_SMS_CODE_WRONG : { "result": false, "code": 3008, "message": "인증번호가 일치하지 않습니다." },
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "result": false, "code": 4000, "message": "데이터 베이스 에러"},
     SERVER_ERROR : { "result": false, "code": 4001, "message": "서버 에러"},
-    REDIS_ERROR : {'result': false, 'code':4002, 'message': "REDIS 에러"}
 
+    //Snoopy
+    SIGNUP_SMS_WRONG : { "result": false, "code": 6000, "message": "SMS가 정상적으로 보내지지 않았습니다." },
+    SIGNUP_SMS_CODE_WRONG : { "result": false, "code": 6001, "message": "인증번호가 일치하지 않습니다." },
+    SIGNUP_PHONENUMBER_LENGTH : { "result": false, "code": 6002, "message":"번호 입력 형식이 올바르지 않습니다."},
+
+    USER_NAME_EMPTY : { "result": false, "code": 6003, "message": "이름을 입력해주세요." },
+    USER_NOT_EXIST : { "result": false, "code": 6004, "message": "해당 정보로 가입한 회원이 존재하지 않습니다." },
+
+    FARM_NOT_KEYWORD : { "result": false, "code": 6005, "message": "검색어를 입력해주세요" },
+
+    REDIS_ERROR : {'result': false, 'code':6900, 'message': "REDIS 에러"}
 }

@@ -3,7 +3,6 @@ const {response, errResponse} = require("../../config/response");
 const axios = require('axios')
 const {NCP_SENS, googleSecret, REDIS} = require('../../config/secret')
 const CryptoJS = require('crypto-js')
-//onst {client} = require('../../config/redisMiddleware')
 const redis = require('redis')
 const userProvider = require('./userProvider')
 const userService = require('./userService')

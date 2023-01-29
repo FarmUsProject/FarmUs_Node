@@ -17,6 +17,6 @@ app.use(cookieParser());
 //app.use('/', indexRouter);
 //app.use('/users', usersRouter);
 require('./components/user/userRoute')(app);
-//require('./components/farm/farmRoute')(app);
+require('./components/farm/farmRoute')(app);
 
 module.exports = app;
