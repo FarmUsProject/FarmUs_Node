@@ -6,6 +6,7 @@ const resStatus_5000 = require('../../config/resStatus_5000');
 const encryptedPassword = require('../../helpers/encrypt');
 const jwtLogin = require('./../../config/jwtLogin');
 const { pool } = require('../../config/database');
+const setDate = require('./../../helpers/setDate');
 
 async function login(email, password) {
 
@@ -32,7 +33,8 @@ async function signUp(email, password, phoneNumber, nickName, name, role) {
     const encryptedData = await encryptedPassword.createHashedPassword(password);
     const hashedPassword = encryptedData.hashedPassword;
     const salt = encryptedData.salt;
-    const newUserInfo = [email, hashedPassword, salt, phoneNumber, nickName, name, role];
+    const now = await setDate.now();
+    const newUserInfo = [email, hashedPassword, salt, phoneNumber, nickName, name, role, now, now];
 
     const connection = await pool.getConnection(async conn => conn);
     const newUser = await userDao.insertUser(connection, newUserInfo);

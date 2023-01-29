@@ -10,10 +10,10 @@ async function selectFarmbyFarmID(connection, farmID) {
 }
 
 async function insertFarm(connection, newFarmInfo) {
-    //newFarmInfo [newFarmID, name, owner, term, price, squaredMeters, location, description, picture_url, category, tag, newFarmStatus]
+    //newFarmInfo [newFarmID, name, owner, term, price, squaredMeters, location, description, picture_url, category, tag, newFarmStatus, createAt, updateAt]
     const insertFarmQuery = `
-    INSERT INTO Farm(FarmID, Name, Owner, Term, Price, SquaredMeters, Location, Description, Picture_url, Category, Tag, Status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    INSERT INTO Farm(FarmID, Name, Owner, Term, Price, SquaredMeters, Location, Description, Picture_url, Category, Tag, Status, createAt, updateAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
     const farmInfo = await connection.query(insertFarmQuery, newFarmInfo);
     

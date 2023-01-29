@@ -15,7 +15,7 @@ async function request(userEmail, farmid) {
     if (farmInfo.length < 1) return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
 
     //userEmail, FarmID, OwnerEmail, Term, createAt, updateAt
-    const now = await setDate.now()
+    const now = await setDate.now();
     const newReservationInfo = [userEmail, farmInfo.FarmID, farmInfo.Owner, farmInfo.Term, now, now];
 
     const connection = await pool.getConnection(async conn => conn);
