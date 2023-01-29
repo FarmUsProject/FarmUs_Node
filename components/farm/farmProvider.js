@@ -7,7 +7,7 @@ async function farmbyfarmID (farmID){
 
     connection.release();
 
-    return farmInfo;
+    return farmInfo[0];
 }
 
 async function isSameFarm (farmInfo){

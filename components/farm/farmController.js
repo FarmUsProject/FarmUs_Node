@@ -15,7 +15,7 @@ exports.getTest = async function (req, res) {
  * [POST] /farm/postings
  */
 exports.newFarm = async function (req, res) {
-    // try {
+    try {
         const { name, owner, term, price, squaredMeters, location, description, picture_url, category, tag } = req.body;
         const invalidation = await validator.newFarm(name, owner, term, price, squaredMeters, location);
 
@@ -25,10 +25,10 @@ exports.newFarm = async function (req, res) {
 
         return res.send(newFarmResponse)
 
-    // }
-    // catch (e) {
-    //     res.send(errResponse(resStatus.SERVER_ERROR));
-    // }
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 
 /**

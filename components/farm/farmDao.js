@@ -2,7 +2,7 @@ async function selectFarmbyFarmID(connection, farmID) {
     const selectFarmbyFarmIDQuery = `
     SELECT *
     FROM Farm
-    WHERE farmID = ?;
+    WHERE FarmID = ?;
     `;
     const farmInfo = await connection.query(selectFarmbyFarmIDQuery, farmID);
 

@@ -1,4 +1,3 @@
-const baseResponse = require("../../config/resStatus");
 const { response, errResponse } = require('./../../config/response');
 const validator = require('../../helpers/validator');
 const resStatus = require("../../config/resStatus");
@@ -13,7 +12,7 @@ exports.request = async function (req, res) {
         const { email, farmid } = req.body;
         const invalidation = await validator.newReservation(email, farmid);
 
-        if (invalidation) return errResponse(invalidation);
+        if (invalidation) return res.send(errResponse(invalidation));
 
         const reserveRequest_result = await reserveService.request(email, farmid);
 
@@ -26,18 +25,18 @@ exports.request = async function (req, res) {
 }
 
 /**
- * [PUT] /reserve/farm/list/:farmid
+ * [GET] /reserve/farm/list/:farmid
 */
 exports.clientsList = async function (req, res) {
     try {
-        const farmid = req.params.farmid;
-        const invalidation = await validator.oneParams(farmid);
+    const farmid = req.params.farmid;
+    const invalidation = await validator.oneParams(farmid);
 
-        if (invalidation) return response(invalidation);
+    if (invalidation) return res.send(response(invalidation));
 
-        const clientsListResponse = await reserveService.clientsList(farmid);
+    const clientsListResponse = await reserveService.clientsList(farmid);
 
-        return response(clientsListResponse)
+    return res.send(clientsListResponse);
 
     }
     catch (e) {
@@ -46,7 +45,7 @@ exports.clientsList = async function (req, res) {
 }
 
 /**
- * [PUT] /reserve/client/list/:email
+ * [GET] /reserve/client/list/:email
 */
 exports.farmsList = async function (req, res) {
     try {
@@ -54,11 +53,11 @@ exports.farmsList = async function (req, res) {
         const userEmail = req.params.email;
         const invalidation = await validator.oneParams(userEmail);
 
-        if (invalidation) return response(invalidation);
+        if (invalidation) return res.send(response(invalidation));
 
         const farmsListResponse = await reserveService.farmsList(userEmail);
 
-        return response(farmsListResponse)
+        return res.send(farmsListResponse);
 
     }
     catch (e) {

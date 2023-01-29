@@ -1,16 +1,8 @@
-const baseResponse = require("../../config/resStatus");
 const { response, errResponse } = require('./../../config/response');
 const validator = require('../../helpers/validator');
 const resStatus = require("../../config/resStatus");
 const userService = require("./userService")
 
-
-/**
- * [GET] /app/test
- */
-exports.getTest = async function (req, res) {
-    return res.send(response(baseResponse.SUCCESS));
-}
 
 /**
  * [POST] /user/login
@@ -37,7 +29,7 @@ exports.login = async function (req, res) {
  * [POST] /user/signup
 */
 exports.signup = async function (req, res) {
-    // try {
+    try {
         const { email, password, phoneNumber, nickName, name, role } = req.body;
         const invalidation = await validator.signUp(email, password, phoneNumber, nickName, name, role);
 
@@ -47,8 +39,8 @@ exports.signup = async function (req, res) {
 
         return res.send(signUpResponse);
 
-    // }
-    // catch (e) {
-    //     res.send(errResponse(resStatus.SERVER_ERROR));
-    // }
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
