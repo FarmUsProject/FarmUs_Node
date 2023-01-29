@@ -1,22 +1,30 @@
-const randomNumber = require('../../helpers/randomNumber');
 const FarmProvider = require('./farmProvider');
-const { pool } = require('../../config/database');
 const farmDao = require('./farmDao');
+const { pool } = require('../../config/database');
+const {response, errResponse} = require('./../../config/response');
+const resStatus_5000 = require('./../../config/resStatus_5000');
+const randomNumber = require('../../helpers/randomNumber');
 
-async function newFarm(name, owner, picture_url, price, squaredMeters, location, description) {
+async function newFarm(name, owner, term, price, squaredMeters, location, description, picture_url, category, tag) {
+    const newFarmStatus = 'A';
     let newFarmID;
     let existedFarm;
     do {
         newFarmID = await randomNumber.createFarmID();
-        existedFarm = await FarmProvider.farmbyfarmID(farmID);
-    } while (existedFarm);
-    const newFarmInfo = [newFarmID, name, owner, picture_url, price, squaredMeters, location, description];
+        existedFarm = await FarmProvider.farmbyfarmID(newFarmID);
+    } while (!existedFarm); //farmID
+
+    const newFarmInfo = [newFarmID, name, owner, term, price, squaredMeters, location, description, picture_url, category, tag, newFarmStatus];
+
+    const isSameFarm = await FarmProvider.isSameFarm(newFarmInfo); //중복체크
+    if (isSameFarm) return errResponse(resStatus_5000.FARM_DUPLICATED_EXISTS);
     const connection = await pool.getConnection(async conn => conn);
+    
     const newFarm = await farmDao.insertFarm(connection, newFarmInfo);
 
     connection.release();
 
-    return response(true, 200, "농장이 등록되었습니다", null);
+    return response(resStatus_5000.FARM_NEW_SAVE_SUCCESS, {"newFarmID" : newFarmID});
 }
 
 

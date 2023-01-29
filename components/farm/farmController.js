@@ -1,4 +1,5 @@
 const farmService = require('./farmService');
+const resStatus = require('./../../config/resStatus');
 const {response, errResponse} = require("../../config/response");
 const validator = require('./../../helpers/validator');
 
@@ -14,20 +15,20 @@ exports.getTest = async function (req, res) {
  * [POST] /farm/postings
  */
 exports.newFarm = async function (req, res) {
-    try {
-        const { name, owner, picture_url, price, squaredMeters, location, description} = req.body;
-        const invalidation = await validator.newFarm(name, owner, picture_url, price, squaredMeters, location, description);
+    // try {
+        const { name, owner, term, price, squaredMeters, location, description, picture_url, category, tag } = req.body;
+        const invalidation = await validator.newFarm(name, owner, term, price, squaredMeters, location);
 
-        if (invalidation) return errResponse(invalidation)
+        if (invalidation) return res.send(errResponse(invalidation))
 
-        const newFarmResponse = await farmService.newFarm(name, owner, picture_url, price, squaredMeters, location, description)
+        const newFarmResponse = await farmService.newFarm(name, owner, term, price, squaredMeters, location, description, picture_url, category, tag);
 
         return res.send(newFarmResponse)
 
-    }
-    catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
-    }
+    // }
+    // catch (e) {
+    //     res.send(errResponse(resStatus.SERVER_ERROR));
+    // }
 }
 
 /**
