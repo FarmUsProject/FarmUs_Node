@@ -5,7 +5,7 @@ const userProvider = require("./userProvider");
 
 
 exports.getBefoFarmUsed_Array = async (req, res, error) => {
-    const userid = req.body;
+    const {userid} = req.params;
 
     if(!userid) return res.render(errResponse(FARMID_EMPTY));
 
@@ -14,7 +14,7 @@ exports.getBefoFarmUsed_Array = async (req, res, error) => {
 }
 
 exports.getCurFarmUse_Array = async (req, res, error) => {
-    const userid = req.body;
+    const {userid} = req.params;
 
     if(!userid) return res.render(errResponse(FARMID_EMPTY));
 

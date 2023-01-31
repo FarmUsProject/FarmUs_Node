@@ -43,3 +43,14 @@ exports.selectUseFarmDetail = async (connection, FarmIDArray) =>{
     const [FarmDetailRows] = await connection.query(selectFarmDetailQuery);
     return FarmDetailRows;
 }
+
+exports.ChangeUser_Status = async (connection, userid) => {
+    const  ChangeToFarmOwnerQuery = `
+        UPDATE User
+        SET Role = 'F'
+        WHERE Email = ?;
+    `;
+
+    const ChangeToFarmOwnerResult = await connection.query(ChangeToFarmOwnerQuery, userid);
+    return ChangeToFarmOwnerResult;
+}

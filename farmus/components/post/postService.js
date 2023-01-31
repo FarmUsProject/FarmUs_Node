@@ -1,19 +1,18 @@
 const { pool } = require('../../config/database');
-const farmDao = require('./farmDao');
+const postDao = require('./postDao');
 const {response} = require("../../config/response");
 const {SUCCESS} = require("../../config/resStatus");
 
-exports.Changeto_Owner = async (userid) => {
-    const User = userid;
+exports.retrievePosting = async (FarmID, UserName, Comment, Star) => {
+    const insertPrams = [FarmID, UserName, Comment, Star];
 
     const connection = await pool.getConnections(async (conn) => conn);
 
-    const UserStatus_ChangeResult = await farmDao.ChangeUser_Status(
+    const postResult = await postDao.insertPost(
         connection,
-        User
+        insertPrams
     );
     connection.release();
 
-    return UserStatus_ChangeResult;
-
+    return postResult;
 }

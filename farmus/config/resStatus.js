@@ -4,7 +4,6 @@ module.exports = {
     SUCCESS : { "result": true},
 
     // Common
-    FARMID_EMPTY : {"result" : false, "code": 1002, "message": "FARMID 값이 비어있습니다."},
     TOKEN_EMPTY : { "result": false, "code": 2000, "message":"JWT 토큰을 입력해주세요." },
     TOKEN_VERIFICATION_FAILURE : { "result": false, "code": 3000, "message":"JWT 토큰 검증 실패" },
     TOKEN_VERIFICATION_SUCCESS : { "result": true}, // ?
@@ -48,6 +47,10 @@ module.exports = {
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "result": false, "code": 4000, "message": "데이터 베이스 에러"},
     SERVER_ERROR : { "result": false, "code": 4001, "message": "서버 에러"},
+
+
+    //농장 상태
+    FARMID_EMPTY : {"result" : false, "code": 6001, "message": "FARMID 값이 비어있습니다."},
 
 
 }
