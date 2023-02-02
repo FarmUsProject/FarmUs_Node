@@ -7,6 +7,10 @@ const redis = require('redis')
 const userProvider = require('./userProvider')
 const userService = require('./userService')
 const nodemailer = require("nodemailer");
+const multer = require("multer");
+const path = require('path')
+
+
 /**
  * [GET] /app/test
  */
@@ -224,4 +228,44 @@ exports.editUsePassword = async(req,res) =>{
     const eidtUser = await userService.editPassword(userEmail, password)
 
     return res.send(eidtUser)
+}
+
+const DIR = "../../config/images/";
+const storage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    callback(null, DIR);
+  },
+  filename: (req, file, callback) => {
+    //callback(null, file.originalname);
+    const ext = path.extname(file.originalname)
+    callback(null, path.basename(file.originalname, ext)+"-"+ Date.now() + ext)
+  },
+});
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, callback) => {
+    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+      callback(null, true);
+    } else {
+      callback(null, false);
+      return callback(new Error("Only .png .jpg and .jpeg format allowed!"));
+    }
+  },
+});
+
+exports.editUserProfileImg = async(req,res)=> {
+    const {userEmail}  = req.query;
+    const image = `/images/${req.file.filename}`
+
+    const eidtImage = await userService.eidtProfileImg(userEmail, image)
+
+    return res.send(eidtImage)
+}
+
+exports.withdrawal = async(req,res) => {
+    const {userEmail}  = req.query;
+
+    const userWithdraw = await userService.eidtUserStatus(userEmail)
+
+    return res.send(userWithdraw)
 }

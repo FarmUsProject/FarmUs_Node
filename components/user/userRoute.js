@@ -11,5 +11,7 @@ module.exports = function(app){
     app.patch('/mypage/editInfo/name',user.editUserName)
     app.patch('/mypage/editInfo/password',user.editUsePassword)
     app.patch('/mypage/editInfo/phoneNumber',user.editUserPhoneNumber)
+    app.patch('/mypage/editInfo/profileImg',user.editUserProfileImg)
+    app.patch('/user/withdrawal',user.withdrawal)
 
 };

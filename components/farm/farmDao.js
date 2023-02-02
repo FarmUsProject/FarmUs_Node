@@ -1,7 +1,7 @@
 
 const searchFarm = async(connection, keyword) => {
     const searchFarmQuery = `
-    SELECT FarmName, Location, Price, SquaredMeters, Picture_url
+    SELECT FarmName, Location, Price, SquaredMeters, Picture_url, Views, Star, Likes, createAt
     FROM farm
     WHERE FarmName LIKE ? OR Location LIKE ?;`
     console.log(keyword);

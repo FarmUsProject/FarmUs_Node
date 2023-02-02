@@ -59,3 +59,32 @@ exports.editPhoneNumber = async (email,phoneNumber) =>{
         return errResponse(baseResponse.DB_ERROR)
     }
 }
+
+exports.eidtUserStatus = async (email) => {
+    try{
+        const connection = await pool.getConnection(async (conn)=>conn)
+        const res = await userDao.withdrawalUser(connection, email)
+
+        connection.release()
+
+        if (res) return response(baseResponse.SUCCESS)
+
+    }catch(err){
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR)
+    }
+}
+
+exports.eidtProfileImg = async(email, img) => {
+    try{
+        const connection = await pool.getConnection(async (conn)=>conn)
+        const res = await userDao.eidtProfileImg(connection, email, img)
+
+        connection.release()
+
+        if (res) return response(baseResponse.SUCCESS)
+    }catch(err){
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR)
+    }
+}
