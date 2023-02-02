@@ -69,8 +69,9 @@ async function eidtProfileImg(connection, email, img){
     UPDATE User
     SET Picture_url = ?
     WHERE Email = ?;`
-
-    const updateUserRow = await connection.query(eidtProfileImgQuery, [img,email])
+    console.log(img);
+    console.log(email);
+    const updateUserRow = await connection.query(eidtProfileImgQuery, [img, email])
     return updateUserRow[0]
 }
 

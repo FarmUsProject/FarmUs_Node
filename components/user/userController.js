@@ -7,8 +7,7 @@ const redis = require('redis')
 const userProvider = require('./userProvider')
 const userService = require('./userService')
 const nodemailer = require("nodemailer");
-const multer = require("multer");
-const path = require('path')
+
 
 
 /**
@@ -190,11 +189,11 @@ exports.findPassword = async(req,res) => {
 }
 
 exports.editUserNickName = async(req,res) =>{
-    const {userEmail}  = req.query;
+    const {email}  = req.query;
     const {nickname} = req.body
 
     if (!nickname) return res.send(response(baseResponse.USER_NICKNAME_EMPTY))
-    const eidtUser = await userService.editNickName(userEmail, nickname)
+    const eidtUser = await userService.editNickName(email, nickname)
 
     return res.send(eidtUser)
 }
@@ -210,54 +209,31 @@ exports.editUserName = async(req,res) =>{
 }
 
 exports.editUserPhoneNumber = async(req,res) =>{
-    const {userEmail}  = req.query;
+    const {email}  = req.query;
     const {phoneNumber} = req.body
 
     if (!phoneNumber) return res.send(response(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
     if (phoneNumber.length != 11) return res.send(response(baseResponse.SIGNUP_PHONENUMBER_LENGTH))
-    const eidtUser = await userService.editPhoneNumber(userEmail, phoneNumber)
+    const eidtUser = await userService.editPhoneNumber(email, phoneNumber)
 
     return res.send(eidtUser)
 }
 
 exports.editUsePassword = async(req,res) =>{
-    const {userEmail}  = req.query;
+    const {email}  = req.query;
     const {password} = req.body
 
     if (!password) return res.send(response(baseResponse.SIGNIN_PASSWORD_EMPTY))
-    const eidtUser = await userService.editPassword(userEmail, password)
+    const eidtUser = await userService.editPassword(email, password)
 
     return res.send(eidtUser)
 }
 
-const DIR = "../../config/images/";
-const storage = multer.diskStorage({
-  destination: (req, file, callback) => {
-    callback(null, DIR);
-  },
-  filename: (req, file, callback) => {
-    //callback(null, file.originalname);
-    const ext = path.extname(file.originalname)
-    callback(null, path.basename(file.originalname, ext)+"-"+ Date.now() + ext)
-  },
-});
-const upload = multer({
-  storage: storage,
-  fileFilter: (req, file, callback) => {
-    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
-      callback(null, true);
-    } else {
-      callback(null, false);
-      return callback(new Error("Only .png .jpg and .jpeg format allowed!"));
-    }
-  },
-});
+
 
 exports.editUserProfileImg = async(req,res)=> {
-    const {userEmail}  = req.query;
-    const image = `/images/${req.file.filename}`
-
-    const eidtImage = await userService.eidtProfileImg(userEmail, image)
+    const {email}  = req.query;
+    const eidtImage = await userService.eidtProfileImg(email, req.file.filename)
 
     return res.send(eidtImage)
 }
