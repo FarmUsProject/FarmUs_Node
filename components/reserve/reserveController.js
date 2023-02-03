@@ -10,12 +10,12 @@ const reserveService = require("./reserveService");
  */
 exports.request = async function (req, res) {
     try {
-        const { email, farmid } = req.body;
-        const invalidation = await validator.newReservation(email, farmid);
+        const { email, farmid, startDate, endDate } = req.body;
+        const invalidation = await validator.newReservation(email, farmid, startDate, endDate);
 
         if (invalidation) return errResponse(invalidation);
 
-        const reserveRequest_result = await reserveService.request(email, farmid);
+        const reserveRequest_result = await reserveService.request(email, farmid, startDate, endDate);
 
         return res.send(reserveRequest_result)
 

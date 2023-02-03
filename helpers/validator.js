@@ -41,8 +41,8 @@ const validator = {
     return false;
   },
 
-  newReservation: async (userEmail, farmid) => {
-    if (!userEmail || !farmid)
+  newReservation: async (userEmail, farmid, startDate, endDate) => {
+    if (!userEmail || !farmid || !startDate || !endDate)
       return resStatus_5000.RESERVE_REQUEST_DATA_SHORTAGE;
 
     return false;
@@ -50,7 +50,14 @@ const validator = {
 
   oneParams : async (aParam) => {
     if (!aParam)
-      return resStatus_5000.PARAMS_ONE_EMPTY
+      return resStatus_5000.PARAMS_ONE_EMPTY;
+
+    return false;
+  },
+
+  twoParams : async (firstParam, SecParam) => {
+    if (!firstParam || !SecParam)
+      return resStatus_5000.PARAMS_TWO_EMPTY;
 
     return false;
   }

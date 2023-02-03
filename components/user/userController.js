@@ -40,12 +40,31 @@ exports.signup = async function (req, res) {
         const { email, password, phoneNumber, nickName, name, role } = req.body;
         const invalidation = await validator.signUp(email, password, phoneNumber, nickName, name, role);
 
-        if (invalidation) return errResponse(invalidation)
+        if (invalidation) return errResponse(invalidation);
 
-        const signUpResponse = await userService.signUp(email, password, phoneNumber, nickName, name, role)
+        const signUpResponse = await userService.signUp(email, password, phoneNumber, nickName, name, role);
 
-        return res.send(signUpResponse)
+        return res.send(signUpResponse);
 
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}
+
+/**
+ *  [POST] /user/star
+ */
+exports.star = async function (req, res) {
+    try {
+        const { email, farmid } = req.body;
+        const invalidation = await validator.twoParams(email, farmid);
+
+        if (invalidation) return errResponse(invalidation);
+
+        const starResponse = await userService.addStar(email, farmid);
+
+        return res.send(starResponse);
     }
     catch (e) {
         res.send(errResponse(resStatus.SERVER_ERROR));

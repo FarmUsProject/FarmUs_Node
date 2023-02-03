@@ -1,6 +1,9 @@
 const userProvider = require('./../user/userProvider');
+const userDao = require('./../user/userDao');
+const farmProvider = require('./../farm/farmProvider');
 const { response, errResponse } = require('../../config/response');
 const resStatus = require('../../config/resStatus');
+const resStatus_5000 = require('../../config/resStatus_5000');
 const encryptedPassword = require('../../helpers/encrypt');
 const jwtLogin = require('./../../config/jwtLogin');
 const { pool } = require('../../config/database');
@@ -39,7 +42,28 @@ async function signUp(email, password, phoneNumber, nickName, name, role) {
     return response(true, 200, "회원가입이 완료되었습니다", null);
 };
 
+async function addStar(email, farmId) {
+    const userInfo = await userProvider.userbyEmail(email);
+    const farmInfo = await farmProvider.farmbyfarmID(farmId);
+    if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
+    if (farmInfo.length < 1) return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
+
+    let newstarList;
+    const userStarList = await userProvider.starListbyEmail(email);
+    if (userStarList.length > 0) newstarList = userStarList + ", " + toString(farmId);
+    else newstarList = toString(farmId);
+
+    const starRequest = [email, newstarList];
+    const connection = await pool.getConnection(async conn => conn);
+    const starList = await userDao.updateUserStar(connection, starRequest);
+
+    connection.release();
+
+    return response(resStatus_5000.USER_STAR_ADD_SUCCESS, null);
+}
+
 module.exports = {
     login,
-    signUp
+    signUp,
+    addStar
 };

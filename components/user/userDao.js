@@ -20,7 +20,30 @@ async function insertUser(connection, newUserInfo) {
     return insertUserResult;
 }
 
+async function selectStarbyEmail(connection, email) {
+    const selectStarbyEmailQuery = `
+    SELECT LikeFarmIDs
+    FROM User
+    WHERE email = ?;
+    `;
+    const starList = await connection.query(selectStarbyEmailQuery, email);
+
+    return starList;
+}
+
+async function updateUserStar(connection, starRequest) {
+    //starRequest [email, newStarList]
+    const updateUserStarQuery = `
+    UPDATE User
+    SET LikeFarmIDs = ?
+    WHERE Email = ?;
+    `;
+    const updateUserStarResult = await connection.query(updateUserStarQuery, starRequest)
+}
+
 module.exports = {
     selectUserbyEmail,
     insertUser,
+    selectStarbyEmail,
+    updateUserStar
 }

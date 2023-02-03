@@ -12,9 +12,11 @@ module.exports = {
 
     //common
     PARAMS_ONE_EMPTY: { "isSuccess": false, "code": 5000, "message": "파라미터가 존재하지 않습니다." },
+    PARAMS_TWO_EMPTY: { "isSuccess": false, "code": 5001, "message": "필요한 두 파라미터 중 최소 하나가 존재하지 않습니다." },
 
 
     //user
+    USER_STAR_ADD_SUCCESS : { "isSuccess": true, "code": 5150, "message": "해당 농장을 찜 목록에 추가하였습니다." },
 
 
     //farm
