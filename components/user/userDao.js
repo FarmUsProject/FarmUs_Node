@@ -54,6 +54,27 @@ async function updatePhoneNum(connection, email, phoneNumber) {
     return updateUserRow[0];
 }
 
+async function withdrawalUser(connection, email){
+    const withdrawalUserQuery = `
+    UPDATE User
+    SET Status = 'D'
+    WHERE Email = ?;`
+
+    const withdrawalUserRow = await connection.query(withdrawalUserQuery, email)
+    return withdrawalUserRow[0]
+}
+
+async function eidtProfileImg(connection, email, img){
+    const eidtProfileImgQuery = `
+    UPDATE User
+    SET Picture_url = ?
+    WHERE Email = ?;`
+    console.log(img);
+    console.log(email);
+    const updateUserRow = await connection.query(eidtProfileImgQuery, [img, email])
+    return updateUserRow[0]
+}
+
 module.exports = {
     selectUserEmail,
     selectUser,
@@ -61,4 +82,6 @@ module.exports = {
     updateNickName,
     updateName,
     updatePhoneNum,
+    withdrawalUser,
+    eidtProfileImg
 }

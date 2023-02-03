@@ -3,11 +3,13 @@ const {response, errResponse} = require("../../config/response");
 const axios = require('axios')
 const {NCP_SENS, googleSecret, REDIS} = require('../../config/secret')
 const CryptoJS = require('crypto-js')
-//onst {client} = require('../../config/redisMiddleware')
 const redis = require('redis')
 const userProvider = require('./userProvider')
 const userService = require('./userService')
 const nodemailer = require("nodemailer");
+
+
+
 /**
  * [GET] /app/test
  */
@@ -187,11 +189,11 @@ exports.findPassword = async(req,res) => {
 }
 
 exports.editUserNickName = async(req,res) =>{
-    const {userEmail}  = req.query;
+    const {email}  = req.query;
     const {nickname} = req.body
 
     if (!nickname) return res.send(response(baseResponse.USER_NICKNAME_EMPTY))
-    const eidtUser = await userService.editNickName(userEmail, nickname)
+    const eidtUser = await userService.editNickName(email, nickname)
 
     return res.send(eidtUser)
 }
@@ -207,22 +209,39 @@ exports.editUserName = async(req,res) =>{
 }
 
 exports.editUserPhoneNumber = async(req,res) =>{
-    const {userEmail}  = req.query;
+    const {email}  = req.query;
     const {phoneNumber} = req.body
 
     if (!phoneNumber) return res.send(response(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
     if (phoneNumber.length != 11) return res.send(response(baseResponse.SIGNUP_PHONENUMBER_LENGTH))
-    const eidtUser = await userService.editPhoneNumber(userEmail, phoneNumber)
+    const eidtUser = await userService.editPhoneNumber(email, phoneNumber)
 
     return res.send(eidtUser)
 }
 
 exports.editUsePassword = async(req,res) =>{
-    const {userEmail}  = req.query;
+    const {email}  = req.query;
     const {password} = req.body
 
     if (!password) return res.send(response(baseResponse.SIGNIN_PASSWORD_EMPTY))
-    const eidtUser = await userService.editPassword(userEmail, password)
+    const eidtUser = await userService.editPassword(email, password)
 
     return res.send(eidtUser)
+}
+
+
+
+exports.editUserProfileImg = async(req,res)=> {
+    const {email}  = req.query;
+    const eidtImage = await userService.eidtProfileImg(email, req.file.filename)
+
+    return res.send(eidtImage)
+}
+
+exports.withdrawal = async(req,res) => {
+    const {userEmail}  = req.query;
+
+    const userWithdraw = await userService.eidtUserStatus(userEmail)
+
+    return res.send(userWithdraw)
 }
