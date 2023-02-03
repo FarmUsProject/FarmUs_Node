@@ -65,3 +65,24 @@ exports.farmsList = async function (req, res) {
         res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
+
+/**
+ * [PUT] /reserve/cancel:reserveid
+*/
+exports.cancel = async function (req, res) {
+    try {
+
+        const reserveId = req.params.reserveid;
+        const invalidation = await validator.oneParams(reserveId);
+
+        if (invalidation) return response(invalidation);
+
+        const cancelReservation = await reserveService.cancel(reserveId);
+
+        return response(cancelReservation)
+
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}

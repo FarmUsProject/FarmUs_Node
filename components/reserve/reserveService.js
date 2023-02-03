@@ -37,9 +37,24 @@ async function farmsList(userEmail) {
     return response(resStatus_5000.RESERVE_LIST_FARMS, reservedFarms);
 };
 
+async function cancel(reserveId) {
+
+    const reservedItem = await reserveProvider.itembyReserveId(reserveId);
+    if (reservedItem.length < 1) return errResponse(resStatus_5000.RESERVE_RESERVEID_NOT_EXIST);
+
+    const connection = await pool.getConnection(async conn => conn);
+    const canceledReservation = await reserveDao.cancelReservation(connection, reserveId);
+
+    connection.release();
+
+    return response(resStatus_5000.RESERVE_CANCEL_SUCCESS, {"reserveID" : reserveId});
+
+}
+
 
 module.exports = {
     request,
     clientsList,
     farmsList,
+    cancel
 };

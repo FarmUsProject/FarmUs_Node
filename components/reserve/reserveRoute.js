@@ -10,4 +10,7 @@ module.exports = function(app){
     // 3. 유저 예약현황 API : 한 유저가 예약한 농장 명단
     app.put('/reserve/client/list/:email', reserve.farmsList);
 
+    // 4. 예약 취소
+    app.put('/reserve/cancel/:reserveid', reserve.cancel);
+
 };

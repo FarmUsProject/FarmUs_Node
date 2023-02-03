@@ -19,7 +19,18 @@ async function clientsbyFarmID (farmID) {
     return reservedClients;
 }
 
+async function itembyReserveId (reserveID) {
+    const connection = await pool.getConnection(async conn => conn);
+    const [reservedItem] = await reserveDao.selectReservedItem(connection, reserveID);
+
+    connection.release();
+
+    return reservedItem;
+}
+
+
 module.exports = {
     farmsbyEmail,
-    clientsbyFarmID
+    clientsbyFarmID,
+    itembyReserveId
 };

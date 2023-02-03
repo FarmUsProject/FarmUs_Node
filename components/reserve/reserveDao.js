@@ -38,9 +38,22 @@ async function selectReservedFarms(connection, userEmail) {
     return reservedFarms;
 }
 
+async function selectReservedItem(connection, reserveID) {
+    const selectReservedItemQuery = `
+    SELECT *
+    FROM Reservation
+    WHERE ReserveID = ?;
+    `;
+
+    const reservedFarms = await connection.query(selectReservedItemQuery, reserveID);
+
+    return reservedFarms;
+}
+
 
 module.exports = {
     insertReservation,
     selectReservedClients,
     selectReservedFarms,
+    selectReservedItem
 }
