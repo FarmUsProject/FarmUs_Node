@@ -1,10 +1,12 @@
-const reserveProvider = require('./../reserve/reserveProvider');
+const reserveProvider = require('./reserveProvider');
 const userProvider = require('./../user/userProvider');
 const farmProvider = require('./../farm/farmProvider');
+const reserveDao = require('./reserveDao');
 const { response, errResponse } = require('../../config/response');
 const resStatus = require('../../config/resStatus');
 const resStatus_5000 = require('../../config/resStatus_5000');
 const { pool } = require('../../config/database');
+const setDate = require('./../../helpers/setDate');
 
 async function request(userEmail, farmid) {
     const userInfo = await userProvider.userbyEmail(userEmail);
@@ -12,8 +14,9 @@ async function request(userEmail, farmid) {
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
     if (farmInfo.length < 1) return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
 
-    //userEmail, FarmID, OwnerEmail, Term, (createAt, updateAt : DAO에서 시간지정)
-    const newReservationInfo = [userEmail, farmInfo.farmID, farmInfo.owner, farmInfo.term];
+    //userEmail, FarmID, OwnerEmail, Term, createAt, updateAt
+    const now = await setDate.now()
+    const newReservationInfo = [userEmail, farmInfo.FarmID, farmInfo.Owner, farmInfo.Term, now, now];
 
     const connection = await pool.getConnection(async conn => conn);
     const newReservation = await reserveDao.insertReservation(connection, newReservationInfo);
@@ -24,8 +27,10 @@ async function request(userEmail, farmid) {
 };
 
 async function clientsList(farmid) {
-    
+
     const reservedClients = await reserveProvider.clientsbyFarmID(farmid);
+
+    if (reservedClients.length < 1) return response(resStatus_5000.RESERVE_LIST_EMPTY);
 
     return response(resStatus_5000.RESERVE_LIST_CLIENTS, reservedClients);
 };
@@ -33,6 +38,8 @@ async function clientsList(farmid) {
 async function farmsList(userEmail) {
 
     const reservedFarms = await reserveProvider.farmsbyEmail(userEmail);
+
+    if (reservedFarms.length < 1) return response(resStatus_5000.RESERVE_LIST_EMPTY);
 
     return response(resStatus_5000.RESERVE_LIST_FARMS, reservedFarms);
 };

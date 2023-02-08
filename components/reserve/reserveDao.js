@@ -1,12 +1,7 @@
-const setDate = require('./../../helpers/setDate');
-
 async function insertReservation(connection, newReservationInfo) {
     //newReservationInfo [userEmail, farmID, ownerEmail, term]
-    const now = setDate.now()
-    let newReservationInfo = newReservationInfo.push(now, now)
-
     const insertReservationQuery = `
-    INSERT INTO Reservation(userEmail, farmID, ownerEmail, term, createAt, updateAt)
+    INSERT INTO Reservation(UserEmail, FarmID, OwnerEmail, Term, createAt, updateAt)
     VALUES (?, ?, ?, ?, ?, ?);
     `;
     const insertUserResult = await connection.query(insertReservationQuery, newReservationInfo);
@@ -18,7 +13,7 @@ async function selectReservedClients(connection, farmID) {
     const selectReservedClientsQuery = `
     SELECT *
     FROM Reservation
-    WHERE farmID = ?;
+    WHERE FarmID = ?;
     `;
 
     const reservedClients = await connection.query(selectReservedClientsQuery, farmID);
@@ -30,7 +25,7 @@ async function selectReservedFarms(connection, userEmail) {
     const selectReservedFarmsQuery = `
     SELECT *
     FROM Reservation
-    WHERE userEmail = ?;
+    WHERE UserEmail = ?;
     `;
 
     const reservedFarms = await connection.query(selectReservedFarmsQuery, userEmail);
