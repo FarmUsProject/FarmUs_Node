@@ -7,14 +7,21 @@ async function farmbyfarmID (farmID){
 
     connection.release();
 
-    return farmInfo;
+    return farmInfo[0];
 }
 
-async function bookedFarm () {
+async function isSameFarm (farmInfo){
+    const connection = await pool.getConnection(async conn => conn);
+    const [sameFarm] = await farmDao.selectFarmbyFarmInfo(connection, farmInfo);
+    connection.release();
+
+    if (sameFarm.length > 0)  return true;
+    else false;
 
 }
+
 
 module.exports = {
     farmbyfarmID,
-    bookedFarm,
+    isSameFarm,
 };

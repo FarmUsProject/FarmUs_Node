@@ -1,8 +1,8 @@
 async function insertReservation(connection, newReservationInfo) {
-    //newReservationInfo [userEmail, farmID, ownerEmail, term]
+    //newReservationInfo [ReserveID, FarmID, UserEmail, OwnerEmail, startAt, endAt, createAt, updateAt]
     const insertReservationQuery = `
-    INSERT INTO Reservation(UserEmail, FarmID, OwnerEmail, Term, createAt, updateAt)
-    VALUES (?, ?, ?, ?, ?, ?);
+    INSERT INTO Reservation(ReserveID, FarmID, UserEmail, OwnerEmail, startAt, endAt, createAt, updateAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?);
     `;
     const insertUserResult = await connection.query(insertReservationQuery, newReservationInfo);
 

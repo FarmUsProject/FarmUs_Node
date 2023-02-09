@@ -2,7 +2,7 @@ async function selectFarmbyFarmID(connection, farmID) {
     const selectFarmbyFarmIDQuery = `
     SELECT *
     FROM Farm
-    WHERE farmID = ?;
+    WHERE FarmID = ?;
     `;
     const farmInfo = await connection.query(selectFarmbyFarmIDQuery, farmID);
 
@@ -10,17 +10,31 @@ async function selectFarmbyFarmID(connection, farmID) {
 }
 
 async function insertFarm(connection, newFarmInfo) {
-    //newFarmInfo [newFarmID, name, owner, picture_url, price, squaredMeters, location, description]
+    //newFarmInfo [newFarmID, name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag, newFarmStatus, createAt, updateAt]
     const insertFarmQuery = `
-    INSERT INTO Farm(newFarmID, name, owner, picture_url, price, squaredMeters, location, description)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+    INSERT INTO Farm(FarmID, Name, Owner, startAt, endAt, Price, SquaredMeters, Location, Description, Picture_url, Category, Tag, Status, createAt, updateAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
     const farmInfo = await connection.query(insertFarmQuery, newFarmInfo);
-
+    
     return farmInfo;
+}
+
+async function selectFarmbyFarmInfo(connection, sameFarmInfo) {
+    //newFarmInfo [newFarmID, name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag, newFarmStatus, createAt, updateAt]
+    const duplicatedInfo = sameFarmInfo.slice(1,8);
+    const selectFarmbyFarmInfoQuery =`
+    SELECT *
+    FROM Farm
+    WHERE NAME = ? AND Owner = ? AND startAT = ? AND endAt = ? AND Price = ? AND SquaredMeters = ? AND Location = ?
+    `;
+    const sameFarm = await connection.query(selectFarmbyFarmInfoQuery, duplicatedInfo);
+
+    return sameFarm;
 }
 
 module.exports = {
     selectFarmbyFarmID,
     insertFarm,
+    selectFarmbyFarmInfo,
 }

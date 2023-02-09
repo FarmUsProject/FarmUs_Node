@@ -20,22 +20,22 @@ const validator = {
   },
 
   signUp: async (email, password, phoneNumber, nickName, name, role) => {
-    const invalidation = await this.login(email, password);
+    const invalidation = await validator.login(email, password);
     if (invalidation) return invalidation
 
     if (!phoneNumber) return resStatus.SIGNUP_PHONENUMBER_EMPTY
-    if (!nickName) return resStatus.SIGNUP_NICKNAME_EMPTY
+    // if (!nickName) return resStatus.SIGNUP_NICKNAME_EMPTY
     if (!name) return resStatus.SIGNUP_NICKNAME_EMPTY
     if (!role) return resStatus.USER_STATUS_EMPTY
-    if (nickName.length > 20) return resStatus.SIGNUP_NICKNAME_LENGTH
+    // if (nickName.length > 20) return resStatus.SIGNUP_NICKNAME_LENGTH
     if (name.length > 20) return resStatus.SIGNUP_NICKNAME_LENGTH
     if (role.length >= 2) return resStatus.USER_STATUS_EMPTY
 
     return false;
   },
 
-  newFarm: async (name, owner, picture_url, price, squaredMeters, location, description) => {
-    if (!name || !owner || !picture_url || !price || !squaredMeters || !location)
+  newFarm: async (name, owner, startDate, endDate, price, squaredMeters, location) => {
+    if (!name || !owner || !startDate || !endDate || !price || !squaredMeters || !location)
       return resStatus_5000.FARM_NEW_DATA_SHORTAGE;
 
     return false;

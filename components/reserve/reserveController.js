@@ -8,20 +8,20 @@ const reserveService = require("./reserveService");
  * [POST] /reserve/request
  */
 exports.request = async function (req, res) {
-    try {
-        const { email, farmid } = req.body;
-        const invalidation = await validator.newReservation(email, farmid);
+    // try {
+        const { email, farmid, startDate, endDate } = req.body;
+        const invalidation = await validator.newReservation(email, farmid, startDate, endDate);
 
         if (invalidation) return res.send(errResponse(invalidation));
 
-        const reserveRequest_result = await reserveService.request(email, farmid);
+        const reserveRequest_result = await reserveService.request(email, farmid, startDate, endDate);
 
         return res.send(reserveRequest_result)
 
-    }
-    catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
-    }
+    // }
+    // catch (e) {
+    //     return res.send(errResponse(resStatus.SERVER_ERROR));
+    // }
 }
 
 /**
@@ -48,7 +48,7 @@ exports.clientsList = async function (req, res) {
  * [GET] /reserve/client/list/:email
 */
 exports.farmsList = async function (req, res) {
-    // try {
+    try {
 
         const userEmail = req.params.email;
         const invalidation = await validator.oneParams(userEmail);
@@ -59,10 +59,10 @@ exports.farmsList = async function (req, res) {
 
         return res.send(farmsListResponse);
 
-    // }
-    // catch (e) {
-    //     res.send(errResponse(resStatus.SERVER_ERROR));
-    // }
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 /**
  * [PUT] /reserve/cancel:reserveid
