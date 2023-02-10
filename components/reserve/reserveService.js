@@ -8,19 +8,35 @@ const resStatus_5000 = require('../../config/resStatus_5000');
 const { pool } = require('../../config/database');
 const setDate = require('./../../helpers/setDate');
 const randomNumber = require('../../helpers/randomNumber');
+const dateAvailability = require('../../helpers/DateAvailability');
 
 async function request(userEmail, farmid,startAt, endAt) {
     const userInfo = await userProvider.userbyEmail(userEmail);
     const farmInfo = await farmProvider.farmbyfarmID(farmid);
+    const reserveInfo = await reserveProvider.clientsbyFarmID(farmid);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
     if (farmInfo.length < 1) return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
 
+    //date availability check
+    const unAvailability = dateAvailability.dateAvailabilityCheck(farmInfo.startAt, farmInfo.endAt, startAt, endAt);
+    if(unAvailability)
+        return errResponse(unAvailability);
+
+    //date reservation check
+    reserveInfo.array.forEach(e => {
+        const reservation_full = dateAvailability.reserveAvailabilityCheck(e.startAt, e.endAt, startAt, endAt);
+        if(reservation_full)
+            return errResponse(reservation_full);
+    });
+
+    //new reserve id
     let newReserveID;
     let existedReserve;
     do {
         newReserveID = await randomNumber.createReserveID();
         existedReserve = await reserveProvider.itembyReserveId(newReserveID);
     } while (!existedReserve);
+
 
     //ReserveID, FarmID, UserEmail, OwnerEmail, startAt, endAt, createAt, updateAt
     const now = await setDate.now();
