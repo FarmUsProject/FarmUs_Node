@@ -9,6 +9,17 @@ async function selectUserbyEmail(connection, email) {
     return userInfo;
 }
 
+async function selectUserbyPhoneNumber(connection, phoneNumber) {
+    const selectUserbyPhoneNumberQuery = `
+    SELECT *
+    FROM User
+    WHERE phoneNumber = ?;
+    `;
+    const userInfo = await connection.query(selectUserbyPhoneNumberQuery, phoneNumber);
+
+    return userInfo;
+}
+
 async function insertUser(connection, newUserInfo) {
     //newUserInfo [email, hashedPassword, salt, phoneNumber, nickName, name, role, createAt, updateAt]
     const insertUserQuery = `
@@ -43,6 +54,7 @@ async function updateUserStar(connection, starRequest) {
 
 module.exports = {
     selectUserbyEmail,
+    selectUserbyPhoneNumber,
     insertUser,
     selectStarbyEmail,
     updateUserStar

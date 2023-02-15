@@ -17,10 +17,11 @@ module.exports = {
     
     
     //user
+    USER_OAUTH_SIGNUP_REDUNDANT_EMAIL : {"isSuccess" : false, "code" : 5100, "message" : "해당 이메일을 가진 회원은 이미 등록되어 있습니다. 소셜로그인을 진행해주세요."},
     USER_SIGNUP_SUCCESS : {"isSuccess" : true, "code" :  5150, "message" : "회원가입이 완료되었습니다."},
     USER_LOGIN_SUCCESS : {"isSuccess" : true, "code" :  5151, "message" : "로그인이 완료되었습니다."},
     USER_STAR_ADD_SUCCESS : { "isSuccess": true, "code": 5152, "message": "해당 농장을 찜 목록에 추가하였습니다." },
-
+    USER_OAUTH_SIGNUP_SUCCESS : {"isSuccess" : true, "code" : 5153, "message" : "신규 소셜로그인 회원이 등록되었습니다."},
     
     //farm
     FARM_FARMID_NOT_EXIST  : { "isSuccess" : false, "code" : 5200, "message" : "해당 아이디를 가진 농장이 존재하지 않습니다."},

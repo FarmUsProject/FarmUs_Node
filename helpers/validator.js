@@ -34,6 +34,17 @@ const validator = {
     return false;
   },
 
+  oauthSignup : async (email, phoneNumber, name, role) => {
+
+    if (!email) return resStatus.SIGNIN_EMAIL_EMPTY
+
+    if (!phoneNumber) return resStatus.SIGNUP_PHONENUMBER_EMPTY
+
+    if (!name) return resStatus.SIGNUP_NICKNAME_EMPTY
+
+    return false;
+  },
+
   newFarm: async (name, owner, startDate, endDate, price, squaredMeters, location) => {
     if (!name || !owner || !startDate || !endDate || !price || !squaredMeters || !location)
       return resStatus_5000.FARM_NEW_DATA_SHORTAGE;
