@@ -55,6 +55,16 @@ async function isSameFarm (farmInfo){
 
 }
 
+exports.retrieveFarms = async(keyword) => {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const newKeyword = '%'+keyword+'%'
+    const res = await farmDao.searchFarm(connection, newKeyword)
+
+    connection.release()
+
+    return res
+}
+
 module.exports = {
     farmbyfarmID,
     isSameFarm,

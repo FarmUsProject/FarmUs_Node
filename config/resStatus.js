@@ -46,9 +46,22 @@ module.exports = {
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},
     SERVER_ERROR : { "isSuccess": false, "code": 4001, "message": "서버 에러"},
 
+
     //Paul
     DELETED_FARM : {"result": false, "code": 2019, "message": "해당 농장은 삭제되었습니다."},
-    //농장 상태
+
     FARMID_EMPTY : {"result" : false, "code": 6001, "message": "FARMID 값이 비어있습니다."},
 
+
+    //Snoopy
+    SIGNUP_SMS_WRONG : { "result": false, "code": 6000, "message": "SMS가 정상적으로 보내지지 않았습니다." },
+    SIGNUP_SMS_CODE_WRONG : { "result": false, "code": 6001, "message": "인증번호가 일치하지 않습니다." },
+    SIGNUP_PHONENUMBER_LENGTH : { "result": false, "code": 6002, "message":"번호 입력 형식이 올바르지 않습니다."},
+
+    USER_NAME_EMPTY : { "result": false, "code": 6003, "message": "이름을 입력해주세요." },
+    USER_NOT_EXIST : { "result": false, "code": 6004, "message": "해당 정보로 가입한 회원이 존재하지 않습니다." },
+
+    FARM_NOT_KEYWORD : { "result": false, "code": 6005, "message": "검색어를 입력해주세요" },
+
+    REDIS_ERROR : {'result': false, 'code':6900, 'message': "REDIS 에러"}
 }

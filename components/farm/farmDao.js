@@ -9,7 +9,6 @@ exports.selectionFarm = async (connection) => {
     return FarmRows;
 }
 
-
 exports.selectFarmDetail = async (connection, farmIdx) =>{
     const selectFarmDetailQuery = `
         SELECT Name, Owner, Picture_url, Price, Term, SquaredMeters, Location, Category, Tag, Status
@@ -20,7 +19,6 @@ exports.selectFarmDetail = async (connection, farmIdx) =>{
     const [FarmDetailRows] = await connection.query(selectFarmDetailQuery);
     return FarmDetailRows[0];
 }
-
 
 exports.selectUsedFarmDetail = async (connection, FarmIDArray) =>{
     const selectFarmDetailQuery = `
@@ -55,7 +53,7 @@ exports.ChangeUser_Status = async (connection, userid) => {
     return ChangeToFarmOwnerResult;
 }
 
-    async function selectFarmbyFarmID(connection, farmID) {
+async function selectFarmbyFarmID(connection, farmID) {
     const selectFarmbyFarmIDQuery = `
     SELECT *
     FROM Farm
@@ -90,8 +88,20 @@ async function selectFarmbyFarmInfo(connection, sameFarmInfo) {
     return sameFarm;
 }
 
+const searchFarm = async(connection, keyword) => {
+    const searchFarmQuery = `
+    SELECT FarmName, Location, Price, SquaredMeters, Picture_url, Views, Star, Likes, createAt
+    FROM farm
+    WHERE FarmName LIKE ? OR Location LIKE ?;`
+    console.log(keyword);
+    const [farmRow] = await connection.query(searchFarmQuery,[keyword,keyword])
+    console.log(farmRow);
+    return farmRow
+}
+
 module.exports = {
     selectFarmbyFarmID,
     insertFarm,
     selectFarmbyFarmInfo,
+    searchFarm
 }
