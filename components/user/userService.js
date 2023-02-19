@@ -56,8 +56,9 @@ async function addStar(email, farmId) {
     if (userStarList.length > 0) newstarList = userStarList + ", " + toString(farmId);
     else newstarList = toString(farmId);
 
-    const starRequest = [email, newstarList];
-    
+    const now = await setDate.now();
+    const starRequest = [email, newstarList, now];
+
     const connection = await pool.getConnection(async conn => conn);
     const starList = await userDao.updateUserStar(connection, starRequest);
 
