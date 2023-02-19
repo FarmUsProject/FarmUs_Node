@@ -1,12 +1,10 @@
 const farmProvider = require('./farmProvider');
-const User = require('../user/userProvider');
-const Responce = require('../../config/response');
-const { pool } = require('../../config/database');
-const { response, errResponse } = require('../../config/response');
-const resStatus = require('../../config/resStatus');
-const {FARMID_EMPTY, DELETED_FARM, USER_USERID_EMPTY, SUCCESS} = require("../../config/resStatus");
 const farmService = require("./farmService");
-
+const User = require('../user/userProvider');
+const { response, errResponse} = require("../../config/response");
+const resStatus = require('./../../config/resStatus');
+const {FARMID_EMPTY, DELETED_FARM, USER_USERID_EMPTY, SUCCESS} = require("../../config/resStatus");
+const validator = require('./../../helpers/validator');
 
 exports.getFarmlist = async (req, res) => {
     const getFarmResult = await farmProvider.retrieveFarmlist();
@@ -55,4 +53,24 @@ exports.register_FarmOwner = async (req, res) =>{
 
     return res.render(Register_Owner);
 
+}
+
+/**
+ * [POST] /farm/postings
+ */
+exports.newFarm = async function (req, res) {
+    try {
+        const { name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag } = req.body;
+        const invalidation = await validator.newFarm(name, owner, startDate, endDate, price, squaredMeters, location);
+
+        if (invalidation) return res.send(errResponse(invalidation))
+
+        const newFarmResponse = await farmService.newFarm(name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag);
+
+        return res.send(newFarmResponse)
+
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
