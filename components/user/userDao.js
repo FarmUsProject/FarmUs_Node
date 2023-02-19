@@ -49,7 +49,21 @@ async function updateUserStar(connection, starRequest) {
     SET LikeFarmIDs = ?
     WHERE Email = ?;
     `;
-    const updateUserStarResult = await connection.query(updateUserStarQuery, starRequest)
+    const updateUserStarResult = await connection.query(updateUserStarQuery, starRequest);
+
+    return updateUserStarResult;
+}
+
+async function updateUserBirth(connection, birthRequest) {
+    //birthRequest = [email, birth, updateAt]
+    const updateUserBirthQuery = `
+    UPDATE User
+    SET Birth = ?, updateAt = ?
+    WHERE Email = ?;
+    `
+    const updateUserBirthResult = await connection.query(updateUserBirthQuery, birthRequest);
+
+    return updateUserBirthResult;
 }
 
 module.exports = {
@@ -57,5 +71,6 @@ module.exports = {
     selectUserbyPhoneNumber,
     insertUser,
     selectStarbyEmail,
-    updateUserStar
+    updateUserStar,
+    updateUserBirth
 }

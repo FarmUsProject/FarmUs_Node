@@ -9,4 +9,7 @@ module.exports = function(app){
 
     // 8. 농장 찜하기 API
     app.post('/user/star', user.star)
+
+    //9. 생일 등록 API
+    app.post('/user/birth', user.birth)
 };

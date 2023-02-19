@@ -57,6 +57,7 @@ async function addStar(email, farmId) {
     else newstarList = toString(farmId);
 
     const starRequest = [email, newstarList];
+    
     const connection = await pool.getConnection(async conn => conn);
     const starList = await userDao.updateUserStar(connection, starRequest);
 
@@ -65,8 +66,25 @@ async function addStar(email, farmId) {
     return response(resStatus_5000.USER_STAR_ADD_SUCCESS, null);
 }
 
+async function editBirth(email, birth) {
+    const userInfo = await userProvider.userbyEmail(email);
+    if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
+
+    const now = await setDate.now();
+    const newUserInfo = [email, birth, now];
+
+    const connection = await pool.getConnection(async conn => conn);
+
+    const editBirthResult = await userDao.updateUserBirth(connection, newUserInfo);
+
+    connection.release();
+
+    return response(resStatus_5000.USER_BIRTH_EDIT_SUCCESS, {"birth" : birth})
+}
+
 module.exports = {
     login,
     signUp,
-    addStar
+    addStar,
+    editBirth
 };

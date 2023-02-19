@@ -1,8 +1,8 @@
 const { response, errResponse } = require('./../../config/response');
-const validator = require('../../helpers/validator');
 const resStatus = require("../../config/resStatus");
 const userService = require("./userService");
-
+const validator = require('../../helpers/validator');
+const dateAvailability = require('../../helpers/DateAvailability');
 
 /**
  * [POST] /user/login
@@ -61,5 +61,27 @@ exports.star = async function (req, res) {
     }
     catch (e) {
         res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}
+
+/**
+ *  [POST] /user/birth
+ */
+exports.birth = async function (req, res) {
+    try {
+        const { email, birth } = req.body;
+        const invalidation = await validator.oneParams(birth);
+
+        if (invalidation) return errResponse(invalidation);
+
+        if(!dateAvailability.isValidDatetype)
+        return errResponse(resStatus_5000.DATE_TYPE_WEIRD);
+
+        const birthResponse = await userService.editBirth(email, birth);
+
+        return res.send(birthResponse);
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR))
     }
 }
