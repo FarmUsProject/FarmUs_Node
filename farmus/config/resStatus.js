@@ -30,6 +30,7 @@ module.exports = {
     USER_USEREMAIL_NOT_EXIST : { "result": false, "code": 2015, "message": "해당 이메일을 가진 회원이 존재하지 않습니다." },
     USER_ID_NOT_MATCH : { "result": false, "code": 2016, "message": "유저 아이디 값을 확인해주세요" },
     USER_NICKNAME_EMPTY : { "result": false, "code": 2017, "message": "변경할 닉네임 값을 입력해주세요" },
+    DELETED_FARM : {"result": false, "code": 2019, "message": "해당 농장은 삭제되었습니다."},
 
     USER_STATUS_EMPTY : { "result": false, "code": 2018, "message": "회원 상태값을 입력해주세요" },
 
@@ -42,9 +43,14 @@ module.exports = {
     SIGNIN_INACTIVE_ACCOUNT : { "result": false, "code": 3005, "message": "비활성화 된 계정입니다. 고객센터에 문의해주세요." },
     SIGNIN_WITHDRAWAL_ACCOUNT : { "result": false, "code": 3006, "message": "탈퇴 된 계정입니다. 고객센터에 문의해주세요." },
 
+
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "result": false, "code": 4000, "message": "데이터 베이스 에러"},
     SERVER_ERROR : { "result": false, "code": 4001, "message": "서버 에러"},
+
+
+    //농장 상태
+    FARMID_EMPTY : {"result" : false, "code": 6001, "message": "FARMID 값이 비어있습니다."},
 
 
 }
