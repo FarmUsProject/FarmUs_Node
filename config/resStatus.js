@@ -52,8 +52,9 @@ module.exports = {
 
     USER_NAME_EMPTY : { "result": false, "code": 6003, "message": "이름을 입력해주세요." },
     USER_NOT_EXIST : { "result": false, "code": 6004, "message": "해당 정보로 가입한 회원이 존재하지 않습니다." },
+    USER_POFILEIMG_EMPTY : {"result":false, "code":6005, "message": "파일을 선택해주세요."},
 
-    FARM_NOT_KEYWORD : { "result": false, "code": 6005, "message": "검색어를 입력해주세요" },
+    FARM_NOT_KEYWORD : { "result": false, "code": 6100, "message": "검색어를 입력해주세요" },
 
     REDIS_ERROR : {'result': false, 'code':6900, 'message': "REDIS 에러"}
 }

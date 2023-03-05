@@ -199,11 +199,11 @@ exports.editUserNickName = async(req,res) =>{
 }
 
 exports.editUserName = async(req,res) =>{
-    const {userEmail}  = req.query;
+    const {email}  = req.query;
     const {name} = req.body
 
     if (!name) return res.send(response(baseResponse.USER_NAME_EMPTY))
-    const eidtUser = await userService.editName(userEmail, name)
+    const eidtUser = await userService.editName(email, name)
 
     return res.send(eidtUser)
 }
@@ -233,7 +233,11 @@ exports.editUsePassword = async(req,res) =>{
 
 exports.editUserProfileImg = async(req,res)=> {
     const {email}  = req.query;
-    const eidtImage = await userService.eidtProfileImg(email, req.file.filename)
+    const image = `/images/${req.file.filename}`
+    console.log(image);
+
+    if (!req.file.filename) return res.send(response(baseResponse.USER_POFILEIMG_EMPTY))
+    const eidtImage = await userService.eidtProfileImg(email, image)
 
     return res.send(eidtImage)
 }
