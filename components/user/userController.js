@@ -206,6 +206,10 @@ exports.userAuthentication = async function (req, res) {
 
 exports.vertifyCode = async(req,res) => {
     const {phoneNumber, usercode,name} = req.body
+    if (!phoneNumber)
+        return res.send(errResponse2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
+    if (!name)
+        return res.send(errResponse2(baseResponse.USER_NAME_EMPTY))
     const code = await client.get(phoneNumber)
     if (code == usercode){
         console.log(code);
@@ -217,6 +221,8 @@ exports.vertifyCode = async(req,res) => {
             await client.del(name)
             return res.send({"name": name, "email": email})
         }
+        else
+            return res.send(errResponse2(baseResponse.USER_USERID_NOT_EXIST))
         return res.send(response2(baseResponse.SUCCESS))
     }else{
         console.log(code);
@@ -303,11 +309,11 @@ exports.editUserNickName = async(req,res) =>{
 }
 
 exports.editUserName = async(req,res) =>{
-    const {userEmail}  = req.query;
+    const {email}  = req.query;
     const {name} = req.body
 
     if (!name) return res.send(response2(baseResponse.USER_NAME_EMPTY))
-    const eidtUser = await userService.editName(userEmail, name)
+    const eidtUser = await userService.editName(email, name)
 
     return res.send(eidtUser)
 }

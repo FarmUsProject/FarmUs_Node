@@ -115,8 +115,10 @@ exports.editNickName = async (email,nickname) =>{
 
 exports.editName = async (email,name) =>{
     try{
+        console.log(name);
         const connection = await pool.getConnection(async (conn)=>conn)
         const res = await userDao.updateName(connection, email, name)
+        console.log(res);
         connection.release()
         if (res)
             return response(baseResponse.SUCCESS)

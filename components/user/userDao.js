@@ -129,6 +129,8 @@ async function updateName(connection, email, name) {
     SET Name = ?
     WHERE Email = ?;`;
     const updateUserRow = await connection.query(updateUserQuery, [name, email]);
+    console.log("name", name);
+    console.log("email",email);
     return updateUserRow[0];
 }
 
