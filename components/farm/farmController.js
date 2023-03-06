@@ -2,10 +2,11 @@ const farmProvider = require('./farmProvider');
 const farmService = require("./farmService");
 const User = require('../user/userProvider');
 const { response, errResponse} = require("../../config/response");
-const resStatus = require('./../../config/resStatus');
+const resStatus = require('../../config/resStatus');
 const baseResponse = require('../../config/resStatus');
 const {FARMID_EMPTY, DELETED_FARM, USER_USERID_EMPTY, SUCCESS} = require("../../config/resStatus");
 const validator = require('./../../helpers/validator');
+const { response2, errResponse2 } = require('./../../config/response2');
 
 exports.getFarmlist = async (req, res) => {
     const getFarmResult = await farmProvider.retrieveFarmlist();
@@ -77,7 +78,7 @@ exports.newFarm = async function (req, res) {
 exports.findFarms = async (req,res) => {
     const {keyword} = req.query
 
-    if (!keyword) return res.send(errResponse(baseResponse.FARM_NOT_KEYWORD))
+    if (!keyword) return res.send(errResponse2(baseResponse.FARM_NOT_KEYWORD))
 
     const farms = await farmProvider.retrieveFarms(keyword)
     return res.send(farms)

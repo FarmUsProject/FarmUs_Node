@@ -1,12 +1,12 @@
-const result = ({result, code, message}) => {
+const response2 = ({result, code, message}) => {
     return {
          result: result,
          code: code,
          message: message,
     }
-   };
+};
 
-   const errResult = ({result, code, message}) => {
+   const errResponse2 = ({result, code, message}) => {
      return {
          result: result,
          code: code,
@@ -14,4 +14,4 @@ const result = ({result, code, message}) => {
        }
    };
 
-module.exports = { result, errResult };
+module.exports = { response2, errResponse2 };
