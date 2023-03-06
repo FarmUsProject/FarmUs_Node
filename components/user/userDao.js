@@ -1,4 +1,4 @@
-exports.SelectionUsedFarmArray = async (connection, userid) => {
+const SelectionUsedFarmArray = async (connection, userid) => {
     const UsedFarmArrayQuery = `
     Select BefoUse_Farm
     From User
@@ -8,7 +8,7 @@ exports.SelectionUsedFarmArray = async (connection, userid) => {
     return UsedFarmArrayQuery;
 }
 
-exports.SelectionUseFarmArray = async (connection, userid) => {
+const SelectionUseFarmArray = async (connection, userid) => {
     const UseFarmArrayQuery = `
     Select CurUse_Farm
     From User
@@ -176,5 +176,7 @@ module.exports = {
     updateName,
     updatePhoneNum,
     withdrawalUser,
-    eidtProfileImg
+    eidtProfileImg,
+    SelectionUsedFarmArray,
+    SelectionUseFarmArray
 }

@@ -10,7 +10,7 @@ const jwtLogin = require('./../../config/jwtLogin');
 const { pool } = require('../../config/database');
 const setDate = require('./../../helpers/setDate');
 
-async function login(email, password) {
+exports.login = async(email, password) =>{
 
     const userInfo = await userProvider.userbyEmail(email);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
@@ -28,7 +28,7 @@ async function login(email, password) {
 };
 
 
-async function signUp(email, password, phoneNumber, nickName, name, role) {
+exports.signUp = async(email, password, phoneNumber, nickName, name, role) =>{
     const userInfo = await userProvider.userbyEmail(email);
     if (userInfo.length >= 1) return errResponse(resStatus.SIGNUP_REDUNDANT_EMAIL);
 
@@ -46,7 +46,7 @@ async function signUp(email, password, phoneNumber, nickName, name, role) {
     return response(resStatus_5000.USER_SIGNUP_SUCCESS, {"email" : email, "role" : role});
 };
 
-async function addStar(email, farmId) {
+exports.addStar= async(email, farmId) =>{
     const userInfo = await userProvider.userbyEmail(email);
     const farmInfo = await farmProvider.farmbyfarmID(farmId);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
@@ -68,7 +68,7 @@ async function addStar(email, farmId) {
     return response(resStatus_5000.USER_STAR_ADD_SUCCESS, null);
 }
 
-async function editBirth(email, birth) {
+exports.editBirth = async(email, birth) =>{
     const userInfo = await userProvider.userbyEmail(email);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
 
@@ -169,10 +169,3 @@ exports.eidtProfileImg = async(email, img) => {
         return errResponse(baseResponse.DB_ERROR)
     }
 }
-
-module.exports = {
-    login,
-    signUp,
-    addStar,
-    editBirth
-};
