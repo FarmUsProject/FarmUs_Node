@@ -2,6 +2,7 @@
   "name": "farmus",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "nodemon ./bin/www"
   },
@@ -18,4 +19,5 @@
     "nodemailer": "^6.9.0",
     "nodemon": "^2.0.20"
   }
+
 }
