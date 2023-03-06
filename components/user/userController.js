@@ -1,14 +1,118 @@
-const baseResponse = require('../../config/resStatus');
-const {response, errResponse} = require("../../config/response");
 const axios = require('axios')
-const {NCP_SENS, googleSecret, REDIS} = require('../../config/secret')
 const CryptoJS = require('crypto-js')
 const redis = require('redis')
-const userProvider = require('./userProvider')
-const userService = require('./userService')
 const nodemailer = require("nodemailer");
+const userService = require("./userService");
+const userProvider = require("./userProvider");
+const { response, errResponse } = require('./../../config/response');
+const { response2, errResponse2 } = require('../../config/response2');
+const resStatus = require("../../config/resStatus");
+const baseResponse = require('../../config/resStatus');
+const { FARMID_EMPTY } = require("../../config/resStatus");
+const {NCP_SENS, googleSecret, REDIS} = require('../../config/secret')
+const validator = require('../../helpers/validator');
+const dateAvailability = require('../../helpers/DateAvailability');
 
+exports.getBefoFarmUsed_Array = async (req, res, error) => {
+    const { userid } = req.params;
 
+    if (!userid) return res.render(errResponse(FARMID_EMPTY));
+
+    const getUsedFarmArray = userProvider.retrieveUsedFarmArray(userid);
+    res.render(getUsedFarmArray);
+}
+
+exports.getCurFarmUse_Array = async (req, res, error) => {
+    const { userid } = req.params;
+
+    if (!userid) return res.render(errResponse(FARMID_EMPTY));
+
+    const getCurFarmArray = userProvider.retrieveCurFarmArray(userid);
+    res.render(getCurFarmArray);
+
+}
+
+/**
+ * [POST] /user/login
+ */
+exports.login = async function (req, res) {
+    try {
+        const { email, password } = req.body;
+
+        const invalidation = await validator.login(email, password);
+
+        if (invalidation) return res.send(errResponse(invalidation));
+
+        const loginResponse = await userService.login(email, password);
+
+        return res.send(loginResponse);
+
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}
+
+/**
+ * [POST] /user/signup
+*/
+exports.signup = async function (req, res) {
+    try {
+        const { email, password, phoneNumber, nickName, name, role } = req.body;
+        const invalidation = await validator.signUp(email, password, phoneNumber, nickName, name, role);
+
+        if (invalidation) return res.send(errResponse(invalidation));
+
+        const signUpResponse = await userService.signUp(email, password, phoneNumber, nickName, name, role);
+
+        return res.send(signUpResponse);
+
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}
+
+/**
+ *  [POST] /user/star
+ */
+exports.star = async function (req, res) {
+    try {
+        const { email, farmid } = req.body;
+        const invalidation = await validator.twoParams(email, farmid);
+
+        if (invalidation) return errResponse(invalidation);
+
+        const starResponse = await userService.addStar(email, farmid);
+
+        return res.send(starResponse);
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}
+
+/**
+ *  [POST] /user/birth
+ */
+exports.birth = async function (req, res) {
+    try {
+        const { email, birth } = req.body;
+        const invalidation = await validator.oneParams(birth);
+
+        if (invalidation) return errResponse(invalidation);
+
+        if (!dateAvailability.isValidDatetype)
+            return errResponse(resStatus_5000.DATE_TYPE_WEIRD);
+
+        const birthResponse = await userService.editBirth(email, birth);
+
+        return res.send(birthResponse);
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR))
+    }
+}
 
 /**
  * [GET] /app/test
@@ -76,7 +180,7 @@ const sendSMS = async (phoneNum) =>{
 }
 
 exports.getTest = async function (req, res) {
-    return res.send(response(baseResponse.SUCCESS))
+    return res.send(response2(baseResponse.SUCCESS))
 }
 
 exports.userAuthentication = async function (req, res) {
@@ -84,19 +188,19 @@ exports.userAuthentication = async function (req, res) {
         const phoneNumber = req.body.phoneNumber
         if (phoneNumber){
             if (phoneNumber.length != 11)
-                return res.send(response(baseResponse.SIGNUP_PHONENUMBER_LENGTH))
+                return res.send(response2(baseResponse.SIGNUP_PHONENUMBER_LENGTH))
         }
         else{
-            return res.send(response(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
+            return res.send(response2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
         }
 
         sendSMS(phoneNumber)
 
-        return res.send(response(baseResponse.SUCCESS))
+        return res.send(response2(baseResponse.SUCCESS))
     }
     catch(err){
         console.log(err);
-        return res.send(response(baseResponse.SIGNUP_SMS_WRONG))
+        return res.send(response2(baseResponse.SIGNUP_SMS_WRONG))
     }
 }
 
@@ -113,10 +217,10 @@ exports.vertifyCode = async(req,res) => {
             await client.del(name)
             return res.send({"name": name, "email": email})
         }
-        return res.send(response(baseResponse.SUCCESS))
+        return res.send(response2(baseResponse.SUCCESS))
     }else{
         console.log(code);
-        return res.send(response(baseResponse.SIGNUP_SMS_CODE_WRONG))
+        return res.send(response2(baseResponse.SIGNUP_SMS_CODE_WRONG))
     }
 }
 
@@ -124,11 +228,11 @@ exports.findAccount = async(req,res) => {
     try{
         const {name, phoneNumber} = req.query
 
-        if (!name) return res.send(errResponse(baseResponse.USER_NAME_EMPTY))
-        if (!phoneNumber) return res.send(errResponse(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
+        if (!name) return res.send(errResponse2(baseResponse.USER_NAME_EMPTY))
+        if (!phoneNumber) return res.send(errResponse2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
 
         const user = await userProvider.retrieveUser(name, phoneNumber)
-        if (!user) return res.send(errResponse(baseResponse.USER_NOT_EXIST))
+        if (!user) return res.send(errResponse2(baseResponse.USER_NOT_EXIST))
 
         let userData = await client.set(name, user.Email, {EX: 185})
         sendSMS(phoneNumber)
@@ -148,10 +252,10 @@ exports.findPassword = async(req,res) => {
         //console.log(userEmail);
 
         if (!userEmail)
-            return res.send(errResponse(baseResponse.USER_USEREMAIL_EMPTY))
+            return res.send(errResponse2(baseResponse.USER_USEREMAIL_EMPTY))
 
         const user = await userProvider.retrieveUserEmail(userEmail)
-        if (!user) return res.send(errResponse(baseResponse.USER_USEREMAIL_NOT_EXIST))
+        if (!user) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
 
       const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -180,10 +284,10 @@ exports.findPassword = async(req,res) => {
         }
       });
 
-      return res.send(response(baseResponse.SUCCESS))
+      return res.send(response2(baseResponse.SUCCESS))
     } catch (err) {
       console.log(err);
-      return res.send(errResponse(baseResponse.DB_ERROR))
+      return res.send(errResponse2(baseResponse.DB_ERROR))
     }
 
 }
@@ -192,18 +296,18 @@ exports.editUserNickName = async(req,res) =>{
     const {email}  = req.query;
     const {nickname} = req.body
 
-    if (!nickname) return res.send(response(baseResponse.USER_NICKNAME_EMPTY))
+    if (!nickname) return res.send(response2(baseResponse.USER_NICKNAME_EMPTY))
     const eidtUser = await userService.editNickName(email, nickname)
 
     return res.send(eidtUser)
 }
 
 exports.editUserName = async(req,res) =>{
-    const {email}  = req.query;
+    const {userEmail}  = req.query;
     const {name} = req.body
 
-    if (!name) return res.send(response(baseResponse.USER_NAME_EMPTY))
-    const eidtUser = await userService.editName(email, name)
+    if (!name) return res.send(response2(baseResponse.USER_NAME_EMPTY))
+    const eidtUser = await userService.editName(userEmail, name)
 
     return res.send(eidtUser)
 }
@@ -212,8 +316,8 @@ exports.editUserPhoneNumber = async(req,res) =>{
     const {email}  = req.query;
     const {phoneNumber} = req.body
 
-    if (!phoneNumber) return res.send(response(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
-    if (phoneNumber.length != 11) return res.send(response(baseResponse.SIGNUP_PHONENUMBER_LENGTH))
+    if (!phoneNumber) return res.send(response2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
+    if (phoneNumber.length != 11) return res.send(response2(baseResponse.SIGNUP_PHONENUMBER_LENGTH))
     const eidtUser = await userService.editPhoneNumber(email, phoneNumber)
 
     return res.send(eidtUser)
@@ -223,7 +327,7 @@ exports.editUsePassword = async(req,res) =>{
     const {email}  = req.query;
     const {password} = req.body
 
-    if (!password) return res.send(response(baseResponse.SIGNIN_PASSWORD_EMPTY))
+    if (!password) return res.send(response2(baseResponse.SIGNIN_PASSWORD_EMPTY))
     const eidtUser = await userService.editPassword(email, password)
 
     return res.send(eidtUser)
@@ -233,11 +337,7 @@ exports.editUsePassword = async(req,res) =>{
 
 exports.editUserProfileImg = async(req,res)=> {
     const {email}  = req.query;
-    const image = `/images/${req.file.filename}`
-    console.log(image);
-
-    if (!req.file.filename) return res.send(response(baseResponse.USER_POFILEIMG_EMPTY))
-    const eidtImage = await userService.eidtProfileImg(email, image)
+    const eidtImage = await userService.eidtProfileImg(email, req.file.filename)
 
     return res.send(eidtImage)
 }

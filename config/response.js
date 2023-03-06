@@ -1,17 +1,18 @@
-const response = ({result, code, message}) => {
-    return {
-         result: result,
-         code: code,
-         message: message,
-    }
-   };
+const response = ({isSuccess, code, message}, result) => {
+  return {
+       isSuccess: isSuccess,
+       code: code,
+       message: message,
+       result: result
+  }
+ };
 
-   const errResponse = ({result, code, message}) => {
-     return {
-         result: result,
-         code: code,
-         message: message
-       }
-   };
+ const errResponse = ({isSuccess, code, message}) => {
+   return {
+       isSuccess: isSuccess,
+       code: code,
+       message: message
+     }
+ };
 
-   module.exports = { response, errResponse };
+ module.exports = { response, errResponse };
