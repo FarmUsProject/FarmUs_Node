@@ -1,7 +1,7 @@
 const { response, errResponse } = require('./../../config/response');
 const validator = require('../../helpers/validator');
 const resStatus = require("../../config/resStatus");
-const userService = require("./userService");
+const userService = require("../user/userService");
 const oauthService = require('./oauthService');
 
 /**

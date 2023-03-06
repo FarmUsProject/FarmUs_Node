@@ -23,5 +23,5 @@ module.exports = function (app) {
     app.get('/farm/search',farm.findFarms);
 
     //검색 필터
-    app.get("/farm/Search_filter", farm.getSearchWithFilter);
+    //app.get("/farm/Search_filter", farm.getSearchWithFilter);
 };
