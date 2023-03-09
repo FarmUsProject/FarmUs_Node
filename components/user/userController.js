@@ -3,6 +3,7 @@ const CryptoJS = require('crypto-js')
 const redis = require('redis')
 const nodemailer = require("nodemailer");
 const userService = require("./userService");
+const farmService = require("../farm/farmService");
 const userProvider = require("./userProvider");
 const { response, errResponse } = require('./../../config/response');
 const { response2, errResponse2 } = require('../../config/response2');
@@ -339,8 +340,6 @@ exports.editUsePassword = async(req,res) =>{
     return res.send(eidtUser)
 }
 
-
-
 exports.editUserProfileImg = async(req,res)=> {
     const {email}  = req.query;
     const eidtImage = await userService.eidtProfileImg(email, req.file.filename)
@@ -349,9 +348,14 @@ exports.editUserProfileImg = async(req,res)=> {
 }
 
 exports.withdrawal = async(req,res) => {
+    //console.log(req);
+    //const {userEmail}  = req.header('userEmail');
     const {userEmail}  = req.query;
 
-    const userWithdraw = await userService.eidtUserStatus(userEmail)
+    console.log(userEmail);
+
+    const userWithdraw = await userService.deleteUser(userEmail)
+    const userWithdrawFarm = await farmService.deleteUserFarm(userEmail)
 
     return res.send(userWithdraw)
 }

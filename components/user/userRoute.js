@@ -48,7 +48,9 @@ module.exports = function(app){
     app.patch('/mypage/editInfo/password',user.editUsePassword)
     app.patch('/mypage/editInfo/phoneNumber',user.editUserPhoneNumber)
     app.patch('/mypage/editInfo/profileImg',upload.single("file"),user.editUserProfileImg)
-    app.patch('/user/withdrawal',user.withdrawal)
+
+    //회원 탈퇴
+    app.delete('/user/withdrawal',user.withdrawal)
 
     //user CurUse_farm 가져오기
     app.get("farm/get_befoArray:userid", user.getBefoFarmUsed_Array);

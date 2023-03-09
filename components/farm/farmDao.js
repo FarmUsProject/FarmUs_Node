@@ -99,3 +99,14 @@ exports.searchFarm = async(connection, keyword) => {
     return farmRow
 }
 
+exports.withdrawalUserFarm = async(connection, email) => {
+    const selectFarmbyEmailQuery = `
+    UPDATE Farm
+    SET Status = 'D'
+    WHERE Owner = ?;`
+
+    const [selectStarbyEmail] = await connection.query(selectFarmbyEmailQuery,email)
+    console.log(selectStarbyEmail);
+    return selectStarbyEmail
+}
+

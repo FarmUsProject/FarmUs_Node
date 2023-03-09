@@ -5,8 +5,11 @@ const { response, errResponse } = require('./../../config/response');
 const resStatus_5000 = require('./../../config/resStatus_5000');
 const randomNumber = require('../../helpers/randomNumber');
 const setDate = require('./../../helpers/setDate');
+const { response2, errResponse2 } = require('../../config/response2');
+const baseResponse = require('../../config/resStatus')
 
-exports.Changeto_Owner = async (userid) => {
+
+const Changeto_Owner = async (userid) => {
     const User = userid;
 
     const connection = await pool.getConnections(async (conn) => conn);
@@ -45,7 +48,23 @@ async function newFarm(name, owner, startDate, endDate, price, squaredMeters, lo
     return response(resStatus_5000.FARM_NEW_SAVE_SUCCESS, { "newFarmID": newFarmID });
 }
 
+const deleteUserFarm = async(email) =>{
+    try{
+        const connection = await pool.getConnection(async (conn)=>conn)
+        const res = await farmDao.withdrawalUserFarm(connection, email)
+
+        connection.release()
+
+        if (res) return response2(baseResponse.SUCCESS)
+
+    }catch(err){
+        console.log(err);
+        return errResponse2(baseResponse.DB_ERROR)
+    }
+}
 
 module.exports = {
     newFarm,
+    Changeto_Owner,
+    deleteUserFarm
 };

@@ -145,8 +145,7 @@ async function updatePhoneNum(connection, email, phoneNumber) {
 
 async function withdrawalUser(connection, email){
     const withdrawalUserQuery = `
-    UPDATE User
-    SET Status = 'D'
+    DELETE FROM User
     WHERE Email = ?;`
 
     const withdrawalUserRow = await connection.query(withdrawalUserQuery, email)

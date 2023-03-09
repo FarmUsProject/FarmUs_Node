@@ -2,6 +2,7 @@ const userProvider = require('./../user/userProvider');
 const userDao = require('./../user/userDao');
 const farmProvider = require('./../farm/farmProvider');
 const { response, errResponse } = require('../../config/response');
+const { response2, errResponse2 } = require('../../config/response2');
 const resStatus = require('../../config/resStatus');
 const baseResponse = require('../../config/resStatus')
 const resStatus_5000 = require('../../config/resStatus_5000');
@@ -13,7 +14,7 @@ const setDate = require('./../../helpers/setDate');
 exports.login = async(email, password) =>{
 
     const userInfo = await userProvider.userbyEmail(email);
-    if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
+    if (userInfo.length < 1) return errResponse2(resStatus.USER_USEREMAIL_NOT_EXIST);
 
     const userPassword = userInfo[0].Password;
     const userSalt = userInfo[0].Salt;
@@ -91,11 +92,11 @@ exports.editPassword = async (email,pw) =>{
         const res = await userDao.updatePassword(connection, email, pw)
         connection.release()
         if (res)
-            return response(baseResponse.SUCCESS)
+            return response2(baseResponse.SUCCESS)
 
     }catch(err){
         console.log(err);
-        return errResponse(baseResponse.DB_ERROR)
+        return errResponse2(baseResponse.DB_ERROR)
     }
 }
 
@@ -105,11 +106,11 @@ exports.editNickName = async (email,nickname) =>{
         const res = await userDao.updateNickName(connection, email, nickname)
         connection.release()
         if (res)
-            return response(baseResponse.SUCCESS)
+            return response2(baseResponse.SUCCESS)
 
     }catch(err){
         console.log(err);
-        return errResponse(baseResponse.DB_ERROR)
+        return errResponse2(baseResponse.DB_ERROR)
     }
 }
 
@@ -121,11 +122,11 @@ exports.editName = async (email,name) =>{
         console.log(res);
         connection.release()
         if (res)
-            return response(baseResponse.SUCCESS)
+            return response2(baseResponse.SUCCESS)
 
     }catch(err){
         console.log(err);
-        return errResponse(baseResponse.DB_ERROR)
+        return errResponse2(baseResponse.DB_ERROR)
     }
 }
 
@@ -135,26 +136,26 @@ exports.editPhoneNumber = async (email,phoneNumber) =>{
         const res = await userDao.updatePhoneNum(connection, email, phoneNumber)
         connection.release()
         if (res)
-            return response(baseResponse.SUCCESS)
+            return response2(baseResponse.SUCCESS)
 
     }catch(err){
         console.log(err);
-        return errResponse(baseResponse.DB_ERROR)
+        return errResponse2(baseResponse.DB_ERROR)
     }
 }
 
-exports.eidtUserStatus = async (email) => {
+exports.deleteUser = async (email) => {
     try{
         const connection = await pool.getConnection(async (conn)=>conn)
         const res = await userDao.withdrawalUser(connection, email)
 
         connection.release()
 
-        if (res) return response(baseResponse.SUCCESS)
+        if (res) return response2(baseResponse.SUCCESS)
 
     }catch(err){
         console.log(err);
-        return errResponse(baseResponse.DB_ERROR)
+        return errResponse2(baseResponse.DB_ERROR)
     }
 }
 
@@ -165,9 +166,9 @@ exports.eidtProfileImg = async(email, img) => {
 
         connection.release()
 
-        if (res) return response(baseResponse.SUCCESS)
+        if (res) return response2(baseResponse.SUCCESS)
     }catch(err){
         console.log(err);
-        return errResponse(baseResponse.DB_ERROR)
+        return errResponse2(baseResponse.DB_ERROR)
     }
 }
