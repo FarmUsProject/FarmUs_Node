@@ -180,10 +180,6 @@ const sendSMS = async (phoneNum) =>{
     })
 }
 
-exports.getTest = async function (req, res) {
-    return res.send(response2(baseResponse.SUCCESS))
-}
-
 exports.userAuthentication = async function (req, res) {
     try{
         const phoneNumber = req.body.phoneNumber
@@ -207,24 +203,32 @@ exports.userAuthentication = async function (req, res) {
 
 exports.vertifyCode = async(req,res) => {
     const {phoneNumber, usercode,name} = req.body
+
     if (!phoneNumber)
         return res.send(errResponse2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
     if (!name)
         return res.send(errResponse2(baseResponse.USER_NAME_EMPTY))
+
+    const user = await userProvider.retrieveUser(name, phoneNumber)
+    if (!user) return res.send(errResponse2(baseResponse.USER_NOT_EXIST))
+
     const code = await client.get(phoneNumber)
     if (code == usercode){
         console.log(code);
-        console.log(client);
+        //console.log(client);
         await client.del(phoneNumber)
 
-        if (name){
-            const email = await client.get(name)
+
+        const email = await client.get(name)
+        console.log(email);
+
+        if (email){ // 아이디찾기
             await client.del(name)
             return res.send({"name": name, "email": email})
         }
-        else
-            return res.send(errResponse2(baseResponse.USER_USERID_NOT_EXIST))
-        return res.send(response2(baseResponse.SUCCESS))
+        else // 회원가입
+            return res.send({"name": name})
+
     }else{
         console.log(code);
         return res.send(response2(baseResponse.SIGNUP_SMS_CODE_WRONG))
@@ -243,11 +247,11 @@ exports.findAccount = async(req,res) => {
 
         let userData = await client.set(name, user.Email, {EX: 185})
         sendSMS(phoneNumber)
-        return res.send(response(baseResponse.SUCCESS))
+        return res.send(response2(baseResponse.SUCCESS))
 
     }catch(err){
         console.log(err);
-        return res.send(response(baseResponse.SIGNUP_SMS_WRONG))
+        return res.send(errResponse2(baseResponse.SIGNUP_SMS_WRONG))
     }
 
 }
