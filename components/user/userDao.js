@@ -105,13 +105,17 @@ async function selectUser(connection, name, phoneNumber){
     return userRow;
 }
 
-async function updatePassword(connection, email, pw) {
-    const updateUserQuery = `
+async function updatePassword(connection, newUserInfo) {
+    // newUserInfo = [password, salt, updateAt, Email]
+
+    const updatePasswordQuery = `
     UPDATE User
-    SET Password = ?
-    WHERE Email = ?;`;
-    const updateUserRow = await connection.query(updateUserQuery, [pw, email]);
-    return updateUserRow[0];
+    SET Password = ?, Salt = ?, updateAt = ?
+    WHERE Email = ?;
+    `;
+
+    const updatePasswordResult = await connection.query(updatePasswordQuery, newUserInfo);
+    return updatePasswordResult;
 }
 
 async function updateNickName(connection, email, nickname) {

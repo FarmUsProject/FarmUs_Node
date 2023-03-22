@@ -334,14 +334,22 @@ exports.editUserPhoneNumber = async(req,res) =>{
     return res.send(eidtUser)
 }
 
-exports.editUsePassword = async(req,res) =>{
-    const {email}  = req.query;
-    const {password} = req.body
+exports.editUserPassword = async(req,res) =>{
+    // try {
+        const { email, password } = req.body;
 
-    if (!password) return res.send(response2(baseResponse.SIGNIN_PASSWORD_EMPTY))
-    const eidtUser = await userService.editPassword(email, password)
+        const invalidation = await validator.login(email, password);
 
-    return res.send(eidtUser)
+        if (invalidation) return res.send(errResponse(invalidation));
+
+        const editPasswordResponse = await userService.editPassword(email, password);
+
+        return res.send(editPasswordResponse);
+
+    // }
+    // catch (e) {
+    //     res.send(errResponse(resStatus.SERVER_ERROR));
+    // }
 }
 
 exports.editUserProfileImg = async(req,res)=> {

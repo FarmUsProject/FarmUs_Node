@@ -5,10 +5,10 @@ const validator = {
 
   login: async (email, password) => {
     if (!email) {
-      return resStatus.SIGNIN_EMAIL_EMPTY
+      return resStatus.SIGNUP_EMAIL_EMPTY
     }
     if (email.length >= 30) {
-      return resStatus.SIGNIN_EMAIL_LENGTH
+      return resStatus.SIGNUP_EMAIL_LENGTH
     }
     if (!password) {
       return resStatus.SIGNIN_PASSWORD_EMPTY

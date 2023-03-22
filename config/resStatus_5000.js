@@ -25,6 +25,7 @@ module.exports = {
     USER_STAR_ADD_SUCCESS : { "isSuccess": true, "code": 5152, "message": "해당 농장을 찜 목록에 추가하였습니다." },
     USER_OAUTH_SIGNUP_SUCCESS : {"isSuccess" : true, "code" : 5153, "message" : "신규 소셜로그인 회원이 등록되었습니다."},
     USER_BIRTH_EDIT_SUCCESS : {"isSuccess" : true, "code" : 5154, "message" : "생일이 정상적으로 수정되었습니다."},
+    USER_PASSWORD_EDIT_SUCCESS : {"isSuccess" : true, "code" : 5155, "message" : "비밀번호가 정상적으로 변경되었습니다."},
 
     
     //farm

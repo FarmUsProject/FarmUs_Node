@@ -82,7 +82,7 @@ exports.editBirth = async(email, birth) =>{
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
 
     const now = await setDate.now();
-    const newUserInfo = [email, birth, now];
+    const newUserInfo = [birth, now, email];
 
     const connection = await pool.getConnection(async conn => conn);
 
@@ -94,18 +94,23 @@ exports.editBirth = async(email, birth) =>{
 }
 
 
-exports.editPassword = async (email,pw) =>{
-    try{
-        const connection = await pool.getConnection(async (conn)=>conn)
-        const res = await userDao.updatePassword(connection, email, pw)
-        connection.release()
-        if (res)
-            return response2(baseResponse.SUCCESS)
+exports.editPassword = async (email,password) =>{
+    const userInfo = await userProvider.usersbyEmail(email);
+    if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
 
-    }catch(err){
-        console.log(err);
-        return errResponse2(baseResponse.DB_ERROR)
-    }
+    const encryptedData = await encryptedPassword.createHashedPassword(password);
+    const hashedPassword = encryptedData.hashedPassword;
+    const salt = encryptedData.salt;
+    const now = await setDate.now();
+    const newUserInfo = [hashedPassword, salt, now, email];
+
+    const connection = await pool.getConnection(async conn => conn);
+
+    const editPasswordResult = await userDao.updatePassword(connection, newUserInfo);
+
+    connection.release();
+
+    return response(resStatus_5000.USER_PASSWORD_EDIT_SUCCESS, null)
 }
 
 exports.editNickName = async (email,nickname) =>{

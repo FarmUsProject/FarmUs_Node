@@ -45,7 +45,7 @@ module.exports = function(app){
     //editInfo
     app.patch('/mypage/editInfo/nickname',user.editUserNickName)
     app.patch('/mypage/editInfo/name',user.editUserName)
-    app.patch('/mypage/editInfo/password',user.editUsePassword)
+    app.patch('/mypage/editInfo/password',user.editUserPassword)
     app.patch('/mypage/editInfo/phoneNumber',user.editUserPhoneNumber)
     app.patch('/mypage/editInfo/profileImg',upload.single("file"),user.editUserProfileImg)
 
