@@ -82,11 +82,11 @@ exports.star = async function (req, res) {
         const { email, farmid } = req.body;
         const invalidation = await validator.twoParams(email, farmid);
 
-        if (invalidation) return errResponse(invalidation);
+        if (invalidation) return(res.send(errResponse(invalidation)));
 
         const starResponse = await userService.addStar(email, farmid);
 
-        return res.send(starResponse);
+        return(res.send(starResponse));
     }
     catch (e) {
         res.send(errResponse(resStatus.SERVER_ERROR));
@@ -101,14 +101,14 @@ exports.birth = async function (req, res) {
         const { email, birth } = req.body;
         const invalidation = await validator.oneParams(birth);
 
-        if (invalidation) return errResponse(invalidation);
+        if (invalidation) return(res.send(errResponse(invalidation)));
 
         if (!dateAvailability.isValidDatetype)
-            return errResponse(resStatus_5000.DATE_TYPE_WEIRD);
+            return(res.send(errResponse(resStatus_5000.DATE_TYPE_WEIRD)));
 
         const birthResponse = await userService.editBirth(email, birth);
 
-        return res.send(birthResponse);
+        return(res.send(birthResponse));
     }
     catch (e) {
         res.send(errResponse(resStatus.SERVER_ERROR))

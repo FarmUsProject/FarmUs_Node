@@ -35,7 +35,7 @@ exports.retrieveUser = async (name, phoneNumber) =>{
     return res[0];
 }
 
-exports.userbyEmail= async(email)=>{
+exports.usersbyEmail= async(email)=>{
     const connection = await pool.getConnection(async conn => conn);
     const [userInfo] = await userDao.selectUserbyEmail(connection, email);
 

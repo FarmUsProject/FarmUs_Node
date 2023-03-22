@@ -8,20 +8,20 @@ const reserveService = require("./reserveService");
  * [POST] /reserve/request
  */
 exports.request = async function (req, res) {
-    // try {
+    try {
         const { email, farmid, startDate, endDate } = req.body;
         const invalidation = await validator.newReservation(email, farmid, startDate, endDate);
 
-        if (invalidation) return res.send(errResponse(invalidation));
+        if (invalidation) return(res.send(errResponse(invalidation)));
 
         const reserveRequest_result = await reserveService.request(email, farmid, startDate, endDate);
 
-        return res.send(reserveRequest_result)
+        return(res.send(reserveRequest_result));
 
-    // }
-    // catch (e) {
-    //     return res.send(errResponse(resStatus.SERVER_ERROR));
-    // }
+    }
+    catch (e) {
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
+    }
 }
 
 /**
@@ -32,11 +32,11 @@ exports.clientsList = async function (req, res) {
     const farmid = req.params.farmid;
     const invalidation = await validator.oneParams(farmid);
 
-    if (invalidation) return res.send(response(invalidation));
+    if (invalidation) return(res.send(response(invalidation)));
 
     const clientsListResponse = await reserveService.clientsList(farmid);
 
-    return res.send(clientsListResponse);
+    return(res.send(clientsListResponse));
 
     }
     catch (e) {
@@ -53,11 +53,11 @@ exports.farmsList = async function (req, res) {
         const userEmail = req.params.email;
         const invalidation = await validator.oneParams(userEmail);
 
-        if (invalidation) return res.send(response(invalidation));
+        if (invalidation) return(res.send(response(invalidation)));
 
         const farmsListResponse = await reserveService.farmsList(userEmail);
 
-        return res.send(farmsListResponse);
+        return(res.send(farmsListResponse));
 
     }
     catch (e) {
@@ -73,11 +73,11 @@ exports.cancel = async function (req, res) {
         const reserveId = req.params.reserveid;
         const invalidation = await validator.oneParams(reserveId);
 
-        if (invalidation) return response(invalidation);
+        if (invalidation) return(res.send(response(invalidation)));
 
         const cancelReservation = await reserveService.cancel(reserveId);
 
-        return response(cancelReservation)
+        return(res.send(response(cancelReservation)));
 
     }
     catch (e) {

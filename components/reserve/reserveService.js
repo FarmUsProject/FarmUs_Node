@@ -11,20 +11,28 @@ const randomNumber = require('../../helpers/randomNumber');
 const dateAvailability = require('../../helpers/DateAvailability');
 
 async function request(userEmail, farmid,startAt, endAt) {
-    const userInfo = await userProvider.userbyEmail(userEmail);
+    const userInfo = await userProvider.usersbyEmail(userEmail);
     const farmInfo = await farmProvider.farmbyfarmID(farmid);
     const reserveInfo = await reserveProvider.clientsbyFarmID(farmid);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
-    if (farmInfo.length < 1) return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
+    if (!farmInfo) return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
+    
+    if(!dateAvailability.isValidDatetype(startAt) || !dateAvailability.isValidDatetype(endAt))
+        return errResponse(resStatus_5000.DATE_TYPE_WEIRD);
+
+    const newStartAt = new Date(startAt);
+    const newEndAt = new Date(endAt)
 
     //date availability check
-    const unAvailability = dateAvailability.dateAvailabilityCheck(farmInfo.startAt, farmInfo.endAt, startAt, endAt);
-    if(unAvailability)
-        return errResponse(unAvailability);
-
+    const unAvailability = await dateAvailability.dateAvailabilityCheck(farmInfo.startAt, farmInfo.endAt, newStartAt, newEndAt);
+    console.log(unAvailability);
+    if(unAvailability != 0)
+    return errResponse(unAvailability);
+    
     //date reservation check
-    reserveInfo.array.forEach(e => {
-        const reservation_full = dateAvailability.reserveAvailabilityCheck(e.startAt, e.endAt, startAt, endAt);
+    reserveInfo.forEach(e => {
+        // console.log("e",e)
+        const reservation_full = dateAvailability.reserveAvailabilityCheck(e.startAt, e.endAt, newStartAt, newEndAt);
         if(reservation_full)
             return errResponse(reservation_full);
     });
@@ -32,17 +40,18 @@ async function request(userEmail, farmid,startAt, endAt) {
     //new reserve id
     let newReserveID;
     let existedReserve;
+
     do {
         newReserveID = await randomNumber.createReserveID();
         existedReserve = await reserveProvider.itembyReserveId(newReserveID);
     } while (!existedReserve);
 
-
     //ReserveID, FarmID, UserEmail, OwnerEmail, startAt, endAt, createAt, updateAt
     const now = await setDate.now();
-    const newReservationInfo = [newReserveID, farmInfo.FarmID, userEmail, farmInfo.Owner, startAt, endAt, now, now];
+    const newReservationInfo = [newReserveID, farmInfo.FarmID, userEmail, farmInfo.Owner, newStartAt, newEndAt, now, now];
 
     const connection = await pool.getConnection(async conn => conn);
+
     const newReservation = await reserveDao.insertReservation(connection, newReservationInfo);
 
     connection.release();
@@ -53,7 +62,7 @@ async function request(userEmail, farmid,startAt, endAt) {
 async function clientsList(farmid) {
 
     const farmInfo = await farmProvider.farmbyfarmID(farmid);
-    if (farmInfo.length < 1) return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
+    if (!farmInfo) return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
 
     const reservedClients = await reserveProvider.clientsbyFarmID(farmid);
     if (reservedClients.length < 1) return response(resStatus_5000.RESERVE_LIST_EMPTY);
@@ -63,7 +72,7 @@ async function clientsList(farmid) {
 
 async function farmsList(userEmail) {
 
-    const userInfo = await userProvider.userbyEmail(userEmail);
+    const userInfo = await userProvider.usersbyEmail(userEmail);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
 
     const reservedFarms = await reserveProvider.farmsbyEmail(userEmail);
@@ -78,6 +87,7 @@ async function cancel(reserveId) {
     if (reservedItem.length < 1) return errResponse(resStatus_5000.RESERVE_RESERVEID_NOT_EXIST);
 
     const connection = await pool.getConnection(async conn => conn);
+
     const canceledReservation = await reserveDao.cancelReservation(connection, reserveId);
 
     connection.release();

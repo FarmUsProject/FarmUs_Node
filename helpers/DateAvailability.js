@@ -1,4 +1,5 @@
 const resStatus_5000 = require('../config/resStatus_5000');
+const moment = require('moment');
 
 const dateAvailability = {
 
@@ -11,16 +12,16 @@ const dateAvailability = {
  * @param {Date} newEnd 새로운 기간 마지막점
  * @returns resStatus_5000 (available : false)
     */
-    dateAvailabilityCheck: async function (tartgetStart, targetEnd, newStart, newEnd) {
+    dateAvailabilityCheck: async function (targetStart, targetEnd, newStart, newEnd) {
         //targetStart - newStart - newEnd - targetwEnd : date 순서
 
-        if (tartgetStart.getTime() > newStart.getTime() && targetEnd.getTime() < newEnd.getTime())
+        if (targetStart.getTime() > newStart.getTime() || targetEnd.getTime() < newEnd.getTime())
             return resStatus_5000.RESERVE_DATE_OFF_PERIOD_OF_FARM;
 
         if (newStart.getTime() > newEnd.getTime())
             return resStatus_5000.DATE_END_FASTER_THAN_FIRST;
 
-        return false;
+        return 0;
     },
 
     reserveAvailabilityCheck: async function (reservedStart, reservedEnd, newStart, newEnd) {
