@@ -59,6 +59,7 @@ module.exports = {
 
     USER_NAME_EMPTY : { "result": false, "code": 6003, "message": "이름을 입력해주세요." },
     USER_NOT_EXIST : { "result": false, "code": 6004, "message": "해당 정보로 가입한 회원이 존재하지 않습니다." },
+    USER_EDITINFO_EMPTYEMAIL : {"result": false, "code":6005, "message": "로그인 한 회원의 이메일 값 전달되지 않음"},
 
     FARM_NOT_KEYWORD : { "result": false, "code": 6005, "message": "검색어를 입력해주세요" },
 

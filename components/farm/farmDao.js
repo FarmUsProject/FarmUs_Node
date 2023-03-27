@@ -90,11 +90,19 @@ exports.selectFarmbyFarmInfo = async(connection, sameFarmInfo) =>{
 
 exports.searchFarm = async(connection, keyword) => {
     const searchFarmQuery = `
-    SELECT FarmName, Location, Price, SquaredMeters, Picture_url, Views, Star, Likes, createAt
+    SELECT FarmID,
+			Name,
+			Picture_url,
+			Price,
+			SquaredMeters,
+			LocationBig,
+			LocationMid,
+			LocationSmall,
+			Likes
     FROM farm
-    WHERE FarmName LIKE ? OR Location LIKE ?;`
+    WHERE Name LIKE ? OR LocationBig LIKE ? OR LocationMid LIKE ? OR LocationSmall LIKE ?;`
     console.log(keyword);
-    const [farmRow] = await connection.query(searchFarmQuery,[keyword,keyword])
+    const [farmRow] = await connection.query(searchFarmQuery,[keyword,keyword,keyword,keyword])
     console.log(farmRow);
     return farmRow
 }

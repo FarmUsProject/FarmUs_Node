@@ -13,6 +13,8 @@ const { FARMID_EMPTY } = require("../../config/resStatus");
 const {NCP_SENS, googleSecret, REDIS} = require('../../config/secret')
 const validator = require('../../helpers/validator');
 const dateAvailability = require('../../helpers/DateAvailability');
+const sharp = require('sharp');
+const fs = require('fs');
 
 exports.getBefoFarmUsed_Array = async (req, res, error) => {
     const { userid } = req.params;
@@ -307,7 +309,9 @@ exports.editUserNickName = async(req,res) =>{
     const {email}  = req.query;
     const {nickname} = req.body
 
+    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
     if (!nickname) return res.send(response2(baseResponse.USER_NICKNAME_EMPTY))
+
     const eidtUser = await userService.editNickName(email, nickname)
 
     return res.send(eidtUser)
@@ -317,7 +321,9 @@ exports.editUserName = async(req,res) =>{
     const {email}  = req.query;
     const {name} = req.body
 
+    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
     if (!name) return res.send(response2(baseResponse.USER_NAME_EMPTY))
+
     const eidtUser = await userService.editName(email, name)
 
     return res.send(eidtUser)
@@ -327,8 +333,11 @@ exports.editUserPhoneNumber = async(req,res) =>{
     const {email}  = req.query;
     const {phoneNumber} = req.body
 
+    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
     if (!phoneNumber) return res.send(response2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
+
     if (phoneNumber.length != 11) return res.send(response2(baseResponse.SIGNUP_PHONENUMBER_LENGTH))
+
     const eidtUser = await userService.editPhoneNumber(email, phoneNumber)
 
     return res.send(eidtUser)
@@ -338,7 +347,9 @@ exports.editUsePassword = async(req,res) =>{
     const {email}  = req.query;
     const {password} = req.body
 
+    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
     if (!password) return res.send(response2(baseResponse.SIGNIN_PASSWORD_EMPTY))
+
     const eidtUser = await userService.editPassword(email, password)
 
     return res.send(eidtUser)
@@ -346,15 +357,43 @@ exports.editUsePassword = async(req,res) =>{
 
 exports.editUserProfileImg = async(req,res)=> {
     const {email}  = req.query;
-    const eidtImage = await userService.eidtProfileImg(email, req.file.filename)
 
-    return res.send(eidtImage)
+    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
+
+    try{
+        sharp(req.file.path)
+        .resize({width:80})
+        .withMetadata() //이미지 크기 변경 시 손실되는 exif 데이터 유지 (이미지 방향 정보)
+        /*
+        .toBuffer((err,buff)=>{
+            console.log(req.file.path);
+            console.log(req)
+            fs.writeFile("config/images/", buff, (err)=>{
+                if (err) throw err
+            })
+        })
+        */
+        .toFile(`${req.file.path}/resize.png`, (err, info) => {
+            if (err) throw err;
+            console.log(`info : ${info}`);
+            fs.unlink(`${req.file.path}/resize.png`, (err) => {
+                if (err) throw err;
+            });
+        });
+        const eidtImage = await userService.eidtProfileImg(email, req.file.filename)
+
+        return res.send(eidtImage)
+    } catch(err){
+        console.log(err);
+    }
 }
 
 exports.withdrawal = async(req,res) => {
     //console.log(req);
     //const {userEmail}  = req.header('userEmail');
     const {userEmail}  = req.query;
+
+    if (!userEmail) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
 
     console.log(userEmail);
 
