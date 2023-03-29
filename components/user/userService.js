@@ -1,6 +1,7 @@
 const userProvider = require('./../user/userProvider');
 const userDao = require('./../user/userDao');
 const farmProvider = require('./../farm/farmProvider');
+const farmDao = require('./../farm/farmDao');
 const { response, errResponse } = require('../../config/response');
 const { response2, errResponse2 } = require('../../config/response2');
 const resStatus = require('../../config/resStatus');
@@ -72,7 +73,24 @@ exports.addStar= async(email, farmId) =>{
     const connection = await pool.getConnection(async conn => conn);
     const starList = await userDao.updateUserStar(connection, starRequest);
 
-    connection.release();
+    /**
+     * PLUS # OF FARM STAR
+    */
+    try {
+        
+        let updatedStarNumber = 0;
+        if (farmInfo.Star && farmInfo.Star > 0) {
+            updatedStarNumber += farmInfo.Star;
+        }
+        const updatedStarNumberInfo = [updatedStarNumber, farmId]
+        const updatedStar = await farmDao.updateFarmStar(connection, updatedStarNumberInfo);
+
+        connection.release();
+
+    }
+    catch (e) {
+        return response(resStatus_5000.FARM_UPDATE_STAR_ERROR);
+    }
 
     return response(resStatus_5000.USER_STAR_ADD_SUCCESS, null);
 }

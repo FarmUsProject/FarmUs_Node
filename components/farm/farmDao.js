@@ -110,3 +110,14 @@ exports.withdrawalUserFarm = async(connection, email) => {
     return selectStarbyEmail
 }
 
+exports.updateFarmStar = async(connection, updatedStarNumberInfo) => {
+    // updatedStarNumberInfo = [StarNumber, farmID]
+    const updateFarmStarQuery = `
+    UPDATE FARM
+    SET Star = ?
+    WHERE FarmID = ?
+    `
+
+    const updatedStarNumber = await connection.query(updateFarmStarQuery, updatedStarNumberInfo);
+    return updatedStarNumber;
+}

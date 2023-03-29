@@ -31,6 +31,7 @@ module.exports = {
     //farm
     FARM_FARMID_NOT_EXIST  : { "isSuccess" : false, "code" : 5200, "message" : "해당 아이디를 가진 농장이 존재하지 않습니다."},
     FARM_NEW_DATA_SHORTAGE : {"isSuccess" : false, "code" : 5201, "message" : "농장을 등록하는 데 필요한 정보가 부족합니다."},
+    FARM_UPDATE_STAR_ERROR : {"isSuccess" : false, "code" :  5202, "message" : "농장의 찜 개수를 업데이트 하는 데 실패했습니다."},
     FARM_DUPLICATED_EXISTS : {"isSuccess" : false, "code" : 5202, "message" : "이미 동일한 정보를 가진 농장이 존재합니다."},
     FARM_NEW_SAVE_SUCCESS : {"isSuccess" : true, "code" :  5250, "message" : "농장이 등록되었습니다."},
     
