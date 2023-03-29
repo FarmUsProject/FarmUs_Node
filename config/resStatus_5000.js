@@ -45,6 +45,9 @@ module.exports = {
     RESERVE_LIST_CLIENTS : {"isSuccess" : true, "code" : 5352, "message" : "농장에 예약된 예약자 명단을 불러왔어요."},
     RESERVE_LIST_EMPTY : {"isSuccess" : true, "code" : 5353, "message" : "예약 목록이 없어요."},
     RESERVE_CANCEL_SUCCESS : { "isSuccess": true, "code": 5354, "message": "농장 예약이 취소되었습니다." },
+    RESERVE_STATUS_ACCPET_SUCCESS : { "isSuccess": true, "code": 5355, "message": "농장 예약을 승인하였습니다." },
+    RESERVE_STATUS_HOLD_SUCCESS : { "isSuccess": true, "code": 5356, "message": "농장 예약을 보류하였습니다." },
+    RESERVE_STATUS_DENIED_SUCCESS : { "isSuccess": true, "code": 5357, "message": "농장 예약 거부했습니다." },
 
 
 }

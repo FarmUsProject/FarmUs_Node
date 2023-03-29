@@ -84,3 +84,27 @@ exports.cancel = async function (req, res) {
         res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
+
+
+/**
+ *  [PUT] /reserve/status/:id/:status
+ */
+exports.editStatus = async function (req, res) {
+    try {
+        const reserveId = req.params.id;
+
+        let status = req.params.status;
+        status = status.toUpperCase();
+
+        const invalidation = await validator.twoParams(reserveId, status);
+
+        if (invalidation) return (res.send(response(invalidation)));
+
+        const editStatusResult = await reserveService.editStatus(reserveId, status);
+
+    }
+    catch (e) {
+        res.sent(errResponse(resStatus.SERVER_ERROR));
+    }
+
+}

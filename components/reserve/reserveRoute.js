@@ -13,4 +13,7 @@ module.exports = function(app){
     // 4. 예약 취소
     app.put('/reserve/cancel/:reserveid', reserve.cancel);
 
+    // 5. 예약 승낙
+    app.put('/reserve/status/:id/:status', reserve.editStatus);
+
 };

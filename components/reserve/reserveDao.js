@@ -57,11 +57,24 @@ async function cancelReservation(connection , reserveID) {
     return canceledReservation;
 }
 
+async function editReservationStatus(connection, updatedStatusInfo) {
+    //updatedStatuasInfo = [status, updateAt, reserveID]
+    const updatedStatusQuery = `
+    UPDATE Reservation
+    SET Status = ?, updateAt = ?
+    WHERE reserveID = ?;
+    `;
+
+    const updatedStatusResult = await connection.query(updatedStatusQuery, updatedStatusInfo);
+
+    return updatedStatusResult;
+}
 
 module.exports = {
     insertReservation,
     selectReservedClients,
     selectReservedFarms,
     selectReservedItem,
-    cancelReservation
+    cancelReservation,
+    editReservationStatus
 }

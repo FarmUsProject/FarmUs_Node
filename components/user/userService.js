@@ -77,19 +77,20 @@ exports.addStar= async(email, farmId) =>{
      * PLUS # OF FARM STAR
     */
     try {
-        
+
         let updatedStarNumber = 0;
         if (farmInfo.Star && farmInfo.Star > 0) {
             updatedStarNumber += farmInfo.Star;
         }
-        const updatedStarNumberInfo = [updatedStarNumber, farmId]
+        const now = await setDate.now();
+        const updatedStarNumberInfo = [updatedStarNumber, now, farmId]
         const updatedStar = await farmDao.updateFarmStar(connection, updatedStarNumberInfo);
 
         connection.release();
 
     }
     catch (e) {
-        return response(resStatus_5000.FARM_UPDATE_STAR_ERROR);
+        return errResponse(resStatus_5000.FARM_UPDATE_STAR_ERROR);
     }
 
     return response(resStatus_5000.USER_STAR_ADD_SUCCESS, null);

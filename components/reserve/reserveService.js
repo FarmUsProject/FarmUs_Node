@@ -96,10 +96,37 @@ async function cancel(reserveId) {
 
 }
 
+async function editStatus(reserveId, status) {
+
+    const reservedItem = await reserveProvider.itembyReserveId(reserveId);
+    if (reservedItem.length < 1) return errResponse(resStatus_5000.RESERVE_RESERVEID_NOT_EXIST);
+
+    const connection = await pool.getConnection(async conn => conn);
+
+    const now = await setDate.now();
+    const updatedStatusInfo = [status, now, reserveId];
+
+    const updatedReservation = await reserveDao.editReservationStatus(connection, updatedStatusInfo);
+
+    connection.release();
+
+    switch (status) {
+        case 'A':
+            return response(resStatus_5000.RESERVE_STATUS_ACCPET_SUCCESS);
+        case 'H':
+            return response(resStatus_5000.RESERVE_STATUS_HOLD_SUCCESS);
+        case 'D':
+            return response(resStatus_5000.RESERVE_STATUS_DENIED_SUCCESS);
+    }
+
+    return errResponse(resStatus.DB_ERROR);
+
+}
 
 module.exports = {
     request,
     clientsList,
     farmsList,
-    cancel
+    cancel,
+    editStatus
 };
