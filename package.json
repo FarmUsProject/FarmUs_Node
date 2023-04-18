@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "nodemon app.js",
+    "deploy": "pm2 start app.js -n farmus",
+    "stop": "pm2 kill -n farmus",
+    "build:dev": "cross-env NODE_ENV=development webpack",
+    "build": "cross-env NODE_ENV=production webpack"
   },
   "dependencies": {
     "@aws-sdk/abort-controller": "^3.310.0",
