@@ -310,7 +310,7 @@ exports.editUserNickName = async(req,res) =>{
     const {nickname} = req.body
 
     if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
-    if (!nickname) return res.send(response2(baseResponse.USER_NICKNAME_EMPTY))
+    if (!nickname) return res.send(errResponse2(baseResponse.USER_NICKNAME_EMPTY))
 
     const eidtUser = await userService.editNickName(email, nickname)
 
@@ -361,26 +361,30 @@ exports.editUserProfileImg = async(req,res)=> {
     if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
 
     try{
-        sharp(req.file.path)
-        .resize({width:80})
-        .withMetadata() //이미지 크기 변경 시 손실되는 exif 데이터 유지 (이미지 방향 정보)
-        /*
-        .toBuffer((err,buff)=>{
-            console.log(req.file.path);
-            console.log(req)
-            fs.writeFile("config/images/", buff, (err)=>{
-                if (err) throw err
-            })
-        })
-        */
-        .toFile(`${req.file.path}/resize.png`, (err, info) => {
-            if (err) throw err;
-            console.log(`info : ${info}`);
-            fs.unlink(`${req.file.path}/resize.png`, (err) => {
-                if (err) throw err;
-            });
-        });
-        const eidtImage = await userService.eidtProfileImg(email, req.file.filename)
+        //sharp(req.file.path)
+        //.resize({width:80})
+        //.withMetadata() //이미지 크기 변경 시 손실되는 exif 데이터 유지 (이미지 방향 정보)
+        ///*
+        //.toBuffer((err,buff)=>{
+        //    console.log(req.file.path);
+        //    console.log(req)
+        //    fs.writeFile("config/images/", buff, (err)=>{
+        //        if (err) throw err
+        //    })
+        //})
+        //*/
+        //.toFile(`${req.file.path}/resize.png`, (err, info) => {
+        //    if (err) throw err;
+        //    console.log(`info : ${info}`);
+        //    fs.unlink(`${req.file.path}/resize.png`, (err) => {
+        //        if (err) throw err;
+        //    });
+        //});
+
+        //const {id} = req.decoded
+        //console.log(id);
+        console.log(req.file.location)
+        const eidtImage = await userService.eidtProfileImg(email, req.file.location)
 
         return res.send(eidtImage)
     } catch(err){

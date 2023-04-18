@@ -1,7 +1,10 @@
 const multer = require("multer");
+const multer_s3 = require('multer-s3');
+//const s3 = require('../../config/s3')
+/*
 const path = require('path')
-
 const DIR = "config/images/";
+
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
         callback(null, DIR);
@@ -13,6 +16,33 @@ const storage = multer.diskStorage({
         callback(null, path.basename(file.originalname, ext)+"-"+ Date.now() + ext)
     },
 });
+*/
+
+const {S3_ACCESS} = require('../../config/secret')
+
+const { S3Client } = require('@aws-sdk/client-s3');
+
+const s3 = new S3Client({
+    region: 'ap-northeast-2',
+    credentials:{
+        accessKeyId: S3_ACCESS.KEY,
+        secretAccessKey: S3_ACCESS.SECRET_KEY ,
+    }
+
+})
+
+const storage = multer_s3({
+    s3:s3,
+    bucket:'farmus',
+    contentType: multer_s3.AUTO_CONTENT_TYPE,
+    acl: 'public-read',
+    metadata: function(req, file, cb) {
+        cb(null, {fieldName: file.fieldname});
+    },
+    key: function (req, file, cb) {
+        cb(null, `user/${Date.now()}_${file.originalname}`);
+    }
+})
 const upload = multer({
     storage: storage,
     fileFilter: (req, file, callback) => {

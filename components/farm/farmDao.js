@@ -1,3 +1,5 @@
+const { connection } = require("mongoose");
+
 exports.selectionFarm = async (connection) => {
     const selectFarmListQuery = `
         SELECT FarmID, Name, Owner, Picture_url, Price, Term, SquaredMeters, Location, Category, Tag
@@ -118,3 +120,15 @@ exports.withdrawalUserFarm = async(connection, email) => {
     return selectStarbyEmail
 }
 
+exports.eidtMyFarm = async(connection, farmID, farmInfo) =>{
+    console.log(farmInfo, farmID);
+    const eidtFarmQuery = `
+    UPDATE Farm
+    SET Name = ?
+    WHERE FarmID = ?;
+    `
+    const [res] = await connection.query(eidtFarmQuery, [farmInfo, farmID])
+    console.log("res",res);
+    return res
+
+}

@@ -65,9 +65,3 @@ exports.retrieveFarms = async(keyword) => {
 
     return res
 }
-/*
-module.exports = {
-    farmbyfarmID,
-    isSameFarm,
-};
-*/
