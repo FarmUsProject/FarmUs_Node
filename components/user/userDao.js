@@ -152,14 +152,14 @@ async function withdrawalUser(connection, email){
     return withdrawalUserRow[0]
 }
 
-async function eidtProfileImg(connection, email, img){
+async function eidtProfileImg(connection, email, img, key){
     const eidtProfileImgQuery = `
     UPDATE User
-    SET Picture_url = ?
+    SET Picture_url = ?, Picture_key = ?
     WHERE Email = ?;`
     console.log(img);
     console.log(email);
-    const updateUserRow = await connection.query(eidtProfileImgQuery, [img, email])
+    const updateUserRow = await connection.query(eidtProfileImgQuery, [img,key, email])
     return updateUserRow[0]
 }
 

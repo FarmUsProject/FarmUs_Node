@@ -159,10 +159,10 @@ exports.deleteUser = async (email) => {
     }
 }
 
-exports.eidtProfileImg = async(email, img) => {
+exports.eidtProfileImg = async(email, img, key) => {
     try{
         const connection = await pool.getConnection(async (conn)=>conn)
-        const res = await userDao.eidtProfileImg(connection, email, img)
+        const res = await userDao.eidtProfileImg(connection, email, img, key)
 
         connection.release()
 

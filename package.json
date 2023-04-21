@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon app.js",
-    "deploy": "pm2 start app.js -n farmus",
+    "start": "nodemon ./bin/www",
+    "deploy": "pm2 start ./bin/www -n farmus",
     "stop": "pm2 kill -n farmus",
     "build:dev": "cross-env NODE_ENV=development webpack",
     "build": "cross-env NODE_ENV=production webpack"
@@ -17,6 +17,7 @@
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "debug": "~2.6.9",
+    "dotenv": "^16.0.3",
     "express": "~4.16.1",
     "jsonwebtoken": "^9.0.0",
     "morgan": "~1.9.1",

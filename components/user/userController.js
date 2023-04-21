@@ -383,8 +383,8 @@ exports.editUserProfileImg = async(req,res)=> {
 
         //const {id} = req.decoded
         //console.log(id);
-        console.log(req.file.location)
-        const eidtImage = await userService.eidtProfileImg(email, req.file.location)
+
+        const eidtImage = await userService.eidtProfileImg(email, req.file.location, req.file.key)
 
         return res.send(eidtImage)
     } catch(err){
