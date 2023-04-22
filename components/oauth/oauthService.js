@@ -1,6 +1,5 @@
 const userProvider = require('./../user/userProvider');
 const userDao = require('./../user/userDao');
-const userProvider = require('./../user/userProvider');
 const oauthDao = require('./oauthDao');
 const { response, errResponse } = require('../../config/response');
 const resStatus = require('../../config/resStatus');

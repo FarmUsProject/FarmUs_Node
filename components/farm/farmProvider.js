@@ -2,7 +2,7 @@ const { pool } = require('./../../config/database');
 const farmDao = require('./farmDao');
 
 exports.retrieveFarmlist = async () =>{
-    const connection  = await pool.getConnections(async (conn) => conn);
+    const connection  = await pool.getConnection(async (conn) => conn);
     const farmListResult =  await farmDao.selectFarm(connection);
     connection.release();
 
@@ -10,7 +10,7 @@ exports.retrieveFarmlist = async () =>{
 }
 
 exports.retrieveFarmDetail = async (Farmidx) => {
-    const connection = await pool.getConnections(async (conn) => conn);
+    const connection = await pool.getConnection(async (conn) => conn);
 
     const farmDetail = await farmDao.selectFarmDetail(connection, Farmidx);
     connection.release();
@@ -19,7 +19,7 @@ exports.retrieveFarmDetail = async (Farmidx) => {
 }
 
 exports.retrieveUsedFarmDetail = async (UsedArray) => {
-    const connection = await pool.getConnections(async (conn) => conn);
+    const connection = await pool.getConnection(async (conn) => conn);
 
     const UsedFarmDetail = await farmDao.selectUsedFarmDetail(connection, UsedArray);
     connection.release();
@@ -28,7 +28,7 @@ exports.retrieveUsedFarmDetail = async (UsedArray) => {
 }
 
 exports.retrieveUseFarmDetail = async (UsedArray) => {
-    const connection = await pool.getConnections(async (conn) => conn);
+    const connection = await pool.getConnection(async (conn) => conn);
 
     const UseFarmDetail = await farmDao.selectUseFarmDetail(connection, UsedArray);
     connection.release();
@@ -36,7 +36,7 @@ exports.retrieveUseFarmDetail = async (UsedArray) => {
     return UseFarmDetail;
 }
 
-async function farmbyfarmID (farmID){
+exports.farmbyfarmID =async(farmID) =>{
     const connection = await pool.getConnection(async conn => conn);
     const [farmInfo] = await farmDao.selectFarmbyFarmID(connection, farmID);
 
@@ -45,7 +45,7 @@ async function farmbyfarmID (farmID){
     return farmInfo[0];
 }
 
-async function isSameFarm (farmInfo){
+exports.isSameFarm = async(farmInfo)=>{
     const connection = await pool.getConnection(async conn => conn);
     const [sameFarm] = await farmDao.selectFarmbyFarmInfo(connection, farmInfo);
     connection.release();
@@ -55,6 +55,7 @@ async function isSameFarm (farmInfo){
 
 }
 
+// 농장 검색관련
 exports.retrieveFarms = async(keyword) => {
     const connection = await pool.getConnection(async (conn) => conn);
     const newKeyword = '%'+keyword+'%'
@@ -64,8 +65,3 @@ exports.retrieveFarms = async(keyword) => {
 
     return res
 }
-
-module.exports = {
-    farmbyfarmID,
-    isSameFarm,
-};

@@ -11,7 +11,3 @@ env
 
 # IDEA
 .idea
-
-# secret
-config/secret.js
-config/images

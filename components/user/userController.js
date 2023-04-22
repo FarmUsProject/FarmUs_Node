@@ -3,6 +3,7 @@ const CryptoJS = require('crypto-js')
 const redis = require('redis')
 const nodemailer = require("nodemailer");
 const userService = require("./userService");
+const farmService = require("../farm/farmService");
 const userProvider = require("./userProvider");
 const { response, errResponse } = require('./../../config/response');
 const { response2, errResponse2 } = require('../../config/response2');
@@ -12,6 +13,8 @@ const { FARMID_EMPTY } = require("../../config/resStatus");
 const {NCP_SENS, googleSecret, REDIS} = require('../../config/secret')
 const validator = require('../../helpers/validator');
 const dateAvailability = require('../../helpers/DateAvailability');
+const sharp = require('sharp');
+const fs = require('fs');
 
 exports.getBefoFarmUsed_Array = async (req, res, error) => {
     const { userid } = req.params;
@@ -179,10 +182,6 @@ const sendSMS = async (phoneNum) =>{
     })
 }
 
-exports.getTest = async function (req, res) {
-    return res.send(response2(baseResponse.SUCCESS))
-}
-
 exports.userAuthentication = async function (req, res) {
     try{
         const phoneNumber = req.body.phoneNumber
@@ -206,18 +205,32 @@ exports.userAuthentication = async function (req, res) {
 
 exports.vertifyCode = async(req,res) => {
     const {phoneNumber, usercode,name} = req.body
+
+    if (!phoneNumber)
+        return res.send(errResponse2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
+    if (!name)
+        return res.send(errResponse2(baseResponse.USER_NAME_EMPTY))
+
+    const user = await userProvider.retrieveUser(name, phoneNumber)
+    if (!user) return res.send(errResponse2(baseResponse.USER_NOT_EXIST))
+
     const code = await client.get(phoneNumber)
     if (code == usercode){
         console.log(code);
-        console.log(client);
+        //console.log(client);
         await client.del(phoneNumber)
 
-        if (name){
-            const email = await client.get(name)
+
+        const email = await client.get(name)
+        console.log(email);
+
+        if (email){ // 아이디찾기
             await client.del(name)
             return res.send({"name": name, "email": email})
         }
-        return res.send(response2(baseResponse.SUCCESS))
+        else // 회원가입
+            return res.send({"name": name})
+
     }else{
         console.log(code);
         return res.send(response2(baseResponse.SIGNUP_SMS_CODE_WRONG))
@@ -236,11 +249,11 @@ exports.findAccount = async(req,res) => {
 
         let userData = await client.set(name, user.Email, {EX: 185})
         sendSMS(phoneNumber)
-        return res.send(response(baseResponse.SUCCESS))
+        return res.send(response2(baseResponse.SUCCESS))
 
     }catch(err){
         console.log(err);
-        return res.send(response(baseResponse.SIGNUP_SMS_WRONG))
+        return res.send(errResponse2(baseResponse.SIGNUP_SMS_WRONG))
     }
 
 }
@@ -296,18 +309,22 @@ exports.editUserNickName = async(req,res) =>{
     const {email}  = req.query;
     const {nickname} = req.body
 
-    if (!nickname) return res.send(response2(baseResponse.USER_NICKNAME_EMPTY))
+    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
+    if (!nickname) return res.send(errResponse2(baseResponse.USER_NICKNAME_EMPTY))
+
     const eidtUser = await userService.editNickName(email, nickname)
 
     return res.send(eidtUser)
 }
 
 exports.editUserName = async(req,res) =>{
-    const {userEmail}  = req.query;
+    const {email}  = req.query;
     const {name} = req.body
 
+    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
     if (!name) return res.send(response2(baseResponse.USER_NAME_EMPTY))
-    const eidtUser = await userService.editName(userEmail, name)
+
+    const eidtUser = await userService.editName(email, name)
 
     return res.send(eidtUser)
 }
@@ -316,8 +333,11 @@ exports.editUserPhoneNumber = async(req,res) =>{
     const {email}  = req.query;
     const {phoneNumber} = req.body
 
+    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
     if (!phoneNumber) return res.send(response2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
+
     if (phoneNumber.length != 11) return res.send(response2(baseResponse.SIGNUP_PHONENUMBER_LENGTH))
+
     const eidtUser = await userService.editPhoneNumber(email, phoneNumber)
 
     return res.send(eidtUser)
@@ -327,25 +347,62 @@ exports.editUsePassword = async(req,res) =>{
     const {email}  = req.query;
     const {password} = req.body
 
+    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
     if (!password) return res.send(response2(baseResponse.SIGNIN_PASSWORD_EMPTY))
+
     const eidtUser = await userService.editPassword(email, password)
 
     return res.send(eidtUser)
 }
 
-
-
 exports.editUserProfileImg = async(req,res)=> {
     const {email}  = req.query;
-    const eidtImage = await userService.eidtProfileImg(email, req.file.filename)
 
-    return res.send(eidtImage)
+    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
+
+    try{
+        //sharp(req.file.path)
+        //.resize({width:80})
+        //.withMetadata() //이미지 크기 변경 시 손실되는 exif 데이터 유지 (이미지 방향 정보)
+        ///*
+        //.toBuffer((err,buff)=>{
+        //    console.log(req.file.path);
+        //    console.log(req)
+        //    fs.writeFile("config/images/", buff, (err)=>{
+        //        if (err) throw err
+        //    })
+        //})
+        //*/
+        //.toFile(`${req.file.path}/resize.png`, (err, info) => {
+        //    if (err) throw err;
+        //    console.log(`info : ${info}`);
+        //    fs.unlink(`${req.file.path}/resize.png`, (err) => {
+        //        if (err) throw err;
+        //    });
+        //});
+
+        //const {id} = req.decoded
+        //console.log(id);
+
+        const eidtImage = await userService.eidtProfileImg(email, req.file.location, req.file.key)
+
+        return res.send(eidtImage)
+    } catch(err){
+        console.log(err);
+    }
 }
 
 exports.withdrawal = async(req,res) => {
+    //console.log(req);
+    //const {userEmail}  = req.header('userEmail');
     const {userEmail}  = req.query;
 
-    const userWithdraw = await userService.eidtUserStatus(userEmail)
+    if (!userEmail) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
+
+    console.log(userEmail);
+
+    const userWithdraw = await userService.deleteUser(userEmail)
+    const userWithdrawFarm = await farmService.deleteUserFarm(userEmail)
 
     return res.send(userWithdraw)
 }
