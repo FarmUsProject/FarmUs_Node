@@ -1,2 +1,13 @@
+# Dependency directories
 node_modules/
-config/secret.js
+
+# Logs
+logs
+*.log
+
+# dotenv environment variable files
+env
+.env
+
+# IDEA
+.idea

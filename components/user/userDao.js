@@ -1,4 +1,91 @@
-//sql문
+const SelectionUsedFarmArray = async (connection, userid) => {
+    const UsedFarmArrayQuery = `
+    Select BefoUse_Farm
+    From User
+    WHERE userid = ?;
+    `;
+
+    return UsedFarmArrayQuery;
+}
+
+const SelectionUseFarmArray = async (connection, userid) => {
+    const UseFarmArrayQuery = `
+    Select CurUse_Farm
+    From User
+    WHERE userid = ?;
+    `;
+
+    return UseFarmArrayQuery;
+}
+
+async function selectUserbyEmail(connection, email) {
+    const selectUserbyEmailQuery = `
+    SELECT *
+    FROM User
+    WHERE email = ?;
+    `;
+    const userInfo = await connection.query(selectUserbyEmailQuery, email);
+
+    return userInfo;
+}
+
+async function selectUserbyPhoneNumber(connection, phoneNumber) {
+    const selectUserbyPhoneNumberQuery = `
+    SELECT *
+    FROM User
+    WHERE phoneNumber = ?;
+    `;
+    const userInfo = await connection.query(selectUserbyPhoneNumberQuery, phoneNumber);
+
+    return userInfo;
+}
+
+async function insertUser(connection, newUserInfo) {
+    //newUserInfo [email, hashedPassword, salt, phoneNumber, nickName, name, role, createAt, updateAt]
+    const insertUserQuery = `
+    INSERT INTO User(email, password, salt, phoneNumber, nickName, name, role, createAt, updateAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+    `;
+    const insertUserResult = await connection.query(insertUserQuery, newUserInfo);
+
+    return insertUserResult;
+}
+
+async function selectStarbyEmail(connection, email) {
+    const selectStarbyEmailQuery = `
+    SELECT LikeFarmIDs
+    FROM User
+    WHERE email = ?;
+    `;
+    const starList = await connection.query(selectStarbyEmailQuery, email);
+
+    return starList;
+}
+
+async function updateUserStar(connection, starRequest) {
+    //starRequest [email, newStarList, updateAt]
+    const updateUserStarQuery = `
+    UPDATE User
+    SET LikeFarmIDs = ? updateAt = ?
+    WHERE Email = ?;
+    `;
+    const updateUserStarResult = await connection.query(updateUserStarQuery, starRequest);
+
+    return updateUserStarResult;
+}
+
+async function updateUserBirth(connection, birthRequest) {
+    //birthRequest = [email, birth, updateAt]
+    const updateUserBirthQuery = `
+    UPDATE User
+    SET Birth = ?, updateAt = ?
+    WHERE Email = ?;
+    `
+    const updateUserBirthResult = await connection.query(updateUserBirthQuery, birthRequest);
+
+    return updateUserBirthResult;
+}
+
 async function selectUserEmail(connection, userEmail) {
     const selectUserEmailQuery = `
                    SELECT *
@@ -42,6 +129,8 @@ async function updateName(connection, email, name) {
     SET Name = ?
     WHERE Email = ?;`;
     const updateUserRow = await connection.query(updateUserQuery, [name, email]);
+    console.log("name", name);
+    console.log("email",email);
     return updateUserRow[0];
 }
 
@@ -56,26 +145,31 @@ async function updatePhoneNum(connection, email, phoneNumber) {
 
 async function withdrawalUser(connection, email){
     const withdrawalUserQuery = `
-    UPDATE User
-    SET Status = 'D'
+    DELETE FROM User
     WHERE Email = ?;`
 
     const withdrawalUserRow = await connection.query(withdrawalUserQuery, email)
     return withdrawalUserRow[0]
 }
 
-async function eidtProfileImg(connection, email, img){
+async function eidtProfileImg(connection, email, img, key){
     const eidtProfileImgQuery = `
     UPDATE User
-    SET Picture_url = ?
+    SET Picture_url = ?, Picture_key = ?
     WHERE Email = ?;`
     console.log(img);
     console.log(email);
-    const updateUserRow = await connection.query(eidtProfileImgQuery, [img, email])
+    const updateUserRow = await connection.query(eidtProfileImgQuery, [img,key, email])
     return updateUserRow[0]
 }
 
 module.exports = {
+    selectUserbyEmail,
+    selectUserbyPhoneNumber,
+    insertUser,
+    selectStarbyEmail,
+    updateUserStar,
+    updateUserBirth,
     selectUserEmail,
     selectUser,
     updatePassword,
@@ -83,5 +177,7 @@ module.exports = {
     updateName,
     updatePhoneNum,
     withdrawalUser,
-    eidtProfileImg
+    eidtProfileImg,
+    SelectionUsedFarmArray,
+    SelectionUseFarmArray
 }
