@@ -17,9 +17,8 @@ const s3 = new S3Client({
 module.exports = deleteImg = async(req,res,next) => {
     try{
         const connection = await pool.getConnection(async (conn)=>conn)
-        const res = await userDao.selectUserEmail(connection,req.query.email)
+        const [res] = await userDao.selectUserbyEmail(connection,req.query.email)
         connection.release()
-
 
         if (res[0].Picture_key){
             const params = {
@@ -41,6 +40,7 @@ module.exports = deleteImg = async(req,res,next) => {
     }catch(err){
         console.log(err);
         console.log( errResponse2(baseResponse.DB_ERROR));
+        return
     }
 
 }
