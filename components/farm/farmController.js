@@ -98,6 +98,7 @@ exports.findFarms = async (req,res) => {
         if (!keyword) return res.send(errResponse2(baseResponse.FARM_NOT_KEYWORD))
 
         const farms = await farmProvider.retrieveFarms(keyword)
+        return res.send(farms)
     }catch(err){
         console.log(err);
     }
