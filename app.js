@@ -9,10 +9,10 @@ const app = express();
 
 app.use(cors(corsOptions))
 if (process.env.NODE_ENV === "production") {
-    app.use(morgan("combined"));
+    app.use(logger("combined"));
   } else {
     // development
-    app.use(morgan("dev"));
+    app.use(logger("dev"));
   }
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
