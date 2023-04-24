@@ -147,7 +147,7 @@ async function eidtProfileImg(connection, email, img, key){
     SET Picture_url = ?, Picture_key = ?
     WHERE Email = ?;`
     console.log(img);
-    console.log(email);
+    console.log(key);
     const updateUserRow = await connection.query(eidtProfileImgQuery, [img,key, email])
     return updateUserRow[0]
 }
