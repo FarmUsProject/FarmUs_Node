@@ -2,26 +2,27 @@ const { response, errResponse } = require('./../../config/response');
 const validator = require('../../helpers/validator');
 const resStatus = require("../../config/resStatus");
 const reserveService = require("./reserveService");
+const resStatus_5000 = require('../../config/resStatus_5000');
 
 
 /**
  * [POST] /reserve/request
  */
 exports.request = async function (req, res) {
-    // try {
+    try {
         const { email, farmid, startDate, endDate } = req.body;
         const invalidation = await validator.newReservation(email, farmid, startDate, endDate);
 
-        if (invalidation) return res.send(errResponse(invalidation));
+        if (invalidation) return(res.send(errResponse(invalidation)));
 
         const reserveRequest_result = await reserveService.request(email, farmid, startDate, endDate);
 
-        return res.send(reserveRequest_result)
+        return(res.send(reserveRequest_result));
 
-    // }
-    // catch (e) {
-    //     return res.send(errResponse(resStatus.SERVER_ERROR));
-    // }
+    }
+    catch (e) {
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
+    }
 }
 
 /**
@@ -32,15 +33,15 @@ exports.clientsList = async function (req, res) {
     const farmid = req.params.farmid;
     const invalidation = await validator.oneParams(farmid);
 
-    if (invalidation) return res.send(response(invalidation));
+    if (invalidation) return(res.send(response(invalidation)));
 
     const clientsListResponse = await reserveService.clientsList(farmid);
 
-    return res.send(clientsListResponse);
+    return(res.send(clientsListResponse));
 
     }
     catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
     }
 }
 
@@ -53,15 +54,15 @@ exports.farmsList = async function (req, res) {
         const userEmail = req.params.email;
         const invalidation = await validator.oneParams(userEmail);
 
-        if (invalidation) return res.send(response(invalidation));
+        if (invalidation) return(res.send(response(invalidation)));
 
         const farmsListResponse = await reserveService.farmsList(userEmail);
 
-        return res.send(farmsListResponse);
+        return(res.send(farmsListResponse));
 
     }
     catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
     }
 }
 /**
@@ -73,14 +74,54 @@ exports.cancel = async function (req, res) {
         const reserveId = req.params.reserveid;
         const invalidation = await validator.oneParams(reserveId);
 
-        if (invalidation) return response(invalidation);
+        if (invalidation) return(res.send(response(invalidation)));
 
         const cancelReservation = await reserveService.cancel(reserveId);
 
-        return response(cancelReservation)
+        return(res.send(response(cancelReservation)));
 
     }
     catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
     }
+}
+
+
+/**
+ *  [PUT] /reserve/status/:id/:status
+ */
+exports.editStatus = async function (req, res) {
+    try {
+        let status = req.params.status;
+        status = status.toUpperCase();
+
+        const reserveId = req.params.reserveid;
+
+        switch (status) {
+            case "ACCEPT":
+                status = "A";
+                break;
+            case "DENIED":
+                status = "D";
+                break;
+            case "HOLD":
+                status = "H";
+                break;
+            default :
+                return (res.send(errResponse(resStatus_5000.RESERVE_STATUS_ERROR)));
+        }
+
+        const invalidation = await validator.twoParams(reserveId, status);
+
+        if (invalidation) return (res.send(response(invalidation)));
+
+        const editStatusResult = await reserveService.editStatus(reserveId, status);
+
+        return(res.send(response(editStatusResult)));
+
+    }
+    catch (e) {
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
+    }
+
 }

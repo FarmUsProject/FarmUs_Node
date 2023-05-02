@@ -8,7 +8,7 @@ module.exports = function (app) {
     app.get("/api/postings", farm.getFarmlist);
 
     //농장 세부사항 조회
-    app.get("api/postings:Farmidx", farm.getFarmDetail);
+    app.get("/farm/detail/:farmid", farm.getFarmDetail);
 
     //과거 이용 내역 조회
     app.get("/farm/befolist:userid", farm.getFarmUsedList);

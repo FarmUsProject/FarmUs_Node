@@ -62,9 +62,9 @@ async function selectStarbyEmail(connection, email) {
 }
 
 async function updateUserStar(connection, starRequest) {
-    //starRequest [email, newStarList, updateAt]
+    //starRequest [newStarList, updateAt, email]
     const updateUserStarQuery = `
-    UPDATE user
+    UPDATE User
     SET LikeFarmIDs = ? updateAt = ?
     WHERE Email = ?;
     `;
@@ -97,7 +97,7 @@ async function selectUser(connection, name, phoneNumber){
 
 async function updatePassword(connection, email, pw) {
     const updateUserQuery = `
-    UPDATE user
+    UPDATE User
     SET Password = ?
     WHERE Email = ?;`;
     const updateUserRow = await connection.query(updateUserQuery, [pw, email]);

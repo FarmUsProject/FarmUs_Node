@@ -84,11 +84,11 @@ exports.star = async function (req, res) {
         const { email, farmid } = req.body;
         const invalidation = await validator.twoParams(email, farmid);
 
-        if (invalidation) return errResponse(invalidation);
+        if (invalidation) return(res.send(errResponse(invalidation)));
 
         const starResponse = await userService.addStar(email, farmid);
 
-        return res.send(starResponse);
+        return(res.send(starResponse));
     }
     catch (e) {
         res.send(errResponse(resStatus.SERVER_ERROR));
@@ -103,14 +103,14 @@ exports.birth = async function (req, res) {
         const { email, birth } = req.body;
         const invalidation = await validator.oneParams(birth);
 
-        if (invalidation) return errResponse(invalidation);
+        if (invalidation) return(res.send(errResponse(invalidation)));
 
         if (!dateAvailability.isValidDatetype)
-            return errResponse(resStatus_5000.DATE_TYPE_WEIRD);
+            return(res.send(errResponse(resStatus_5000.DATE_TYPE_WEIRD)));
 
         const birthResponse = await userService.editBirth(email, birth);
 
-        return res.send(birthResponse);
+        return(res.send(birthResponse));
     }
     catch (e) {
         res.send(errResponse(resStatus.SERVER_ERROR))
@@ -343,16 +343,22 @@ exports.editUserPhoneNumber = async(req,res) =>{
     return res.send(eidtUser)
 }
 
-exports.editUsePassword = async(req,res) =>{
-    const {email}  = req.query;
-    const {password} = req.body
+exports.editUserPassword = async(req,res) =>{
+    // try {
+        const { email, password } = req.body;
 
-    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
-    if (!password) return res.send(response2(baseResponse.SIGNIN_PASSWORD_EMPTY))
+        const invalidation = await validator.login(email, password);
 
-    const eidtUser = await userService.editPassword(email, password)
+        if (invalidation) return res.send(errResponse(invalidation));
 
-    return res.send(eidtUser)
+        const editPasswordResponse = await userService.editPassword(email, password);
+
+        return res.send(editPasswordResponse);
+
+    // }
+    // catch (e) {
+    //     res.send(errResponse(resStatus.SERVER_ERROR));
+    // }
 }
 
 exports.editUserProfileImg = async(req,res)=> {

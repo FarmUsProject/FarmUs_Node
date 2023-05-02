@@ -21,7 +21,9 @@ const encryptedPassword = {
   verifyPassword : async (password, salt, userPassword) => {
     const key = await pbkdf2Promise(password, salt, 108273, 64, "sha512");
     const hashedPassword = key.toString("base64");
-     if (hashedPassword == userPassword) return true;
+    console.log("[uu]",hashedPassword);
+    console.log("[db]",userPassword);
+     if (hashedPassword === userPassword) return true;
      else return false;
   }
 }

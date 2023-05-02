@@ -45,10 +45,36 @@ async function selectReservedItem(connection, reserveID) {
     return reservedFarms;
 }
 
+async function cancelReservation(connection , reserveID) {
+    const cancelReservationQuery = `
+    DELETE
+    FROM Reservation
+    WHERE ReserveID = ?;
+    `;
+
+    const canceledReservation = await connection.query(cancelReservationQuery, reserveID);
+
+    return canceledReservation;
+}
+
+async function editReservationStatus(connection, updatedStatusInfo) {
+    //updatedStatuasInfo = [status, updateAt, reserveID]
+    const updatedStatusQuery = `
+    UPDATE Reservation
+    SET Status = ?, updateAt = ?
+    WHERE reserveID = ?;
+    `;
+
+    const updatedStatusResult = await connection.query(updatedStatusQuery, updatedStatusInfo);
+
+    return updatedStatusResult;
+}
 
 module.exports = {
     insertReservation,
     selectReservedClients,
     selectReservedFarms,
-    selectReservedItem
+    selectReservedItem,
+    cancelReservation,
+    editReservationStatus
 }

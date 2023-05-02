@@ -132,3 +132,14 @@ exports.eidtMyFarm = async(connection, farmID, farmInfo) =>{
     return res
 
 }
+exports.updateFarmStar = async(connection, updatedStarNumberInfo) => {
+    // updatedStarNumberInfo = [StarNumber, updateAt, farmID]
+    const updateFarmStarQuery = `
+    UPDATE FARM
+    SET Star = ?, updateAt = ?
+    WHERE FarmID = ?
+    `
+
+    const updatedStarNumber = await connection.query(updateFarmStarQuery, updatedStarNumberInfo);
+    return updatedStarNumber;
+}
