@@ -1,7 +1,7 @@
 const SelectionUsedFarmArray = async (connection, userid) => {
     const UsedFarmArrayQuery = `
     Select BefoUse_Farm
-    From User
+    From user
     WHERE userid = ?;
     `;
 
@@ -11,7 +11,7 @@ const SelectionUsedFarmArray = async (connection, userid) => {
 const SelectionUseFarmArray = async (connection, userid) => {
     const UseFarmArrayQuery = `
     Select CurUse_Farm
-    From User
+    From user
     WHERE userid = ?;
     `;
 
@@ -21,8 +21,8 @@ const SelectionUseFarmArray = async (connection, userid) => {
 async function selectUserbyEmail(connection, email) {
     const selectUserbyEmailQuery = `
     SELECT *
-    FROM User
-    WHERE email = ?;
+    FROM user
+    WHERE Email = ?;
     `;
     const userInfo = await connection.query(selectUserbyEmailQuery, email);
 
@@ -32,8 +32,8 @@ async function selectUserbyEmail(connection, email) {
 async function selectUserbyPhoneNumber(connection, phoneNumber) {
     const selectUserbyPhoneNumberQuery = `
     SELECT *
-    FROM User
-    WHERE phoneNumber = ?;
+    FROM user
+    WHERE PhoneNumber = ?;
     `;
     const userInfo = await connection.query(selectUserbyPhoneNumberQuery, phoneNumber);
 
@@ -41,9 +41,8 @@ async function selectUserbyPhoneNumber(connection, phoneNumber) {
 }
 
 async function insertUser(connection, newUserInfo) {
-    //newUserInfo [email, hashedPassword, salt, phoneNumber, nickName, name, role, createAt, updateAt]
     const insertUserQuery = `
-    INSERT INTO User(email, password, salt, phoneNumber, nickName, name, role, createAt, updateAt)
+    INSERT INTO user(Email, Password, Salt, PhoneNumber, NickName, Name, Role, createAt, updateAt)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
     const insertUserResult = await connection.query(insertUserQuery, newUserInfo);
@@ -54,8 +53,8 @@ async function insertUser(connection, newUserInfo) {
 async function selectStarbyEmail(connection, email) {
     const selectStarbyEmailQuery = `
     SELECT LikeFarmIDs
-    FROM User
-    WHERE email = ?;
+    FROM user
+    WHERE Email = ?;
     `;
     const starList = await connection.query(selectStarbyEmailQuery, email);
 
@@ -66,7 +65,7 @@ async function updateUserStar(connection, starRequest) {
     //starRequest [newStarList, updateAt, email]
     const updateUserStarQuery = `
     UPDATE User
-    SET LikeFarmIDs = ?, updateAt = ?
+    SET LikeFarmIDs = ? updateAt = ?
     WHERE Email = ?;
     `;
     const updateUserStarResult = await connection.query(updateUserStarQuery, starRequest);
@@ -77,7 +76,7 @@ async function updateUserStar(connection, starRequest) {
 async function updateUserBirth(connection, birthRequest) {
     //birthRequest = [email, birth, updateAt]
     const updateUserBirthQuery = `
-    UPDATE User
+    UPDATE user
     SET Birth = ?, updateAt = ?
     WHERE Email = ?;
     `
@@ -86,41 +85,28 @@ async function updateUserBirth(connection, birthRequest) {
     return updateUserBirthResult;
 }
 
-async function selectUserEmail(connection, userEmail) {
-    const selectUserEmailQuery = `
-                   SELECT *
-                   FROM User
-                   WHERE Email = ?;
-                   `;
-    const [userRow] = await connection.query(selectUserEmailQuery, userEmail);
-    return userRow;
-}
 
 async function selectUser(connection, name, phoneNumber){
     const selectUserQuery = `
     SELECT Name, Email
-    FROM User
+    FROM user
     WHERE Name = ? AND PhoneNumber = ?;`;
     const [userRow] = await connection.query(selectUserQuery, [name, phoneNumber]);
     return userRow;
 }
 
-async function updatePassword(connection, newUserInfo) {
-    // newUserInfo = [password, salt, updateAt, Email]
-
-    const updatePasswordQuery = `
+async function updatePassword(connection, email, pw) {
+    const updateUserQuery = `
     UPDATE User
-    SET Password = ?, Salt = ?, updateAt = ?
-    WHERE Email = ?;
-    `;
-
-    const updatePasswordResult = await connection.query(updatePasswordQuery, newUserInfo);
-    return updatePasswordResult;
+    SET Password = ?
+    WHERE Email = ?;`;
+    const updateUserRow = await connection.query(updateUserQuery, [pw, email]);
+    return updateUserRow[0];
 }
 
 async function updateNickName(connection, email, nickname) {
     const updateUserQuery = `
-    UPDATE User
+    UPDATE user
     SET NickName = ?
     WHERE Email = ?;`;
     const updateUserRow = await connection.query(updateUserQuery, [nickname, email]);
@@ -129,18 +115,17 @@ async function updateNickName(connection, email, nickname) {
 
 async function updateName(connection, email, name) {
     const updateUserQuery = `
-    UPDATE User
+    UPDATE user
     SET Name = ?
     WHERE Email = ?;`;
     const updateUserRow = await connection.query(updateUserQuery, [name, email]);
-    console.log("name", name);
-    console.log("email",email);
+
     return updateUserRow[0];
 }
 
 async function updatePhoneNum(connection, email, phoneNumber) {
     const updateUserQuery = `
-    UPDATE User
+    UPDATE user
     SET PhoneNumber = ?
     WHERE Email = ?;`;
     const updateUserRow = await connection.query(updateUserQuery, [phoneNumber, email]);
@@ -149,21 +134,21 @@ async function updatePhoneNum(connection, email, phoneNumber) {
 
 async function withdrawalUser(connection, email){
     const withdrawalUserQuery = `
-    DELETE FROM User
+    DELETE FROM user
     WHERE Email = ?;`
 
     const withdrawalUserRow = await connection.query(withdrawalUserQuery, email)
     return withdrawalUserRow[0]
 }
 
-async function eidtProfileImg(connection, email, img){
+async function eidtProfileImg(connection, email, img, key){
     const eidtProfileImgQuery = `
-    UPDATE User
-    SET Picture_url = ?
+    UPDATE user
+    SET Picture_url = ?, Picture_key = ?
     WHERE Email = ?;`
     console.log(img);
-    console.log(email);
-    const updateUserRow = await connection.query(eidtProfileImgQuery, [img, email])
+    console.log(key);
+    const updateUserRow = await connection.query(eidtProfileImgQuery, [img,key, email])
     return updateUserRow[0]
 }
 
@@ -174,7 +159,6 @@ module.exports = {
     selectStarbyEmail,
     updateUserStar,
     updateUserBirth,
-    selectUserEmail,
     selectUser,
     updatePassword,
     updateNickName,

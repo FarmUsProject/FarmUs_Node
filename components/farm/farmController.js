@@ -1,5 +1,5 @@
 const farmProvider = require('./farmProvider');
-const farmService = require("./farmService");
+const farmService = require('./farmService');
 const User = require('../user/userProvider');
 const { response, errResponse} = require("../../config/response");
 const resStatus = require('../../config/resStatus');
@@ -55,6 +55,22 @@ exports.register_FarmOwner = async (req, res) =>{
 
 }
 
+exports.editFarm = async(req, res) =>{
+    try{
+        //const {farmID} = req.params;
+        const farmID = req.query.farmID;
+        const {Name} = req.body
+
+        const eidtFarmRes = await farmService.editFarmInfo(farmID, Name)
+        //console.log(eidtFarmRes);
+
+        return res.send(eidtFarmRes)
+    }catch(err){
+        return res.send(err)
+    }
+
+}
+
 /**
  * [POST] /farm/postings
  */
@@ -76,10 +92,15 @@ exports.newFarm = async function (req, res) {
 }
 
 exports.findFarms = async (req,res) => {
-    const {keyword} = req.query
+    try{
+        const {keyword} = req.query
 
-    if (!keyword) return res.send(errResponse2(baseResponse.FARM_NOT_KEYWORD))
+        if (!keyword) return res.send(errResponse2(baseResponse.FARM_NOT_KEYWORD))
 
-    const farms = await farmProvider.retrieveFarms(keyword)
-    return res.send(farms)
+        const farms = await farmProvider.retrieveFarms(keyword)
+        return res.send(farms)
+    }catch(err){
+        console.log(err);
+    }
+
 }

@@ -19,7 +19,7 @@ exports.retrieveCurFarmArray = async (userid) =>{
 
 exports.retrieveUserEmail = async function (userEmail) {
     const connection = await pool.getConnection(async (conn) => conn);
-    const res = await userDao.selectUserEmail(connection, userEmail);
+    const [res] = await userDao.selectUserbyEmail(connection, userEmail);
 
     connection.release();
 

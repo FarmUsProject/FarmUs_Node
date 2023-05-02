@@ -1,3 +1,5 @@
+//const { connection } = require("mongoose");
+
 exports.selectionFarm = async (connection) => {
     const selectFarmListQuery = `
         SELECT FarmID, Name, Owner, Picture_url, Price, Term, SquaredMeters, Location, Category, Tag
@@ -90,11 +92,19 @@ exports.selectFarmbyFarmInfo = async(connection, sameFarmInfo) =>{
 
 exports.searchFarm = async(connection, keyword) => {
     const searchFarmQuery = `
-    SELECT FarmName, Location, Price, SquaredMeters, Picture_url, Views, Star, Likes, createAt
+    SELECT FarmID,
+			Name,
+			Picture_url,
+			Price,
+			SquaredMeters,
+			LocationBig,
+			LocationMid,
+			LocationSmall,
+			Likes
     FROM farm
-    WHERE FarmName LIKE ? OR Location LIKE ?;`
+    WHERE Name LIKE ? OR LocationBig LIKE ? OR LocationMid LIKE ? OR LocationSmall LIKE ?;`
     console.log(keyword);
-    const [farmRow] = await connection.query(searchFarmQuery,[keyword,keyword])
+    const [farmRow] = await connection.query(searchFarmQuery,[keyword,keyword,keyword,keyword])
     console.log(farmRow);
     return farmRow
 }
@@ -110,6 +120,18 @@ exports.withdrawalUserFarm = async(connection, email) => {
     return selectStarbyEmail
 }
 
+exports.eidtMyFarm = async(connection, farmID, farmInfo) =>{
+    console.log(farmInfo, farmID);
+    const eidtFarmQuery = `
+    UPDATE Farm
+    SET Name = ?
+    WHERE FarmID = ?;
+    `
+    const [res] = await connection.query(eidtFarmQuery, [farmInfo, farmID])
+    console.log("res",res);
+    return res
+
+}
 exports.updateFarmStar = async(connection, updatedStarNumberInfo) => {
     // updatedStarNumberInfo = [StarNumber, updateAt, farmID]
     const updateFarmStarQuery = `
