@@ -2,6 +2,7 @@ const { response, errResponse } = require('./../../config/response');
 const validator = require('../../helpers/validator');
 const resStatus = require("../../config/resStatus");
 const reserveService = require("./reserveService");
+const resStatus_5000 = require('../../config/resStatus_5000');
 
 
 /**
@@ -40,7 +41,7 @@ exports.clientsList = async function (req, res) {
 
     }
     catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
     }
 }
 
@@ -61,7 +62,7 @@ exports.farmsList = async function (req, res) {
 
     }
     catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
     }
 }
 /**
@@ -81,7 +82,7 @@ exports.cancel = async function (req, res) {
 
     }
     catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
     }
 }
 
@@ -91,10 +92,24 @@ exports.cancel = async function (req, res) {
  */
 exports.editStatus = async function (req, res) {
     try {
-        const reserveId = req.params.id;
-
         let status = req.params.status;
         status = status.toUpperCase();
+
+        const reserveId = req.params.reserveid;
+
+        switch (status) {
+            case "ACCEPT":
+                status = "A";
+                break;
+            case "DENIED":
+                status = "D";
+                break;
+            case "HOLD":
+                status = "H";
+                break;
+            default :
+                return (res.send(errResponse(resStatus_5000.RESERVE_STATUS_ERROR)));
+        }
 
         const invalidation = await validator.twoParams(reserveId, status);
 
@@ -102,9 +117,11 @@ exports.editStatus = async function (req, res) {
 
         const editStatusResult = await reserveService.editStatus(reserveId, status);
 
+        return(res.send(response(editStatusResult)));
+
     }
     catch (e) {
-        res.sent(errResponse(resStatus.SERVER_ERROR));
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
     }
 
 }

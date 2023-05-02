@@ -14,9 +14,9 @@ exports.getFarmlist = async (req, res) => {
 }
 
 exports.getFarmDetail = async (req, res) => {
-    const { Farmidx } = req.params;
+    const { farmid } = req.params;
 
-    if(!Farmidx) return res.render(errResponse(FARMID_EMPTY));
+    if(!farmid) return res.render(errResponse(FARMID_EMPTY));
 
     const getFarmDetail = await farmProvider.retrieveFarmDetail(Farmidx);
     return res.render(response(resStatus.SUCCESS, getFarmDetail));
