@@ -25,10 +25,18 @@ const S3_ACCESS = {
     KEY : process.env.S3_KEY,
     SECRET_KEY : process.env.S3_SECRET_KEY
 }
+const secretKey = process.env.JWT_SECRET_KEY
+const options = {
+    algorithm : process.env.algorithm,
+    expiresIn : process.env.expiresIn,
+    issuer : process.env.issuer
+}
 module.exports = {
     googleSecret,
     NCP_SENS,
     REDIS,
     DB_ENV,
-    S3_ACCESS
+    S3_ACCESS,
+    secretKey,
+    options
 }
