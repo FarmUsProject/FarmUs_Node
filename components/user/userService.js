@@ -1,6 +1,7 @@
 const userProvider = require('./../user/userProvider');
 const userDao = require('./../user/userDao');
 const farmProvider = require('./../farm/farmProvider');
+const farmDao = require('./../farm/farmDao');
 const { response, errResponse } = require('../../config/response');
 const { response2, errResponse2 } = require('../../config/response2');
 const resStatus = require('../../config/resStatus');
@@ -13,7 +14,7 @@ const setDate = require('./../../helpers/setDate');
 
 exports.login = async(email, password) =>{
 
-    const userInfo = await userProvider.userbyEmail(email);
+    const userInfo = await userProvider.usersbyEmail(email);
     if (userInfo.length < 1) return errResponse2(resStatus.USER_USEREMAIL_NOT_EXIST);
 
     const userPassword = userInfo[0].Password;
@@ -30,7 +31,7 @@ exports.login = async(email, password) =>{
 
 
 exports.signUp = async(email, password, phoneNumber, nickName, name, role) =>{
-    const userInfo = await userProvider.userbyEmail(email);
+    const userInfo = await userProvider.usersbyEmail(email);
     if (userInfo.length >= 1) return errResponse(resStatus.SIGNUP_REDUNDANT_EMAIL);
 
     const encryptedData = await encryptedPassword.createHashedPassword(password);
@@ -48,33 +49,59 @@ exports.signUp = async(email, password, phoneNumber, nickName, name, role) =>{
 };
 
 exports.addStar= async(email, farmId) =>{
-    const userInfo = await userProvider.userbyEmail(email);
+    const userInfo = await userProvider.usersbyEmail(email);
     const farmInfo = await farmProvider.farmbyfarmID(farmId);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
-    if (farmInfo.length < 1) return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
+    if (!farmInfo)  return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
 
     let newstarList;
     const userStarList = await userProvider.starListbyEmail(email);
-    if (userStarList.length > 0) newstarList = userStarList + ", " + toString(farmId);
-    else newstarList = toString(farmId);
+    if (userStarList[0].LikeFarmIDs.length > 0) {
+        let startListString = userStarList[0].LikeFarmIDs;
+        const existedArr = startListString.split(", ");
+        for (e in existedArr) {
+            if(e.localeCompare(farmId) != 0 ) return errResponse(resStatus_5000.USER_REDUNDANT_STAR);
+        }
+        newstarList = userStarList[0].LikeFarmIDs + ", " + farmId;
+    }
+    else newstarList = farmId;
+    console.log(userStarList[0]);
 
     const now = await setDate.now();
-    const starRequest = [email, newstarList, now];
+    const starRequest = [newstarList, now, email];
 
     const connection = await pool.getConnection(async conn => conn);
     const starList = await userDao.updateUserStar(connection, starRequest);
 
-    connection.release();
+    /**
+     * PLUS # OF FARM STAR
+    */
+    try {
+
+        let updatedStarNumber = 0;
+        if (farmInfo.Star && farmInfo.Star > 0) {
+            updatedStarNumber += farmInfo.Star;
+        }
+        const now = await setDate.now();
+        const updatedStarNumberInfo = [updatedStarNumber, now, farmId]
+        const updatedStar = await farmDao.updateFarmStar(connection, updatedStarNumberInfo);
+
+        connection.release();
+
+    }
+    catch (e) {
+        return errResponse(resStatus_5000.FARM_UPDATE_STAR_ERROR);
+    }
 
     return response(resStatus_5000.USER_STAR_ADD_SUCCESS, null);
 }
 
 exports.editBirth = async(email, birth) =>{
-    const userInfo = await userProvider.userbyEmail(email);
+    const userInfo = await userProvider.usersbyEmail(email);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
 
     const now = await setDate.now();
-    const newUserInfo = [email, birth, now];
+    const newUserInfo = [birth, now, email];
 
     const connection = await pool.getConnection(async conn => conn);
 
@@ -86,18 +113,23 @@ exports.editBirth = async(email, birth) =>{
 }
 
 
-exports.editPassword = async (email,pw) =>{
-    try{
-        const connection = await pool.getConnection(async (conn)=>conn)
-        const res = await userDao.updatePassword(connection, email, pw)
-        connection.release()
-        if (res)
-            return response2(baseResponse.SUCCESS)
+exports.editPassword = async (email,password) =>{
+    const userInfo = await userProvider.usersbyEmail(email);
+    if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
 
-    }catch(err){
-        console.log(err);
-        return errResponse2(baseResponse.DB_ERROR)
-    }
+    const encryptedData = await encryptedPassword.createHashedPassword(password);
+    const hashedPassword = encryptedData.hashedPassword;
+    const salt = encryptedData.salt;
+    const now = await setDate.now();
+    const newUserInfo = [hashedPassword, salt, now, email];
+
+    const connection = await pool.getConnection(async conn => conn);
+
+    const editPasswordResult = await userDao.updatePassword(connection, newUserInfo);
+
+    connection.release();
+
+    return response(resStatus_5000.USER_PASSWORD_EDIT_SUCCESS, null)
 }
 
 exports.editNickName = async (email,nickname) =>{

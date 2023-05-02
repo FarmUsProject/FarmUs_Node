@@ -8,7 +8,7 @@ const { pool } = require('../../config/database');
 const setDate = require('./../../helpers/setDate');
 
 async function signUp(email, phoneNumber, name, role) {
-    const userInfobyEmail = await userProvider.userbyEmail(email);
+    const userInfobyEmail = await userProvider.usersbyEmail(email);
     if (userInfobyEmail.length >= 1) return errResponse(resStatus_5000.USER_OAUTH_SIGNUP_REDUNDANT_EMAIL);
 
     // const userInfobyPhoneNumber = await userProvider.userbyPhoneNumber(phoneNumber);

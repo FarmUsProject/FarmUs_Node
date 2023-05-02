@@ -13,4 +13,7 @@ module.exports = function(app){
     // 4. 예약 취소
     app.put('/reserve/cancel/:reserveid', reserve.cancel);
 
+    // 5. 예약 상태 변경 - 예약 승낙, 예약 보류, 예약 거부
+    app.put('/reserve/:status/:reserveid', reserve.editStatus);
+
 };
