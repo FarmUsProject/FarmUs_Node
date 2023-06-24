@@ -57,14 +57,31 @@ exports.register_FarmOwner = async (req, res) =>{
 
 exports.editFarm = async(req, res) =>{
     try{
-        //const {farmID} = req.params;
-        const farmID = req.query.farmID;
-        const {Name} = req.body
+        const {farmId, name} = req.query;
+        if (!farmId) return res.send(errResponse2(baseResponse.FARMID_EMPTY))
+        if (!name) return res.send(errResponse2(baseResponse.FARM_NAME_EMPTY))
 
-        const eidtFarmRes = await farmService.editFarmInfo(farmID, Name)
-        //console.log(eidtFarmRes);
+        const eidtFarmInfoRes = await farmService.editFarmInfo(farmId, req.body)
 
-        return res.send(eidtFarmRes)
+        // req.files의 originalname
+        /*
+        const locations = req.files.map(file => file.location);
+        const keys = req.files.map(file => file.key);
+
+        console.log("Locations:", locations);
+        console.log("Keys:", keys);
+        */
+       if (!eidtFarmInfoRes.result) return res.send(eidtFarmInfoRes)
+
+        let editFarmPicturesRes;
+        for (let i = 0; i < req.files.length; i++) {
+            const file = req.files[i];
+            const location = file.location;
+            const key = file.key;
+            editFarmPicturesRes = await farmService.editFarmPictures(farmId, name, location, key);
+            if (!editFarmPicturesRes.result) break
+        }
+        return res.send(editFarmPicturesRes);
     }catch(err){
         return res.send(err)
     }

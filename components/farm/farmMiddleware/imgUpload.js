@@ -11,7 +11,7 @@ const storage = multer_s3({
         cb(null, {fieldName: file.fieldname});
     },
     key: function (req, file, cb) {
-        cb(null, `user/${Date.now()}_${file.originalname}`);
+        cb(null, `farm/${Date.now()}_${file.originalname}`);
     }
 })
 
@@ -25,7 +25,6 @@ const upload = multer({
         return callback(new Error("Only .png .jpg and .jpeg format allowed!"));
         }
     },
-});
+})
 
-
-module.exports = upload.single('file');
+module.exports = upload.array('file',5);
