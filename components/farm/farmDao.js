@@ -101,7 +101,7 @@ exports.searchFarm = async(connection, keyword) => {
 			LocationMid,
 			LocationSmall,
 			Likes
-    FROM farm
+    FROM Farm
     WHERE Name LIKE ? OR LocationBig LIKE ? OR LocationMid LIKE ? OR LocationSmall LIKE ?;`
     console.log(keyword);
     const [farmRow] = await connection.query(searchFarmQuery,[keyword,keyword,keyword,keyword])
@@ -121,21 +121,32 @@ exports.withdrawalUserFarm = async(connection, email) => {
 }
 
 exports.eidtMyFarm = async(connection, farmID, farmInfo) =>{
-    console.log(farmInfo, farmID);
+    const update =  Object.values(farmInfo)
+    update.push(farmID)
     const eidtFarmQuery = `
     UPDATE Farm
-    SET Name = ?
+    SET Name = ?, Description=?, LocationBig=?, LocationMid=?, LocationSmall=?, SquaredMeters=?, Price=?
     WHERE FarmID = ?;
     `
-    const [res] = await connection.query(eidtFarmQuery, [farmInfo, farmID])
+    const [res] = await connection.query(eidtFarmQuery, update)
     console.log("res",res);
     return res
 
 }
+
+exports.editFarmPicture = async(connection, farmID, farmName, img, key) => {
+    const saveFarmPicturesQuery= `
+    INSERT INTO FarmPictures(FarmID, Name, Picture_url, Picture_key)
+    VALUES (?, ?, ?, ?);
+    `
+    const postFarmPicture = await connection.query(saveFarmPicturesQuery, [farmID, farmName, img, key])
+    return postFarmPicture[0]
+}
+
 exports.updateFarmStar = async(connection, updatedStarNumberInfo) => {
     // updatedStarNumberInfo = [StarNumber, updateAt, farmID]
     const updateFarmStarQuery = `
-    UPDATE FARM
+    UPDATE Farm
     SET Star = ?, updateAt = ?
     WHERE FarmID = ?
     `
