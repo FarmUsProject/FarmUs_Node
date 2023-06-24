@@ -101,7 +101,7 @@ exports.searchFarm = async(connection, keyword) => {
 			LocationMid,
 			LocationSmall,
 			Likes
-    FROM farm
+    FROM Farm
     WHERE Name LIKE ? OR LocationBig LIKE ? OR LocationMid LIKE ? OR LocationSmall LIKE ?;`
     console.log(keyword);
     const [farmRow] = await connection.query(searchFarmQuery,[keyword,keyword,keyword,keyword])
@@ -135,7 +135,7 @@ exports.eidtMyFarm = async(connection, farmID, farmInfo) =>{
 exports.updateFarmStar = async(connection, updatedStarNumberInfo) => {
     // updatedStarNumberInfo = [StarNumber, updateAt, farmID]
     const updateFarmStarQuery = `
-    UPDATE FARM
+    UPDATE Farm
     SET Star = ?, updateAt = ?
     WHERE FarmID = ?
     `

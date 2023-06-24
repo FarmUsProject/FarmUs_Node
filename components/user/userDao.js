@@ -1,7 +1,7 @@
 const SelectionUsedFarmArray = async (connection, userid) => {
     const UsedFarmArrayQuery = `
     Select BefoUse_Farm
-    From user
+    From User
     WHERE userid = ?;
     `;
 
@@ -11,7 +11,7 @@ const SelectionUsedFarmArray = async (connection, userid) => {
 const SelectionUseFarmArray = async (connection, userid) => {
     const UseFarmArrayQuery = `
     Select CurUse_Farm
-    From user
+    From User
     WHERE userid = ?;
     `;
 
@@ -21,7 +21,7 @@ const SelectionUseFarmArray = async (connection, userid) => {
 async function selectUserbyEmail(connection, email) {
     const selectUserbyEmailQuery = `
     SELECT *
-    FROM user
+    FROM User
     WHERE Email = ?;
     `;
     const userInfo = await connection.query(selectUserbyEmailQuery, email);
@@ -32,7 +32,7 @@ async function selectUserbyEmail(connection, email) {
 async function selectUserbyPhoneNumber(connection, phoneNumber) {
     const selectUserbyPhoneNumberQuery = `
     SELECT *
-    FROM user
+    FROM User
     WHERE PhoneNumber = ?;
     `;
     const userInfo = await connection.query(selectUserbyPhoneNumberQuery, phoneNumber);
@@ -42,7 +42,7 @@ async function selectUserbyPhoneNumber(connection, phoneNumber) {
 
 async function insertUser(connection, newUserInfo) {
     const insertUserQuery = `
-    INSERT INTO user(Email, Password, Salt, PhoneNumber, NickName, Name, Role, createAt, updateAt)
+    INSERT INTO User(Email, Password, Salt, PhoneNumber, NickName, Name, Role, createAt, updateAt)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
     const insertUserResult = await connection.query(insertUserQuery, newUserInfo);
@@ -53,7 +53,7 @@ async function insertUser(connection, newUserInfo) {
 async function selectStarbyEmail(connection, email) {
     const selectStarbyEmailQuery = `
     SELECT LikeFarmIDs
-    FROM user
+    FROM User
     WHERE Email = ?;
     `;
     const starList = await connection.query(selectStarbyEmailQuery, email);
@@ -76,7 +76,7 @@ async function updateUserStar(connection, starRequest) {
 async function updateUserBirth(connection, birthRequest) {
     //birthRequest = [email, birth, updateAt]
     const updateUserBirthQuery = `
-    UPDATE user
+    UPDATE User
     SET Birth = ?, updateAt = ?
     WHERE Email = ?;
     `
@@ -89,7 +89,7 @@ async function updateUserBirth(connection, birthRequest) {
 async function selectUser(connection, name, phoneNumber){
     const selectUserQuery = `
     SELECT Name, Email
-    FROM user
+    FROM User
     WHERE Name = ? AND PhoneNumber = ?;`;
     const [userRow] = await connection.query(selectUserQuery, [name, phoneNumber]);
     return userRow;
@@ -106,7 +106,7 @@ async function updatePassword(connection, email, pw) {
 
 async function updateNickName(connection, email, nickname) {
     const updateUserQuery = `
-    UPDATE user
+    UPDATE User
     SET NickName = ?
     WHERE Email = ?;`;
     const updateUserRow = await connection.query(updateUserQuery, [nickname, email]);
@@ -115,7 +115,7 @@ async function updateNickName(connection, email, nickname) {
 
 async function updateName(connection, email, name) {
     const updateUserQuery = `
-    UPDATE user
+    UPDATE User
     SET Name = ?
     WHERE Email = ?;`;
     const updateUserRow = await connection.query(updateUserQuery, [name, email]);
@@ -125,7 +125,7 @@ async function updateName(connection, email, name) {
 
 async function updatePhoneNum(connection, email, phoneNumber) {
     const updateUserQuery = `
-    UPDATE user
+    UPDATE User
     SET PhoneNumber = ?
     WHERE Email = ?;`;
     const updateUserRow = await connection.query(updateUserQuery, [phoneNumber, email]);
@@ -134,7 +134,7 @@ async function updatePhoneNum(connection, email, phoneNumber) {
 
 async function withdrawalUser(connection, email){
     const withdrawalUserQuery = `
-    DELETE FROM user
+    DELETE FROM User
     WHERE Email = ?;`
 
     const withdrawalUserRow = await connection.query(withdrawalUserQuery, email)
@@ -143,7 +143,7 @@ async function withdrawalUser(connection, email){
 
 async function eidtProfileImg(connection, email, img, key){
     const eidtProfileImgQuery = `
-    UPDATE user
+    UPDATE User
     SET Picture_url = ?, Picture_key = ?
     WHERE Email = ?;`
     console.log(img);
