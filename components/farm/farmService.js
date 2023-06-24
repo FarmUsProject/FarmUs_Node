@@ -66,22 +66,25 @@ exports.deleteUserFarm = async(email) =>{
 exports.editFarmInfo = async(farmID, farmInfo) =>{
     try{
         const connection = await pool.getConnection(async (conn)=>conn)
-        console.log(farmID);
         const res = await farmDao.eidtMyFarm(connection, farmID, farmInfo)
         connection.release()
 
-        if(res)
-            return response2(baseResponse.SUCCESS)
+        return response2(baseResponse.SUCCESS)
     }catch(err){
         console.log(err);
         return errResponse2(baseResponse.DB_ERROR)
     }
 }
-/*
-module.exports = {
-    newFarm,
-    Changeto_Owner,
-    deleteUserFarm,
-    editFarmInfo
-};
-*/
+
+exports.editFarmPictures = async(farmID, farmName, img, key) =>{
+    try{
+        const connection = await pool.getConnection(async (conn)=>conn)
+        const res = await farmDao.editFarmPicture(connection, farmID, farmName, img, key)
+        connection.release()
+
+        return response2(baseResponse.SUCCESS)
+    }catch(err){
+        console.log(err);
+        return errResponse2(baseResponse.DB_ERROR)
+    }
+}

@@ -62,6 +62,8 @@ module.exports = {
     USER_EDITINFO_EMPTYEMAIL : {"result": false, "code":6005, "message": "로그인 한 회원의 이메일 값 전달되지 않음"},
 
     FARM_NOT_KEYWORD : { "result": false, "code": 6005, "message": "검색어를 입력해주세요" },
+    FARM_NAME_EMPTY : {"result": false, "code": 6006, "message": "농장 이름값이 비었습니다."},
 
     REDIS_ERROR : {'result': false, 'code':6900, 'message': "REDIS 에러"}
+
 }
