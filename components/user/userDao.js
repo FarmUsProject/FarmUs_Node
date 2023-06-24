@@ -42,7 +42,7 @@ async function selectUserbyPhoneNumber(connection, phoneNumber) {
 
 async function insertUser(connection, newUserInfo) {
     const insertUserQuery = `
-    INSERT INTO user(Email, Password, Salt, PhoneNumber, NickName, Name, Role, createAt, updateAt)
+    INSERT INTO User(Email, Password, Salt, PhoneNumber, NickName, Name, Role, createAt, updateAt)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
     const insertUserResult = await connection.query(insertUserQuery, newUserInfo);
