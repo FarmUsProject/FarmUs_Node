@@ -56,7 +56,7 @@ exports.addStar= async(email, farmId) =>{
 
     let newstarList;
     const userStarList = await userProvider.starListbyEmail(email);
-    if (userStarList[0].LikeFarmIDs.length > 0) {
+    if (userStarList[0].LikeFarmIDs && userStarList[0].LikeFarmIDs.length > 0) {
         let startListString = userStarList[0].LikeFarmIDs;
         const existedArr = startListString.split(",");
         existedArr
