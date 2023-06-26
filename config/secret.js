@@ -27,9 +27,9 @@ const S3_ACCESS = {
 }
 const secretKey = process.env.JWT_SECRET_KEY
 const options = {
-    algorithm : process.env.algorithm,
-    expiresIn : process.env.expiresIn,
-    issuer : process.env.issuer
+    algorithm : process.env.ALGORITHM,
+    expiresIn : process.env.EXPIRESIN,
+    issuer : process.env.ISSUER
 }
 module.exports = {
     googleSecret,
