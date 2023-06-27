@@ -7,6 +7,8 @@ const baseResponse = require('../../config/resStatus');
 const {FARMID_EMPTY, DELETED_FARM, USER_USERID_EMPTY, SUCCESS} = require("../../config/resStatus");
 const validator = require('./../../helpers/validator');
 const { response2, errResponse2 } = require('./../../config/response2');
+const jwt = require('jsonwebtoken');
+const { secretKey } = require('./../../config/secret')
 
 exports.getFarmlist = async (req, res) => {
     const getFarmResult = await farmProvider.retrieveFarmlist();
@@ -44,27 +46,51 @@ exports.getFarmUseList = async (req, res) => {
 
 }
 
-exports.register_FarmOwner = async (req, res) =>{
-    const { userid }= req.params;
+exports.postFarmer = async (req, res) =>{
+    try{
+        const decoded = jwt.verify(req.headers.token, secretKey);
+        if (decoded.role == 'F') return res.send(errResponse2(baseResponse.ALREADY_FARMER));
+        console.log(decoded);
 
-    if(!userid) return res.render(errResponse(USER_USERID_EMPTY));
+        const farmer = await farmService.postFarmer(decoded.email);
+        if (!farmer) return res.send(response2(baseResponse.SIGNIN_INACTIVE_ACCOUNT))
 
-    const Register_Owner = await farmService.Changeto_Owner(userid);
+        return res.send(baseResponse.SUCCESS);
 
-    return res.render(Register_Owner);
+    }catch(err){
+        console.log(err);
+        return res.send(errResponse2(baseResponse.NOT_LOGIN));
+    }
 
 }
 
 exports.editFarm = async(req, res) =>{
     try{
-        //const {farmID} = req.params;
-        const farmID = req.query.farmID;
-        const {Name} = req.body
+        const {farmId, name} = req.query;
+        if (!farmId) return res.send(errResponse2(baseResponse.FARMID_EMPTY))
+        if (!name) return res.send(errResponse2(baseResponse.FARM_NAME_EMPTY))
 
-        const eidtFarmRes = await farmService.editFarmInfo(farmID, Name)
-        //console.log(eidtFarmRes);
+        const eidtFarmInfoRes = await farmService.editFarmInfo(farmId, req.body)
 
-        return res.send(eidtFarmRes)
+        // req.files의 originalname
+        /*
+        const locations = req.files.map(file => file.location);
+        const keys = req.files.map(file => file.key);
+
+        console.log("Locations:", locations);
+        console.log("Keys:", keys);
+        */
+       if (!eidtFarmInfoRes.result) return res.send(eidtFarmInfoRes)
+
+        let editFarmPicturesRes;
+        for (let i = 0; i < req.files.length; i++) {
+            const file = req.files[i];
+            const location = file.location;
+            const key = file.key;
+            editFarmPicturesRes = await farmService.editFarmPictures(farmId, name, location, key);
+            if (!editFarmPicturesRes.result) break
+        }
+        return res.send(editFarmPicturesRes);
     }catch(err){
         return res.send(err)
     }

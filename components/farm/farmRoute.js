@@ -1,3 +1,5 @@
+const uploadImg = require('./farmMiddleware/imgUpload')
+
 module.exports = function (app) {
     const farm = require('./farmController');
 
@@ -17,11 +19,12 @@ module.exports = function (app) {
     app.get("/farm/curlist:userid", farm.getFarmUseList);
 
     //농장주 등록
-    app.patch("/farm/register_FarmOwner:userid", farm.register_FarmOwner);
+    app.patch("/farm/register", farm.postFarmer);
 
     //농장 검색
     app.get('/farm/search',farm.findFarms);
 
     //농장 글 수정
-    app.patch('/farm/editInfo', farm.editFarm);
+    app.patch('/farm/editInfo',uploadImg ,farm.editFarm);
+    //app.post('/farm/editInfo',uploadImg, farm.editFarm);
 };

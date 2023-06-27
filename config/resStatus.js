@@ -61,7 +61,12 @@ module.exports = {
     USER_NOT_EXIST : { "result": false, "code": 6004, "message": "해당 정보로 가입한 회원이 존재하지 않습니다." },
     USER_EDITINFO_EMPTYEMAIL : {"result": false, "code":6005, "message": "로그인 한 회원의 이메일 값 전달되지 않음"},
 
-    FARM_NOT_KEYWORD : { "result": false, "code": 6005, "message": "검색어를 입력해주세요" },
+    FARM_NOT_KEYWORD : { "result": false, "code": 6006, "message": "검색어를 입력해주세요" },
+    FARM_NAME_EMPTY : {"result": false, "code": 6007, "message": "농장 이름값이 비었습니다."},
+
+    ALREADY_FARMER : {'result': false, 'code': 6008, "message": "이미 농장주 등록이 완료되었습니다."},
+    NOT_LOGIN : {'result': false, 'code': 6009, "message": "로그인을 먼저 진행해 주세요."},
 
     REDIS_ERROR : {'result': false, 'code':6900, 'message': "REDIS 에러"}
+
 }
