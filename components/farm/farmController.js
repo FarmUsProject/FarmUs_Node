@@ -7,6 +7,8 @@ const baseResponse = require('../../config/resStatus');
 const {FARMID_EMPTY, DELETED_FARM, USER_USERID_EMPTY, SUCCESS} = require("../../config/resStatus");
 const validator = require('./../../helpers/validator');
 const { response2, errResponse2 } = require('./../../config/response2');
+const jwt = require('jsonwebtoken');
+const { secretKey } = require('./../../config/secret')
 
 exports.getFarmlist = async (req, res) => {
     const getFarmResult = await farmProvider.retrieveFarmlist();
@@ -44,14 +46,21 @@ exports.getFarmUseList = async (req, res) => {
 
 }
 
-exports.register_FarmOwner = async (req, res) =>{
-    const { userid }= req.params;
+exports.postFarmer = async (req, res) =>{
+    try{
+        const decoded = jwt.verify(req.headers.token, secretKey);
+        if (decoded.role == 'F') return res.send(errResponse2(baseResponse.ALREADY_FARMER));
+        console.log(decoded);
 
-    if(!userid) return res.render(errResponse(USER_USERID_EMPTY));
+        const farmer = await farmService.postFarmer(decoded.email);
+        if (!farmer) return res.send(response2(baseResponse.SIGNIN_INACTIVE_ACCOUNT))
 
-    const Register_Owner = await farmService.Changeto_Owner(userid);
+        return res.send(baseResponse.SUCCESS);
 
-    return res.render(Register_Owner);
+    }catch(err){
+        console.log(err);
+        return res.send(errResponse2(baseResponse.NOT_LOGIN));
+    }
 
 }
 
