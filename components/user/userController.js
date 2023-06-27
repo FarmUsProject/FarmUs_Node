@@ -81,7 +81,7 @@ exports.signup = async function (req, res) {
  *  [POST] /user/star
  */
 exports.star = async function (req, res) {
-    try {
+    // try {
         const { email, farmid } = req.body;
         const invalidation = await validator.twoParams(email, farmid);
 
@@ -90,10 +90,10 @@ exports.star = async function (req, res) {
         const starResponse = await userService.addStar(email, farmid);
 
         return(res.send(starResponse));
-    }
-    catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
-    }
+    // }
+    // catch (e) {
+    //     res.send(errResponse(resStatus.SERVER_ERROR));
+    // }
 }
 
 /**

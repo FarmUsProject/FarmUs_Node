@@ -56,16 +56,18 @@ exports.addStar= async(email, farmId) =>{
 
     let newstarList;
     const userStarList = await userProvider.starListbyEmail(email);
-    if (userStarList[0].LikeFarmIDs.length > 0) {
+    if (userStarList[0].LikeFarmIDs && userStarList[0].LikeFarmIDs.length > 0) {
         let startListString = userStarList[0].LikeFarmIDs;
-        const existedArr = startListString.split(", ");
-        for (e in existedArr) {
-            if(e.localeCompare(farmId) != 0 ) return errResponse(resStatus_5000.USER_REDUNDANT_STAR);
+        const existedArr = startListString.split(",");
+        existedArr
+        for (let e of existedArr) {
+            e = e.trim();
+            if(e.localeCompare(farmId) === 0 ) return errResponse(resStatus_5000.USER_REDUNDANT_STAR);
         }
         newstarList = userStarList[0].LikeFarmIDs + ", " + farmId;
     }
     else newstarList = farmId;
-    console.log(userStarList[0]);
+    console.log("newstarList", newstarList);
 
     const now = await setDate.now();
     const starRequest = [newstarList, now, email];
@@ -76,12 +78,14 @@ exports.addStar= async(email, farmId) =>{
     /**
      * PLUS # OF FARM STAR
     */
+    let updatedStarNumber = 0;
     try {
 
-        let updatedStarNumber = 0;
         if (farmInfo.Star && farmInfo.Star > 0) {
             updatedStarNumber += farmInfo.Star;
         }
+        else updatedStarNumber = 1;
+        // console.log("updatedStarNumber", updatedStarNumber);
         const now = await setDate.now();
         const updatedStarNumberInfo = [updatedStarNumber, now, farmId]
         const updatedStar = await farmDao.updateFarmStar(connection, updatedStarNumberInfo);
@@ -93,7 +97,7 @@ exports.addStar= async(email, farmId) =>{
         return errResponse(resStatus_5000.FARM_UPDATE_STAR_ERROR);
     }
 
-    return response(resStatus_5000.USER_STAR_ADD_SUCCESS, null);
+    return response(resStatus_5000.USER_STAR_ADD_SUCCESS, {"currentStarList" : newstarList, "updatedStarNumber" : updatedStarNumber});
 }
 
 exports.editBirth = async(email, birth) =>{
