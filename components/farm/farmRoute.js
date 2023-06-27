@@ -19,7 +19,7 @@ module.exports = function (app) {
     app.get("/farm/curlist:userid", farm.getFarmUseList);
 
     //농장주 등록
-    app.patch("/farm/register_FarmOwner:userid", farm.register_FarmOwner);
+    app.patch("/farm/register", farm.postFarmer);
 
     //농장 검색
     app.get('/farm/search',farm.findFarms);
