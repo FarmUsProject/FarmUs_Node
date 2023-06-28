@@ -26,9 +26,9 @@ exports.retrieveUserEmail = async function (userEmail) {
     return res[0];
 };
 
-exports.retrieveUser = async (name, phoneNumber) =>{
+exports.retrieveUser = async (phoneNumber) =>{
     const connection = await pool.getConnection(async (conn) => conn);
-    const res = await userDao.selectUser(connection, name, phoneNumber);
+    const res = await userDao.selectUser(connection, phoneNumber);
 
     connection.release();
 

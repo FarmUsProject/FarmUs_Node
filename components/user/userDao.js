@@ -86,12 +86,12 @@ async function updateUserBirth(connection, birthRequest) {
 }
 
 
-async function selectUser(connection, name, phoneNumber){
+async function selectUser(connection, phoneNumber){
     const selectUserQuery = `
     SELECT Name, Email
     FROM User
-    WHERE Name = ? AND PhoneNumber = ?;`;
-    const [userRow] = await connection.query(selectUserQuery, [name, phoneNumber]);
+    WHERE PhoneNumber = ?;`;
+    const [userRow] = await connection.query(selectUserQuery,  phoneNumber);
     return userRow;
 }
 
