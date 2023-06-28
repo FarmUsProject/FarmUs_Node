@@ -209,28 +209,27 @@ exports.vertifyCode = async(req,res) => {
 
     if (!phoneNumber)
         return res.send(errResponse2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
+    /*
     if (!name)
         return res.send(errResponse2(baseResponse.USER_NAME_EMPTY))
+    */
 
-    const user = await userProvider.retrieveUser(name, phoneNumber)
+    const user = await userProvider.retrieveUser(phoneNumber)
+    console.log(user);
+
     if (!user) return res.send(errResponse2(baseResponse.USER_NOT_EXIST))
 
     const code = await client.get(phoneNumber)
     if (code == usercode){
-        console.log(code);
         //console.log(client);
         await client.del(phoneNumber)
 
-
-        const email = await client.get(name)
-        console.log(email);
-
-        if (email){ // 아이디찾기
+        if (name){ // 아이디찾기
             await client.del(name)
-            return res.send({"name": name, "email": email})
+            return res.send({"name": name, "email": user.Email})
         }
         else // 회원가입
-            return res.send({"name": name})
+            return res.send(baseResponse.SUCCESS)
 
     }else{
         console.log(code);
