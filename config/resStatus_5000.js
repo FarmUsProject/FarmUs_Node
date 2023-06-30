@@ -27,6 +27,7 @@ module.exports = {
     USER_OAUTH_SIGNUP_SUCCESS : {"isSuccess" : true, "code" : 5153, "message" : "신규 소셜로그인 회원이 등록되었습니다."},
     USER_BIRTH_EDIT_SUCCESS : {"isSuccess" : true, "code" : 5154, "message" : "생일이 정상적으로 수정되었습니다."},
     USER_PASSWORD_EDIT_SUCCESS : {"isSuccess" : true, "code" : 5155, "message" : "비밀번호가 정상적으로 변경되었습니다."},
+    USER_EMAIL_AVAILABLE : {"isSuccess" : true, "code" : 5155, "message" : "사용가능한 이메일입니다."},
 
     //farm
     FARM_FARMID_NOT_EXIST  : { "isSuccess" : false, "code" : 5200, "message" : "해당 아이디를 가진 농장이 존재하지 않습니다."},

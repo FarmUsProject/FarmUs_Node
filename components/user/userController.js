@@ -15,6 +15,7 @@ const validator = require('../../helpers/validator');
 const dateAvailability = require('../../helpers/DateAvailability');
 const sharp = require('sharp');
 const fs = require('fs');
+const resStatus_5000 = require('../../config/resStatus_5000');
 
 exports.getBefoFarmUsed_Array = async (req, res, error) => {
     const { userid } = req.params;
@@ -411,4 +412,22 @@ exports.withdrawal = async(req,res) => {
     const userWithdrawFarm = await farmService.deleteUserFarm(userEmail)
 
     return res.send(userWithdraw)
+}
+
+exports.verfiyEmail = async (req, res) => {
+
+    try {
+        const userEmail = req.params.email;
+        // if (!userEmail || userEmail.length < 1) return res.send(errResponse(resStatus.SIGNUP_EMAIL_EMPTY))
+        if(validator.isValidEmail(userEmail) == false) return res.send(errResponse(resStatus.SIGNIN_EMAIL_ERROR_TYPE));
+
+        const userInfo = await userProvider.usersbyEmail(userEmail);
+
+        if (userInfo && userInfo.length > 0) return res.send(errResponse(resStatus.SIGNUP_REDUNDANT_EMAIL));
+
+        else return res.send(response(resStatus_5000.USER_EMAIL_AVAILABLE));
+
+    } catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }

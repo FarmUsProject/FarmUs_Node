@@ -71,6 +71,11 @@ const validator = {
       return resStatus_5000.PARAMS_TWO_EMPTY;
 
     return false;
+  },
+
+  isValidEmail: (email) => {
+    const emailPattern = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
+    return emailPattern.test(email);
   }
 }
 
