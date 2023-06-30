@@ -105,7 +105,7 @@ exports.editFarm = async(req, res) =>{
  * [POST] /farm/postings
  */
 exports.newFarm = async function (req, res) {
-    // try {
+    try {
         const { name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall,description, category, tag } = req.body;
 
         const invalidation = await validator.newFarm(name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid);
@@ -129,10 +129,10 @@ exports.newFarm = async function (req, res) {
             newFarmResponse.result = {"newFarmID" : newFarmResponse.result.newFarmID, "districtCode" : districtCode};
         return res.send(newFarmResponse)
 
-    // }
-    // catch (e) {
-    //     res.send(errResponse(resStatus.SERVER_ERROR));
-    // }
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 
 exports.findFarms = async (req,res) => {
