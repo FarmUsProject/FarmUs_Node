@@ -8,7 +8,8 @@ const {FARMID_EMPTY, DELETED_FARM, USER_USERID_EMPTY, SUCCESS} = require("../../
 const validator = require('./../../helpers/validator');
 const { response2, errResponse2 } = require('./../../config/response2');
 const jwt = require('jsonwebtoken');
-const { secretKey } = require('./../../config/secret')
+const { secretKey } = require('./../../config/secret');
+const districtClarity = require('./../../helpers/districtClarity');
 
 exports.getFarmlist = async (req, res) => {
     const getFarmResult = await farmProvider.retrieveFarmlist();
@@ -102,7 +103,9 @@ exports.editFarm = async(req, res) =>{
  */
 exports.newFarm = async function (req, res) {
     try {
-        const { name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag } = req.body;
+        const { name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall,description, category, tag } = req.body;
+        const districtClarityResponse = await districtClarity.checkLocation(locationBig, locationMid, locationSmall);
+
         const invalidation = await validator.newFarm(name, owner, startDate, endDate, price, squaredMeters, location);
 
         if (invalidation) return res.send(errResponse(invalidation))

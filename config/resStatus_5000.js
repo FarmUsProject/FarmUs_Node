@@ -6,6 +6,7 @@ module.exports = {
      * user    | 5100 ~ 5199
      * farm    | 5200 ~ 5299
      * reserve | 5300 ~ 5399
+     * district| 5400 ~ 5499
      * fail    | ##00 ~ ##49
      * success | ##50 ~ ##99
      */
@@ -15,8 +16,7 @@ module.exports = {
     PARAMS_TWO_EMPTY: { "isSuccess": false, "code": 5001, "message": "필요한 두 파라미터 중 최소 하나가 존재하지 않습니다." },
     DATE_END_FASTER_THAN_FIRST : { "isSuccess": false, "code": 5002, "message": "시작날짜보다 마지막날짜가 앞서 있습니다." },
     DATE_TYPE_WEIRD : { "isSuccess": false, "code": 5003, "message": "날짜 형식에 부합하지 않습니다."},
-    
-    
+
     //user
     USER_OAUTH_SIGNUP_REDUNDANT_EMAIL : {"isSuccess" : false, "code" : 5100, "message" : "해당 이메일을 가진 회원은 이미 등록되어 있습니다. 로그인을 진행해주세요."},
     USER_REDUNDANT_STAR :  {"isSuccess" : false, "code" : 5101, "message" : "이미 찜한 농장입니다."},
@@ -27,7 +27,6 @@ module.exports = {
     USER_BIRTH_EDIT_SUCCESS : {"isSuccess" : true, "code" : 5154, "message" : "생일이 정상적으로 수정되었습니다."},
     USER_PASSWORD_EDIT_SUCCESS : {"isSuccess" : true, "code" : 5155, "message" : "비밀번호가 정상적으로 변경되었습니다."},
 
-    
     //farm
     FARM_FARMID_NOT_EXIST  : { "isSuccess" : false, "code" : 5200, "message" : "해당 아이디를 가진 농장이 존재하지 않습니다."},
     FARM_NEW_DATA_SHORTAGE : {"isSuccess" : false, "code" : 5201, "message" : "농장을 등록하는 데 필요한 정보가 부족합니다."},
@@ -50,5 +49,10 @@ module.exports = {
     RESERVE_STATUS_HOLD_SUCCESS : { "isSuccess": true, "code": 5356, "message": "농장 예약을 보류하였습니다." },
     RESERVE_STATUS_DENIED_SUCCESS : { "isSuccess": true, "code": 5357, "message": "농장 예약 거부했습니다." },
 
-
+    //district
+    DISTRICT_AUTH_FAIL : { "isSuccess": false, "code": 5400, "message": "주소 유효성 검사에 실패하였습니다."},
+    DISTRICT_CODE_FAIL : { "isSuccess": false, "code": 5401, "message": "주소 유효성 검사에 실패하였습니다."},
+    DISTRICT_NOT_EXIST : { "isSuccess": false, "code": 5402, "message": "잘못된 주소입니다. 정확한 주소를 입력해주세요"},
+    DISTRICT_CLEAR : { "isSuccess": true, "code": 5451, "message": "주소 유효성 검사를 완료하였습니다."},
+    
 }
