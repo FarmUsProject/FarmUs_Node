@@ -18,17 +18,17 @@ exports.postFarmer = async (email) => {
     return res;
 }
 
-async function newFarm(name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag) {
+exports.newFarm = async (name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag) => {
     const newFarmStatus = 'A';
     let newFarmID;
     let existedFarm;
     do {
         newFarmID = await randomNumber.createFarmID();
         existedFarm = await FarmProvider.farmbyfarmID(newFarmID);
-    } while (!existedFarm); //farmID
+    } while (existedFarm); //unique farmID
 
     const now = await setDate.now();
-    const newFarmInfo = [newFarmID, name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag, newFarmStatus, now, now];
+    const newFarmInfo = [newFarmID, name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag, newFarmStatus, now, now];
 
     const isSameFarm = await FarmProvider.isSameFarm(newFarmInfo); //중복체크
     if (isSameFarm) return errResponse(resStatus_5000.FARM_DUPLICATED_EXISTS);

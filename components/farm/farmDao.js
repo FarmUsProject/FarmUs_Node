@@ -67,10 +67,10 @@ exports.selectFarmbyFarmID = async(connection, farmID) =>{
 }
 
 exports.insertFarm = async(connection, newFarmInfo) => {
-    //newFarmInfo [newFarmID, name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag, newFarmStatus, createAt, updateAt]
+    //newFarmInfo [newFarmID, name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag, newFarmStatus, createAt, updateAt] : 16 fields
     const insertFarmQuery = `
-    INSERT INTO Farm(FarmID, Name, Owner, startAt, endAt, Price, SquaredMeters, Location, Description, Picture_url, Category, Tag, Status, createAt, updateAt)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    INSERT INTO Farm(FarmID, Name, Owner, startAt, endAt, Price, SquaredMeters, LocationBig, LocationMid, LocationSmall, Description, Category, Tag, Status, createAt, updateAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
     const farmInfo = await connection.query(insertFarmQuery, newFarmInfo);
 
@@ -78,12 +78,12 @@ exports.insertFarm = async(connection, newFarmInfo) => {
 }
 
 exports.selectFarmbyFarmInfo = async(connection, sameFarmInfo) =>{
-    //newFarmInfo [newFarmID, name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag, newFarmStatus, createAt, updateAt]
-    const duplicatedInfo = sameFarmInfo.slice(1,8);
+    //newFarmInfo [newFarmID, name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag, newFarmStatus, createAt, updateAt]
+    const duplicatedInfo = sameFarmInfo.slice(1,10);
     const selectFarmbyFarmInfoQuery =`
     SELECT *
     FROM Farm
-    WHERE NAME = ? AND Owner = ? AND startAT = ? AND endAt = ? AND Price = ? AND SquaredMeters = ? AND Location = ?
+    WHERE NAME = ? AND Owner = ? AND startAT = ? AND endAt = ? AND Price = ? AND SquaredMeters = ? AND LocationBig = ? AND LocationMid = ? AND LocationSmall = ?
     `;
     const sameFarm = await connection.query(selectFarmbyFarmInfoQuery, duplicatedInfo);
 

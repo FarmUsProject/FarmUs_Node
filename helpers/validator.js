@@ -45,8 +45,8 @@ const validator = {
     return false;
   },
 
-  newFarm: async (name, owner, startDate, endDate, price, squaredMeters, location) => {
-    if (!name || !owner || !startDate || !endDate || !price || !squaredMeters || !location)
+  newFarm: async (name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid) => {
+    if (!name || !owner || !startDate || !endDate || !price || !squaredMeters || !locationBig || !locationMid)
       return resStatus_5000.FARM_NEW_DATA_SHORTAGE;
 
     return false;

@@ -9,7 +9,10 @@ const validator = require('./../../helpers/validator');
 const { response2, errResponse2 } = require('./../../config/response2');
 const jwt = require('jsonwebtoken');
 const { secretKey } = require('./../../config/secret');
+const resStatus_5000 = require('../../config/resStatus_5000');
 const districtClarity = require('./../../helpers/districtClarity');
+const {isValidDatetype} = require('../../helpers/DateAvailability');
+const userProvider = require('../user/userProvider');
 
 exports.getFarmlist = async (req, res) => {
     const getFarmResult = await farmProvider.retrieveFarmlist();
@@ -102,22 +105,34 @@ exports.editFarm = async(req, res) =>{
  * [POST] /farm/postings
  */
 exports.newFarm = async function (req, res) {
-    try {
+    // try {
         const { name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall,description, category, tag } = req.body;
+
+        const invalidation = await validator.newFarm(name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid);
+        if (invalidation) return res.send(errResponse(invalidation))
+        if (isValidDatetype(startDate) == false || isValidDatetype(endDate) == false)
+            return res.send(errResponse(resStatus_5000.DATE_TYPE_WEIRD));
+
+        const userInfo = await userProvider.usersbyEmail(owner);
+        if (!userInfo || userInfo.length < 1) return res.send(errResponse(resStatus.USER_USEREMAIL_NOT_EXIST));
+
+        if(userInfo[0].Role.toUpperCase() != 'F') return res.send(errResponse(resStatus_5000.USER_NOT_FARMER));
+
         const districtClarityResponse = await districtClarity.checkLocation(locationBig, locationMid, locationSmall);
 
-        const invalidation = await validator.newFarm(name, owner, startDate, endDate, price, squaredMeters, location);
+        if(!districtClarityResponse.result) return res.send(districtClarityResponse);
 
-        if (invalidation) return res.send(errResponse(invalidation))
+        const districtCode = districtClarityResponse.result;
 
-        const newFarmResponse = await farmService.newFarm(name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag);
-
+        let newFarmResponse = await farmService.newFarm(name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag);
+        if (newFarmResponse.result)
+            newFarmResponse.result = {"newFarmID" : newFarmResponse.result.newFarmID, "districtCode" : districtCode};
         return res.send(newFarmResponse)
 
-    }
-    catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
-    }
+    // }
+    // catch (e) {
+    //     res.send(errResponse(resStatus.SERVER_ERROR));
+    // }
 }
 
 exports.findFarms = async (req,res) => {
