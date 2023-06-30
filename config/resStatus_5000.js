@@ -14,7 +14,7 @@ module.exports = {
     //common
     PARAMS_ONE_EMPTY: { "isSuccess": false, "code": 5000, "message": "파라미터가 존재하지 않습니다." },
     PARAMS_TWO_EMPTY: { "isSuccess": false, "code": 5001, "message": "필요한 두 파라미터 중 최소 하나가 존재하지 않습니다." },
-    DATE_END_FASTER_THAN_FIRST : { "isSuccess": false, "code": 5002, "message": "시작날짜보다 마지막날짜가 앞서 있습니다." },
+    DATE_END_FASTER_THAN_FIRST : { "isSuccess": false, "code": 5002, "message": "시작 날짜보다 마지막 날짜가 앞서 있습니다. 올바른 기간을 설정해주세요." },
     DATE_TYPE_WEIRD : { "isSuccess": false, "code": 5003, "message": "날짜 형식에 부합하지 않습니다."},
 
     //user

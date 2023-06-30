@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken');
 const { secretKey } = require('./../../config/secret');
 const resStatus_5000 = require('../../config/resStatus_5000');
 const districtClarity = require('./../../helpers/districtClarity');
-const {isValidDatetype} = require('../../helpers/DateAvailability');
+const dateAvailability = require('../../helpers/DateAvailability');
 const userProvider = require('../user/userProvider');
 
 exports.getFarmlist = async (req, res) => {
@@ -110,13 +110,17 @@ exports.newFarm = async function (req, res) {
 
         const invalidation = await validator.newFarm(name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid);
         if (invalidation) return res.send(errResponse(invalidation))
-        if (isValidDatetype(startDate) == false || isValidDatetype(endDate) == false)
+        if (dateAvailability.isValidDatetype(startDate) == false || dateAvailability.isValidDatetype(endDate) == false)
             return res.send(errResponse(resStatus_5000.DATE_TYPE_WEIRD));
+
+        if(dateAvailability.validFarmDate(new Date(), new Date(startDate), new Date(endDate)) == false)
+            return res.send(errResponse(resStatus_5000.DATE_END_FASTER_THAN_FIRST));
 
         const userInfo = await userProvider.usersbyEmail(owner);
         if (!userInfo || userInfo.length < 1) return res.send(errResponse(resStatus.USER_USEREMAIL_NOT_EXIST));
 
         if(userInfo[0].Role.toUpperCase() != 'F') return res.send(errResponse(resStatus_5000.USER_NOT_FARMER));
+
 
         const districtClarityResponse = await districtClarity.checkLocation(locationBig, locationMid, locationSmall);
 

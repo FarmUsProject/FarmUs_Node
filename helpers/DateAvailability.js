@@ -57,6 +57,15 @@ const dateAvailability = {
         } catch (e) {
             return false;
         }
+    },
+
+    validFarmDate : function (now, startDate, endDate) {
+        //now - startDate - endDate : date 순서
+
+        if (now.getTime() > startDate.getTime() || startDate.getTime() > endDate.getTime())
+            return false;
+
+        return true;
     }
 
 }
