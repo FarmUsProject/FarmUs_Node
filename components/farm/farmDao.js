@@ -1,10 +1,10 @@
 //const { connection } = require("mongoose");
 
-exports.selectionFarm = async (connection) => {
+exports.selectFarm = async (connection) => {
     const selectFarmListQuery = `
-        SELECT FarmID, Name, Owner, Picture_url, Price, Term, SquaredMeters, Location, Category, Tag
-        FROM Farm
-        WHERE Status = 1;
+    SELECT *
+    FROM Farm
+    WHERE Status IN ('A', 'R');
     `;
 
     const [FarmRows] = await connection.query(selectFarmListQuery);

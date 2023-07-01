@@ -15,8 +15,13 @@ const dateAvailability = require('../../helpers/DateAvailability');
 const userProvider = require('../user/userProvider');
 
 exports.getFarmlist = async (req, res) => {
-    const getFarmResult = await farmProvider.retrieveFarmlist();
-    return res.render(response(resStatus.SUCCESS, getFarmResult));
+    try{
+        const getFarmResult = await farmProvider.retrieveFarmlist();
+        return res.send(response(resStatus_5000.FARM_LIST_AVAILABLE_FOR_RESERVATION, getFarmResult));
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 
 exports.getFarmDetail = async (req, res) => {
