@@ -15,7 +15,7 @@ const setDate = require('./../../helpers/setDate');
 exports.login = async(email, password) =>{
 
     const userInfo = await userProvider.usersbyEmail(email);
-    if (userInfo.length < 1) return errResponse2(resStatus.USER_USEREMAIL_NOT_EXIST);
+    if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
 
     const userPassword = userInfo[0].Password;
     const userSalt = userInfo[0].Salt;
