@@ -66,6 +66,7 @@ module.exports = {
 
     ALREADY_FARMER : {'result': false, 'code': 6008, "message": "이미 농장주 등록이 완료되었습니다."},
     NOT_LOGIN : {'result': false, 'code': 6009, "message": "로그인을 먼저 진행해 주세요."},
+    ALREADY_USER : {'result': false, 'code': 6010, "message": "이미 가입한 회원입니다."},
 
     REDIS_ERROR : {'result': false, 'code':6900, 'message': "REDIS 에러"}
 
