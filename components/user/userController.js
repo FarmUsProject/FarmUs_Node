@@ -206,31 +206,26 @@ exports.userAuthentication = async function (req, res) {
 }
 
 exports.vertifyCode = async(req,res) => {
-    const {phoneNumber, usercode,name} = req.body
+    const {phoneNumber, usercode} = req.body
 
     if (!phoneNumber)
         return res.send(errResponse2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
-    /*
-    if (!name)
-        return res.send(errResponse2(baseResponse.USER_NAME_EMPTY))
-    */
+
 
     const user = await userProvider.retrieveUser(phoneNumber)
-    console.log(user);
+    if (user) {
+        if (user.Status == 'D') return res.send(errResponse2(baseResponse.SIGNIN_WITHDRAWAL_ACCOUNT))
+        else if (user.Status == 'B') return res.send(errResponse2(baseResponse.SIGNIN_INACTIVE_ACCOUNT))
 
-    if (!user) return res.send(errResponse2(baseResponse.USER_NOT_EXIST))
+        return res.send(errResponse2(baseResponse.ALREADY_USER))
+    }
 
     const code = await client.get(phoneNumber)
     if (code == usercode){
         //console.log(client);
         await client.del(phoneNumber)
 
-        if (name){ // 아이디찾기
-            await client.del(name)
-            return res.send({"name": name, "email": user.Email})
-        }
-        else // 회원가입
-            return res.send(baseResponse.SUCCESS)
+        return res.send(baseResponse.SUCCESS)
 
     }else{
         console.log(code);
@@ -245,12 +240,10 @@ exports.findAccount = async(req,res) => {
         if (!name) return res.send(errResponse2(baseResponse.USER_NAME_EMPTY))
         if (!phoneNumber) return res.send(errResponse2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
 
-        const user = await userProvider.retrieveUser(name, phoneNumber)
+        const user = await userProvider.retrieveUser(phoneNumber)
         if (!user) return res.send(errResponse2(baseResponse.USER_NOT_EXIST))
 
-        let userData = await client.set(name, user.Email, {EX: 185})
-        sendSMS(phoneNumber)
-        return res.send(response2(baseResponse.SUCCESS))
+        return res.send(user)
 
     }catch(err){
         console.log(err);
