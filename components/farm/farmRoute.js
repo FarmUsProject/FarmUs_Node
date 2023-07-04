@@ -26,5 +26,4 @@ module.exports = function (app) {
 
     //농장 글 수정
     app.patch('/farm/editInfo',uploadImg ,farm.editFarm);
-    //app.post('/farm/editInfo',uploadImg, farm.editFarm);
 };

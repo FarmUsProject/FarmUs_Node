@@ -1,5 +1,7 @@
 //const { connection } = require("mongoose");
 
+const { login } = require("../../helpers/validator");
+
 exports.selectFarm = async (connection) => {
     const selectFarmListQuery = `
     SELECT *
@@ -136,8 +138,8 @@ exports.eidtMyFarm = async(connection, farmID, farmInfo) =>{
 
 exports.editFarmPicture = async(connection, farmID, farmName, img, key) => {
     const saveFarmPicturesQuery= `
-    INSERT INTO FarmPictures(FarmID, Name, Picture_url, Picture_key)
-    VALUES (?, ?, ?, ?);
+    INSERT INTO FarmPictures(FarmID, Picture_url, Picture_key)
+    VALUES (?, ?, ?);
     `
     const postFarmPicture = await connection.query(saveFarmPicturesQuery, [farmID, farmName, img, key])
     return postFarmPicture[0]
