@@ -243,6 +243,10 @@ exports.findAccount = async(req,res) => {
         const user = await userProvider.retrieveUser(phoneNumber)
         if (!user) return res.send(errResponse2(baseResponse.USER_NOT_EXIST))
 
+        const userEmail = user.Email.split('@')
+        const block = userEmail[0].slice(0,-3) + '*'.repeat(3)
+        user.Email = block + '@' + userEmail[1]
+
         return res.send(user)
 
     }catch(err){
