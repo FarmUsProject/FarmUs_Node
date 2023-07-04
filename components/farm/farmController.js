@@ -75,9 +75,8 @@ exports.postFarmer = async (req, res) =>{
 
 exports.editFarm = async(req, res) =>{
     try{
-        const {farmId, name} = req.query;
+        const {farmId} = req.query;
         if (!farmId) return res.send(errResponse2(baseResponse.FARMID_EMPTY))
-        if (!name) return res.send(errResponse2(baseResponse.FARM_NAME_EMPTY))
 
         const eidtFarmInfoRes = await farmService.editFarmInfo(farmId, req.body)
 
@@ -96,7 +95,7 @@ exports.editFarm = async(req, res) =>{
             const file = req.files[i];
             const location = file.location;
             const key = file.key;
-            editFarmPicturesRes = await farmService.editFarmPictures(farmId, name, location, key);
+            editFarmPicturesRes = await farmService.editFarmPictures(farmId,location, key);
             if (!editFarmPicturesRes.result) break
         }
         return res.send(editFarmPicturesRes);
