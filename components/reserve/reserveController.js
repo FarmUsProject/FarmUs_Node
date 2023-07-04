@@ -3,7 +3,7 @@ const validator = require('../../helpers/validator');
 const resStatus = require("../../config/resStatus");
 const reserveService = require("./reserveService");
 const resStatus_5000 = require('../../config/resStatus_5000');
-
+const dateAvailability = require('../../helpers/DateAvailability');
 
 /**
  * [POST] /reserve/request
@@ -14,6 +14,9 @@ exports.request = async function (req, res) {
         const invalidation = await validator.newReservation(email, farmid, startDate, endDate);
 
         if (invalidation) return(res.send(errResponse(invalidation)));
+
+        if(dateAvailability.isValidDatetype(startDate) == false || dateAvailability.isValidDatetype(endDate) == false)
+            return(res.send(errResponse(resStatus_5000.DATE_TYPE_WEIRD)));
 
         const reserveRequest_result = await reserveService.request(email, farmid, startDate, endDate);
 
@@ -78,7 +81,7 @@ exports.cancel = async function (req, res) {
 
         const cancelReservation = await reserveService.cancel(reserveId);
 
-        return(res.send(response(cancelReservation)));
+        return(res.send(cancelReservation));
 
     }
     catch (e) {
@@ -113,11 +116,11 @@ exports.editStatus = async function (req, res) {
 
         const invalidation = await validator.twoParams(reserveId, status);
 
-        if (invalidation) return (res.send(response(invalidation)));
+        if (invalidation) return (res.send(errResponse(invalidation)));
 
         const editStatusResult = await reserveService.editStatus(reserveId, status);
 
-        return(res.send(response(editStatusResult)));
+        return(res.send(editStatusResult));
 
     }
     catch (e) {

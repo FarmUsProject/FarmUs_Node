@@ -117,8 +117,9 @@ exports.newFarm = async function (req, res) {
         if (dateAvailability.isValidDatetype(startDate) == false || dateAvailability.isValidDatetype(endDate) == false)
             return res.send(errResponse(resStatus_5000.DATE_TYPE_WEIRD));
 
-        if(dateAvailability.validFarmDate(new Date(), new Date(startDate), new Date(endDate)) == false)
-            return res.send(errResponse(resStatus_5000.DATE_END_FASTER_THAN_FIRST));
+        const farmDateErrorMessage = dateAvailability.validFarmDate(new Date(), new Date(startDate), new Date(endDate))
+        if(farmDateErrorMessage != true)
+            return res.send(errResponse(farmDateErrorMessage));
 
         const userInfo = await userProvider.usersbyEmail(owner);
         if (!userInfo || userInfo.length < 1) return res.send(errResponse(resStatus.USER_USEREMAIL_NOT_EXIST));
