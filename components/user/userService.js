@@ -124,8 +124,7 @@ exports.editPassword = async (email,password) =>{
     const encryptedData = await encryptedPassword.createHashedPassword(password);
     const hashedPassword = encryptedData.hashedPassword;
     const salt = encryptedData.salt;
-    const now = await setDate.now();
-    const newUserInfo = [hashedPassword, salt, now, email];
+    const newUserInfo = [hashedPassword, salt, email];
 
     const connection = await pool.getConnection(async conn => conn);
 

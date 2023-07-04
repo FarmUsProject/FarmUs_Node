@@ -260,7 +260,7 @@ exports.findPassword = async(req,res) => {
     try {
         let tempPw = Math.random().toString(36).substring(2, 12);
         const  {userEmail}  = req.query;
-        //console.log(userEmail);
+        console.log(userEmail);
 
         if (!userEmail)
             return res.send(errResponse2(baseResponse.USER_USEREMAIL_EMPTY))
@@ -276,7 +276,7 @@ exports.findPassword = async(req,res) => {
         },
       });
 
-
+      console.log(tempPw);
       const setTempPw = await userService.editPassword(userEmail,tempPw)
 
       const mailOptions = {
