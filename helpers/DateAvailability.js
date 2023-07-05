@@ -19,12 +19,12 @@ const dateAvailability = {
             return resStatus_5000.RESERVE_DATE_OFF_PERIOD_OF_FARM;
 
         if (newStart.getTime() > newEnd.getTime())
-            return resStatus_5000.DATE_END_FASTER_THAN_FIRST;
+            return resStatus_5000.DATE_END_FASTER_THAN_START;
 
         return 0;
     },
 
-    reserveAvailabilityCheck: async function (reservedStart, reservedEnd, newStart, newEnd) {
+    reserveAvailabilityCheck: function (reservedStart, reservedEnd, newStart, newEnd) {
         //newStart - reservedStart - newEnd - reservedEnd : unavailable
         //newStart - reservedStart - reservedEnd - newEnd : unavailable
         //reservedStart - newStart - newEnd - reservedEnd : unavailable
@@ -32,7 +32,7 @@ const dateAvailability = {
         //newStart - newEnd - reservedStart - reservedEnd : available
         //reservedStart - reservedEnd - newStart - newEnd : available
 
-        if (newEnd < reservedStart || reservedEnd < newStart)
+        if (newEnd <= reservedStart || reservedEnd <= newStart)
             return false;
 
         return resStatus_5000.RESERVE_DATE_FULL;
@@ -47,7 +47,7 @@ const dateAvailability = {
 
         try {
             let YMD_format = moment(date, "YYYY-MM-DD", true).isValid();
-            let YMDhms_format = moment(date, "YYYY-MM-DD HH:mm:ss").isValid();
+            let YMDhms_format = moment(date, "YYYY-MM-DD HH:mm:ss", true).isValid();
             // let dateObj = new Date(date);
             // let isValid = !isNaN(dateObj.getTime());
 
@@ -62,8 +62,10 @@ const dateAvailability = {
     validFarmDate : function (now, startDate, endDate) {
         //now - startDate - endDate : date 순서
 
-        if (now.getTime() > startDate.getTime() || startDate.getTime() > endDate.getTime())
-            return false;
+        if (now.getTime() > startDate.getTime())
+            return resStatus_5000.DATE_START_FASTER_THAN_NOW;
+        if (startDate.getTime() > endDate.getTime())
+            return resStatus_5000.DATE_END_FASTER_THAN_START;
 
         return true;
     }
