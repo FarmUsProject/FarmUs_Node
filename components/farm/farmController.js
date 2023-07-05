@@ -58,8 +58,8 @@ exports.getFarmUseList = async (req, res) => {
 exports.postFarmer = async (req, res) =>{
     try{
         const decoded = jwt.verify(req.headers.token, secretKey);
-        if (decoded.role == 'F') return res.send(errResponse2(baseResponse.ALREADY_FARMER));
         console.log(decoded);
+        if (decoded.role == 'F') return res.send(errResponse2(baseResponse.ALREADY_FARMER));
 
         const farmer = await farmService.postFarmer(decoded.email);
         if (!farmer) return res.send(response2(baseResponse.SIGNIN_INACTIVE_ACCOUNT))

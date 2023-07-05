@@ -132,7 +132,7 @@ exports.editPassword = async (email,password) =>{
 
     connection.release();
 
-    return response(resStatus_5000.USER_PASSWORD_EDIT_SUCCESS, null)
+    return response(resStatus_5000.USER_PASSWORD_EDIT_SUCCESS)
 }
 
 exports.editNickName = async (email,nickname) =>{
