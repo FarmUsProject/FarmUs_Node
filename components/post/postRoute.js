@@ -5,5 +5,5 @@ module.exports = (app) => {
     app.get("/post/getPostring:FarmID", postController.getPostings);
 
     //후기 작성
-    app.post("/post/posting:FarmID", postController.writePost)
+    app.post("/post:FarmID", postController.writePost)
 }

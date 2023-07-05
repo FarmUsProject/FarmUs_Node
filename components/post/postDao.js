@@ -2,7 +2,7 @@ exports.selectFarmPostings = async (connection, farmid) =>{
     const selectFarmPostingsQuery = `
         SELECT UserName, Comment, Star
         FROM Post
-        WHERE FarmID = ?; 
+        WHERE FarmID = ?;
     `;
 
     const [FarmPostRows] = await connection.query(selectFarmPostingsQuery);
@@ -11,7 +11,7 @@ exports.selectFarmPostings = async (connection, farmid) =>{
 
 exports.insertPost = async (connection, params) => {
     const insertingPostsQuery = `
-       INSERT INTO POST (FarmID, Username, Comment, Star)
+       INSERT INTO POST (Username, Comment, Star, FarmID)
         Values (?,?,?,?);
     `;
 

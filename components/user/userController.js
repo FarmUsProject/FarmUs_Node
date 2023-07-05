@@ -241,14 +241,14 @@ exports.findAccount = async(req,res) => {
         if (!phoneNumber) return res.send(errResponse2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
 
         const user = await userProvider.retrieveUser(phoneNumber)
-        if (!user) return res.send(errResponse2(baseResponse.USER_NOT_EXIST))
+        if (!user || user.Name != name) return res.send(errResponse2(baseResponse.USER_NOT_EXIST))
 
         const userEmail = user.Email.split('@')
         const block = userEmail[0].slice(0,-3) + '*'.repeat(3)
         user.Email = block + '@' + userEmail[1]
+        user.result = true
 
         return res.send(user)
-
     }catch(err){
         console.log(err);
         return res.send(errResponse2(baseResponse.SIGNUP_SMS_WRONG))
@@ -342,8 +342,9 @@ exports.editUserPhoneNumber = async(req,res) =>{
 }
 
 exports.editUserPassword = async(req,res) =>{
-    // try {
-        const { email, password } = req.body;
+    try {
+        const {email}  = req.query;
+        const {password} = req.body
 
         const invalidation = await validator.login(email, password);
 
@@ -351,12 +352,10 @@ exports.editUserPassword = async(req,res) =>{
 
         const editPasswordResponse = await userService.editPassword(email, password);
 
-        return res.send(editPasswordResponse);
-
-    // }
-    // catch (e) {
-    //     res.send(errResponse(resStatus.SERVER_ERROR));
-    // }
+        return res.send(editPasswordResponse);}
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 
 exports.editUserProfileImg = async(req,res)=> {
