@@ -98,15 +98,16 @@ exports.getFarmDetail = async (farmID) => {
         delete farmDetail.createAt;
         delete farmDetail.updateAt;
 
-        // 농장 사진 추가
-        let Picture_url = [];
+        // 농장 사진 추가 : Picture_url, Picture_key
+        let pictureObject;
         if(farmPictureUrlInformation && farmPictureUrlInformation.length > 0 ) {
-            for (let i = 0; i < farmPictureUrlInformation.length; i++) {
-                Picture_url.push(farmPictureUrlInformation[i].Picture_url);
-            }
+            pictureObject = farmPictureUrlInformation.map(({ Picture_url, Picture_key }) => ({
+                Picture_url,
+                Picture_key
+              }));
         }
-        else  Picture_url = null;
-        farmDetail.Picture_url = Picture_url;
+        else  pictureObject = null;
+        farmDetail.PictureObject = pictureObject;
 
         //농장주 정보 추가 : Email, PhoneNumber, Name, NickName
         let userInfo = { 
@@ -114,7 +115,8 @@ exports.getFarmDetail = async (farmID) => {
             PhoneNumber : userInformation[0].PhoneNumber, 
             Name : userInformation[0].Name, 
             NickName : userInformation[0].NickName,
-            Picture_url : userInformation[0].Picture_url
+            Picture_url : userInformation[0].Picture_url || null,
+            Picture_key : userInformation[0].Picture_key || null
         }
         farmDetail.farmer = userInfo;
 
@@ -129,25 +131,34 @@ exports.getFarmDetail = async (farmID) => {
 exports.getFarmList = async (email) => {
     try {
         const farmList = await FarmProvider.retrieveFarmlist();
-        const farmPictureUrlInformation = await FarmProvider.farmPictureUrl();
+        const farmPictureInformation = await FarmProvider.farmPictureUrl();
         const userInformation = await userProvider.usersbyEmail(email);
-        const likeFarmIDs = userInformation[0].LikeFarmIDs.split(',').map(id => id.trim());
+        let likeFarmIDs;
 
-        //picture_url
+        //picture_url & picture_key
         farmList.forEach(farm => {
-            const matchingPictures = farmPictureUrlInformation.filter(p => p.FarmID === farm.FarmID);
-            const pictureUrls = matchingPictures.map(p => p.Picture_url);
-            farm.Picture_urls = pictureUrls;
-        });
+            const matchingPictures = farmPictureInformation.filter(p => p.FarmID === farm.FarmID);
+            const pictureObjects = matchingPictures.map(p => ({
+              Picture_url: p.Picture_url,
+              Picture_key: p.Picture_key
+            }));
+            farm.Pictures = pictureObjects;
+          });
         
         //like
-        farmList.forEach(farm => {
-            if (likeFarmIDs.includes(farm.FarmID.toString())) {
-                farm.Liked = true;
-            } else {
-                farm.Liked = false;
-            }
-        });
+        if (userInformation.length > 0 && userInformation[0].LikeFarmIDs.length > 0) {
+            likeFarmIDs = userInformation[0].LikeFarmIDs.split(',').map(id => id.trim());
+            farmList.forEach(farm => {
+                if (likeFarmIDs.includes(farm.FarmID.toString())) {
+                    farm.Liked = true;
+                } else {
+                    farm.Liked = false;
+                }
+            });
+        }
+        else {
+            farmList.forEach(farm => {farm.Liked = false;});
+        }
 
         //불필요한 항목 삭제
         farmList.forEach((farm) => {

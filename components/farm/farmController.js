@@ -16,7 +16,6 @@ const userProvider = require('../user/userProvider');
 
 exports.getFarmlist = async (req, res) => {
     try{
-        // return res.send(response(resStatus_5000.FARM_LIST_AVAILABLE_FOR_RESERVATION, getFarmResult));
         const email = req.params.email;
         const invalidation = await validator.oneParams(email);
 
@@ -41,7 +40,6 @@ exports.getFarmDetail = async (req, res) => {
 
         const FarmDetailResponse = await farmService.getFarmDetail(farmID);
 
-        // console.log(FarmDetailResponse)
         return res.send(FarmDetailResponse);
 
     }

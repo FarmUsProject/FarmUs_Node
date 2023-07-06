@@ -78,7 +78,7 @@ exports.farmPictureUrlbyFarmID = async (farmID) =>{
 
 exports.farmPictureUrl = async () =>{
     const connection = await pool.getConnection(async conn => conn);
-    const farmPicturesInfo = await farmDao.selectFarmPicturesUrl(connection);
+    const farmPicturesInfo = await farmDao.selectFarmPicturesUrlKey(connection);
 
     connection.release();
 
