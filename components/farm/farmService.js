@@ -72,7 +72,7 @@ exports.editFarmInfo = async(farmID, farmInfo) =>{
 exports.editFarmPictures = async(farmID, farmName, img, key) =>{
     try{
         const connection = await pool.getConnection(async (conn)=>conn)
-        const res = await farmDao.editFarmPicture(connection, farmID, farmName, img, key)
+        const res = await farmDao.editFarmPicture(connection, farmID, img, key)
         connection.release()
 
         return response2(baseResponse.SUCCESS)

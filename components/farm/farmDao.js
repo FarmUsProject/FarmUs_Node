@@ -136,12 +136,12 @@ exports.eidtMyFarm = async(connection, farmID, farmInfo) =>{
 
 }
 
-exports.editFarmPicture = async(connection, farmID, farmName, img, key) => {
+exports.editFarmPicture = async(connection, farmID, img, key) => {
     const saveFarmPicturesQuery= `
     INSERT INTO FarmPictures(FarmID, Picture_url, Picture_key)
     VALUES (?, ?, ?);
     `
-    const postFarmPicture = await connection.query(saveFarmPicturesQuery, [farmID, farmName, img, key])
+    const postFarmPicture = await connection.query(saveFarmPicturesQuery, [farmID, img, key])
     return postFarmPicture[0]
 }
 
