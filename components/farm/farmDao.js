@@ -6,16 +6,16 @@ exports.selectFarm = async (connection) => {
     const selectFarmListQuery = `
     SELECT *
     FROM Farm
-    WHERE Status IN ('A', 'R');
+    WHERE Status IN ('A');
     `;
 
     const [FarmRows] = await connection.query(selectFarmListQuery);
     return FarmRows;
 }
 
-exports.selectFarmDetail = async (connection, farmIdx) =>{
+exports.selectFarmDetail = async (connection, farmID) =>{
     const selectFarmDetailQuery = `
-        SELECT Name, Owner, Picture_url, Price, Term, SquaredMeters, Location, Category, Tag, Status
+        SELECT FarmID, Name, Owner, SquaredMeters, Price, LocationBig, LocationMid, LocationSmall, Description, Views, Status
         FROM Farm
         WHERE FarmID = ?;
     `;

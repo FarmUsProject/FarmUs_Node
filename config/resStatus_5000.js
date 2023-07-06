@@ -37,6 +37,7 @@ module.exports = {
     FARM_DUPLICATED_EXISTS : {"isSuccess" : false, "code" : 5202, "message" : "이미 동일한 정보를 가진 농장이 존재합니다."},
     FARM_NEW_SAVE_SUCCESS : {"isSuccess" : true, "code" :  5250, "message" : "농장이 등록되었습니다."},
     FARM_LIST_AVAILABLE_FOR_RESERVATION : {"isSuccess" : true, "code" :  5251, "message" : "예약 가능한 농장 목록을 불러왔어요."},
+    FARM_DETAIL_GET_SUCCESS : {"isSuccess" : true, "code" :  5252, "message" : "농장 상세 정보를 불러왔어요."},
     
     //reserve
     RESERVE_REQUEST_DATA_SHORTAGE : { "isSuccess": false, "code": 5300, "message": "농장을 예약하는 데 필요한 정보가 부족합니다." },

@@ -24,13 +24,23 @@ exports.getFarmlist = async (req, res) => {
     }
 }
 
+//추가할 사진 정보 : farm 테이블의 사진, user 테이블의 사진
 exports.getFarmDetail = async (req, res) => {
-    const { farmid } = req.params;
+    try {
+        const farmID = req.params.farmid;
+        const invalidation = await validator.oneParams(farmID);
 
-    if(!farmid) return res.render(errResponse(FARMID_EMPTY));
+        if (invalidation) return (res.send(response(invalidation)));
 
-    const getFarmDetail = await farmProvider.retrieveFarmDetail(Farmidx);
-    return res.render(response(resStatus.SUCCESS, getFarmDetail));
+        const FarmDetailResponse = await farmService.getFarmDetail(farmID);
+
+        // console.log(FarmDetailResponse)
+        return res.send(FarmDetailResponse);
+
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 
 exports.getFarmUsedList = async (req, res) => {
@@ -39,7 +49,7 @@ exports.getFarmUsedList = async (req, res) => {
     if(!userid) return res.render(errResponse(USER_USERID_EMPTY));
 
     const FarmUsedArray = User.retrieveUsedFarmArray(userid);
-    const getUsedFarm_Detail = await farmProvider.retrieveFarmDetail(FarmUsedArray);
+    const getUsedFarm_Detail = await farmProvider.retrieveFarmInfo(FarmUsedArray);
     return res.render(getUsedFarm_Detail);
 
 }

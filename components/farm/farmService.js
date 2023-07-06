@@ -8,6 +8,8 @@ const setDate = require('./../../helpers/setDate');
 const { response2, errResponse2 } = require('../../config/response2');
 const baseResponse = require('../../config/resStatus');
 const { eidtFarm } = require('./farmController');
+const resStatus = require('../../config/resStatus');
+const userProvider = require('./../user/userProvider');
 
 
 exports.postFarmer = async (email) => {
@@ -79,5 +81,41 @@ exports.editFarmPictures = async(farmID, farmName, img, key) =>{
     }catch(err){
         console.log(err);
         return errResponse2(baseResponse.DB_ERROR)
+    }
+}
+
+//추가할 사진 정보 : farm 테이블의 사진, user 테이블의 사진
+exports.getFarmDetail = async (farmID) => {
+    try {
+
+        const farmInformation = await FarmProvider.retrieveFarmInfo(farmID);
+        const userInformation = await userProvider.usersbyEmail(farmInformation[0].Owner);
+
+        //최종 농장 세부사항
+        let farmDetail = farmInformation[0];
+
+        //농장 항목 삭제 : Owner, crateAt, updateAt 
+        delete farmDetail.Owner;
+        delete farmDetail.createAt;
+        delete farmDetail.updateAt;
+
+        //농장주 정보 추가 : Email, PhoneNumber, Name, NickName
+        let userInfo = { 
+            Email : userInformation[0].Email, 
+            PhoneNumber : userInformation[0].PhoneNumber, 
+            Name : userInformation[0].Name, 
+            NickName : userInformation[0].NickName
+        }
+        farmDetail.farmer = userInfo;
+
+        /**
+         * 농장 사진과 농장주 사진 farmDetail에 추가할 필요 있음!
+         * 사진 파일 추가 전  farmDetail예시는 API 명세서 참고
+         */
+
+        return response(resStatus_5000.FARM_DETAIL_GET_SUCCESS, farmDetail);
+
+    } catch(err) {
+        return errResponse(resStatus.DB_ERROR);
     }
 }
