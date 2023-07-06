@@ -71,7 +71,7 @@ exports.editFarmInfo = async(farmID, farmInfo) =>{
     }
 }
 
-exports.editFarmPictures = async(farmID, farmName, img, key) =>{
+exports.editFarmPictures = async(farmID, img, key) =>{
     try{
         const connection = await pool.getConnection(async (conn)=>conn)
         const res = await farmDao.editFarmPicture(connection, farmID, img, key)
@@ -94,16 +94,16 @@ exports.getFarmDetail = async (farmID) => {
         //최종 농장 세부사항
         let farmDetail = farmInformation[0];
 
-        //농장 항목 삭제 : Owner, crateAt, updateAt 
+        //농장 항목 삭제 : Owner, crateAt, updateAt
         delete farmDetail.Owner;
         delete farmDetail.createAt;
         delete farmDetail.updateAt;
 
         //농장주 정보 추가 : Email, PhoneNumber, Name, NickName
-        let userInfo = { 
-            Email : userInformation[0].Email, 
-            PhoneNumber : userInformation[0].PhoneNumber, 
-            Name : userInformation[0].Name, 
+        let userInfo = {
+            Email : userInformation[0].Email,
+            PhoneNumber : userInformation[0].PhoneNumber,
+            Name : userInformation[0].Name,
             NickName : userInformation[0].NickName
         }
         farmDetail.farmer = userInfo;

@@ -24,23 +24,13 @@ exports.getFarmlist = async (req, res) => {
     }
 }
 
-//추가할 사진 정보 : farm 테이블의 사진, user 테이블의 사진
 exports.getFarmDetail = async (req, res) => {
-    try {
-        const farmID = req.params.farmid;
-        const invalidation = await validator.oneParams(farmID);
+    const { farmid } = req.params;
 
-        if (invalidation) return (res.send(response(invalidation)));
+    if(!farmid) return res.render(errResponse(FARMID_EMPTY));
 
-        const FarmDetailResponse = await farmService.getFarmDetail(farmID);
-
-        // console.log(FarmDetailResponse)
-        return res.send(FarmDetailResponse);
-
-    }
-    catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
-    }
+    const getFarmDetail = await farmProvider.retrieveFarmDetail(Farmidx);
+    return res.render(response(resStatus.SUCCESS, getFarmDetail));
 }
 
 exports.getFarmUsedList = async (req, res) => {
@@ -49,7 +39,7 @@ exports.getFarmUsedList = async (req, res) => {
     if(!userid) return res.render(errResponse(USER_USERID_EMPTY));
 
     const FarmUsedArray = User.retrieveUsedFarmArray(userid);
-    const getUsedFarm_Detail = await farmProvider.retrieveFarmInfo(FarmUsedArray);
+    const getUsedFarm_Detail = await farmProvider.retrieveFarmDetail(FarmUsedArray);
     return res.render(getUsedFarm_Detail);
 
 }
@@ -86,6 +76,7 @@ exports.postFarmer = async (req, res) =>{
 exports.editFarm = async(req, res) =>{
     try{
         const {farmId} = req.query;
+
         if (!farmId) return res.send(errResponse2(baseResponse.FARMID_EMPTY))
 
         const eidtFarmInfoRes = await farmService.editFarmInfo(farmId, req.body)
