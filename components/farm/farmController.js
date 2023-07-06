@@ -33,12 +33,21 @@ exports.getFarmlist = async (req, res) => {
 }
 
 exports.getFarmDetail = async (req, res) => {
-    const { farmid } = req.params;
+    try {
+        const farmID = req.params.farmid;
+        const invalidation = await validator.oneParams(farmID);
 
-    if(!farmid) return res.render(errResponse(FARMID_EMPTY));
+        if (invalidation) return (res.send(response(invalidation)));
 
-    const getFarmDetail = await farmProvider.retrieveFarmDetail(Farmidx);
-    return res.render(response(resStatus.SUCCESS, getFarmDetail));
+        const FarmDetailResponse = await farmService.getFarmDetail(farmID);
+
+        // console.log(FarmDetailResponse)
+        return res.send(FarmDetailResponse);
+
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 
 exports.getFarmUsedList = async (req, res) => {
