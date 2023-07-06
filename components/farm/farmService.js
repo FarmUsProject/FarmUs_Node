@@ -129,7 +129,7 @@ exports.getFarmDetail = async (farmID) => {
 
 
 exports.getFarmList = async (email) => {
-    try {
+    // try {
         const farmList = await FarmProvider.retrieveFarmlist();
         const farmPictureInformation = await FarmProvider.farmPictureUrl();
         const userInformation = await userProvider.usersbyEmail(email);
@@ -146,7 +146,7 @@ exports.getFarmList = async (email) => {
           });
         
         //like
-        if (userInformation.length > 0 && userInformation[0].LikeFarmIDs.length > 0) {
+        if (userInformation.length > 0 && userInformation[0].LikeFarmIDs) {
             likeFarmIDs = userInformation[0].LikeFarmIDs.split(',').map(id => id.trim());
             farmList.forEach(farm => {
                 if (likeFarmIDs.includes(farm.FarmID.toString())) {
@@ -174,7 +174,7 @@ exports.getFarmList = async (email) => {
         // console.log(farmList, "farmList")
         return response(resStatus_5000.FARM_LIST_AVAILABLE_FOR_RESERVATION, farmList);
 
-    } catch (err) {
-        return errResponse(resStatus.DB_ERROR);
-    }
+    // } catch (err) {
+    //     return errResponse(resStatus.DB_ERROR);
+    // }
 }

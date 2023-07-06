@@ -15,7 +15,7 @@ const dateAvailability = require('../../helpers/DateAvailability');
 const userProvider = require('../user/userProvider');
 
 exports.getFarmlist = async (req, res) => {
-    try{
+    // try{
         const email = req.params.email;
         const invalidation = await validator.oneParams(email);
 
@@ -25,10 +25,10 @@ exports.getFarmlist = async (req, res) => {
 
         // console.log(FarmDetailResponse)
         return res.send(FarmListResponse);
-    }
-    catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
-    }
+    // }
+    // catch (e) {
+    //     res.send(errResponse(resStatus.SERVER_ERROR));
+    // }
 }
 
 exports.getFarmDetail = async (req, res) => {
