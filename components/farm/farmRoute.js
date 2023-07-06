@@ -7,7 +7,7 @@ module.exports = function (app) {
     app.post('/farm/postings', farm.newFarm);
 
     //농장목록 조회
-    app.get("/farm/list", farm.getFarmlist);
+    app.get("/farm/list/:email", farm.getFarmlist);
 
     //농장 세부사항 조회
     app.get("/farm/detail/:farmid", farm.getFarmDetail);

@@ -66,3 +66,21 @@ exports.retrieveFarms = async(keyword) => {
 
     return res
 }
+
+exports.farmPictureUrlbyFarmID = async (farmID) =>{
+    const connection = await pool.getConnection(async conn => conn);
+    const farmPicturesInfo = await farmDao.selectFarmPicturesUrlbyFarmID(connection, farmID);
+
+    connection.release();
+
+    return farmPicturesInfo[0];
+}
+
+exports.farmPictureUrl = async () =>{
+    const connection = await pool.getConnection(async conn => conn);
+    const farmPicturesInfo = await farmDao.selectFarmPicturesUrl(connection);
+
+    connection.release();
+
+    return farmPicturesInfo[0];
+}

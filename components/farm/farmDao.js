@@ -156,3 +156,24 @@ exports.updateFarmStar = async(connection, updatedStarNumberInfo) => {
     const updatedStarNumber = await connection.query(updateFarmStarQuery, updatedStarNumberInfo);
     return updatedStarNumber;
 }
+
+exports.selectFarmPicturesUrlbyFarmID = async(connection, farmID) =>{
+    const selectFarmPicturesUrlbyFarmIDQuery =`
+    SELECT Picture_url
+    FROM FarmPictures
+    WHERE FarmID = ?;
+    `;
+    const pictureUrlByFarmID = await connection.query(selectFarmPicturesUrlbyFarmIDQuery, farmID);
+
+    return pictureUrlByFarmID;
+}
+
+exports.selectFarmPicturesUrl = async(connection) =>{
+    const selectFarmPicturesUrlQuery =`
+    SELECT FarmID, Picture_url
+    FROM FarmPictures;
+    `;
+    const pictureUrls = await connection.query(selectFarmPicturesUrlQuery);
+
+    return pictureUrls;
+}

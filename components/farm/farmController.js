@@ -16,15 +16,22 @@ const userProvider = require('../user/userProvider');
 
 exports.getFarmlist = async (req, res) => {
     try{
-        const getFarmResult = await farmProvider.retrieveFarmlist();
-        return res.send(response(resStatus_5000.FARM_LIST_AVAILABLE_FOR_RESERVATION, getFarmResult));
+        // return res.send(response(resStatus_5000.FARM_LIST_AVAILABLE_FOR_RESERVATION, getFarmResult));
+        const email = req.params.email;
+        const invalidation = await validator.oneParams(email);
+
+        if (invalidation) return (res.send(response(invalidation)));
+
+        const FarmListResponse = await farmService.getFarmList(email);
+
+        // console.log(FarmDetailResponse)
+        return res.send(FarmListResponse);
     }
     catch (e) {
         res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
 
-//추가할 사진 정보 : farm 테이블의 사진, user 테이블의 사진
 exports.getFarmDetail = async (req, res) => {
     try {
         const farmID = req.params.farmid;
