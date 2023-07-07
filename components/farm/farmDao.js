@@ -96,7 +96,6 @@ exports.searchFarm = async(connection, keyword) => {
     const searchFarmQuery = `
     SELECT FarmID,
 			Name,
-			Picture_url,
 			Price,
 			SquaredMeters,
 			LocationBig,
