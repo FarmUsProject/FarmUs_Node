@@ -8,7 +8,7 @@ const oauthService = require('./oauthService');
  * [POST] /oauth/kakao/signup
 */
 exports.signup = async function (req, res) {
-    // try {
+    try {
         const { account_email, phone_number, profile_nickname, profile_image, role } = req.body;
 
         const invalidation = await validator.oauthSignup(account_email, phone_number, profile_nickname, role);
@@ -19,8 +19,8 @@ exports.signup = async function (req, res) {
 
         return res.send(signUpResponse);
 
-    // }
-    // catch (e) {
-    //     res.send(errResponse(resStatus.SERVER_ERROR));
-    // }
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }

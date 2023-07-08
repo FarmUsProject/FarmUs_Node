@@ -9,7 +9,7 @@ const setDate = require('./../../helpers/setDate');
 
 async function signUp(email, phoneNumber, name, picture_url, role) {
     //account_email, phone_number, profile_nickname, profile_image, role
-    // try{
+    try{
         const userInfobyEmail = await userProvider.usersbyEmail(email);
         if (userInfobyEmail.length >= 1) return response(resStatus_5000.USER_OAUTH_SIGNUP_REDUNDANT_EMAIL, null);
 
@@ -32,9 +32,9 @@ async function signUp(email, phoneNumber, name, picture_url, role) {
             "picture_url": picture_url,
             "role": role
         });
-// } catch(e) {
-//     return Response(resStatus.DB_ERROR);
-// }
+} catch(e) {
+    return Response(resStatus.DB_ERROR);
+}
 };
 
 module.exports = {
