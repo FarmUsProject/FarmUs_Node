@@ -43,7 +43,7 @@ module.exports = {
     //reserve
     RESERVE_REQUEST_DATA_SHORTAGE : { "isSuccess": false, "code": 5300, "message": "농장을 예약하는 데 필요한 정보가 부족합니다." },
     RESERVE_RESERVEID_NOT_EXIST : {"isSuccess" : false, "code" : 5301, "message" : "요청하신 예약 내역이 존재하지 않습니다."},
-    RESERVE_DATE_OFF_PERIOD_OF_FARM : { "isSuccess": false, "code": 5303, "message": "요청하신 기간에는 농장을 이용할 수 없습니다." },
+    RESERVE_DATE_OFF_PERIOD_OF_FARM : { "isSuccess": false, "code": 5303, "message": "요청하신 기간에는 농장을 예약할 수 없습니다." },
     RESERVE_STATUS_ERROR : { "isSuccess": false, "code": 5304, "message": "잘못된 농장 예약 상태를 요청하였습니다. 농장 예약의 상태 변경에 실패했습니다." },
     RESERVE_CANCEL_NOT_ALLOWED : { "isSuccess": false, "code": 5305, "message": "예약 확정 상태에서는 예약을 취소할 수 없습니다." },
     RESERVE_REQUEST_SUCCESS: { "isSuccess": true, "code": 5350, "message": "농장 예약이 완료되었습니다." },

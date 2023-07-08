@@ -21,7 +21,7 @@ async function request(userEmail, farmid,startAt, endAt) {
     const newEndAt = new Date(endAt)
 
     //date availability check
-    const unAvailability = await dateAvailability.dateAvailabilityCheck(farmInfo.startAt, farmInfo.endAt, newStartAt, newEndAt);
+    const unAvailability = await dateAvailability.dateAvailabilityCheck(newStartAt, newEndAt);
 
     if(unAvailability != 0)
         return errResponse(unAvailability);
