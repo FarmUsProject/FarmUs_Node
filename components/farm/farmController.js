@@ -15,7 +15,7 @@ const dateAvailability = require('../../helpers/DateAvailability');
 const userProvider = require('../user/userProvider');
 
 exports.getFarmlist = async (req, res) => {
-    // try{
+    try{
         const email = req.params.email;
         const invalidation = await validator.oneParams(email);
 
@@ -25,10 +25,10 @@ exports.getFarmlist = async (req, res) => {
 
         // console.log(FarmDetailResponse)
         return res.send(FarmListResponse);
-    // }
-    // catch (e) {
-    //     res.send(errResponse(resStatus.SERVER_ERROR));
-    // }
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 
 exports.getFarmDetail = async (req, res) => {
@@ -126,16 +126,17 @@ exports.editFarm = async(req, res) =>{
  */
 exports.newFarm = async function (req, res) {
     try {
-        const { name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall,description, category, tag } = req.body;
+        const { name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description, file} = req.body;
 
-        const invalidation = await validator.newFarm(name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid);
+        const invalidation = await validator.newFarm(name, owner, price, squaredMeters, locationBig, locationMid);
         if (invalidation) return res.send(errResponse(invalidation))
-        if (dateAvailability.isValidDatetype(startDate) == false || dateAvailability.isValidDatetype(endDate) == false)
-            return res.send(errResponse(resStatus_5000.DATE_TYPE_WEIRD));
 
-        const farmDateErrorMessage = dateAvailability.validFarmDate(new Date(), new Date(startDate), new Date(endDate))
-        if(farmDateErrorMessage != true)
-            return res.send(errResponse(farmDateErrorMessage));
+        // Date Availability 유효성 검사
+        // if (dateAvailability.isValidDatetype(startDate) == false || dateAvailability.isValidDatetype(endDate) == false)
+        //     return res.send(errResponse(resStatus_5000.DATE_TYPE_WEIRD));
+        // const farmDateErrorMessage = dateAvailability.validFarmDate(new Date(), new Date(startDate), new Date(endDate))
+        // if(farmDateErrorMessage != true)
+        //     return res.send(errResponse(farmDateErrorMessage));
 
         const userInfo = await userProvider.usersbyEmail(owner);
         if (!userInfo || userInfo.length < 1) return res.send(errResponse(resStatus.USER_USEREMAIL_NOT_EXIST));
@@ -149,7 +150,7 @@ exports.newFarm = async function (req, res) {
 
         const districtCode = districtClarityResponse.result;
 
-        let newFarmResponse = await farmService.newFarm(name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag);
+        let newFarmResponse = await farmService.newFarm(name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description, file);
         if (newFarmResponse.result)
             newFarmResponse.result = {"newFarmID" : newFarmResponse.result.newFarmID, "districtCode" : districtCode};
         return res.send(newFarmResponse)
