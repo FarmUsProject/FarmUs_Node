@@ -174,17 +174,17 @@ exports.pastUse = async function (req, res) {
 }
 
 /**
- *  [GET] /reserve/unavailable/:farmid
+ *  [GET] /reserve/unbookable/:farmid
  */
-exports.unavaliablePeriod = async function (req, res) {
+exports.unbookablePeriods = async function (req, res) {
     try {
         let farmID = req.params.farmid;
         // const invalidation = await validator.oneParams(farmID);
         // if (invalidation) return (res.send(errResponse(invalidation)));
 
-        const unavaliablePeriodResult = await reserveService.unavaliablePeriods(farmID);
+        const unbookablePeriodsResult = await reserveService.unbookablePeriods(farmID);
 
-        return(res.send(unavaliablePeriodResult));
+        return(res.send(unbookablePeriodsResult));
     }
     catch (e) {
         return(res.send(errResponse(resStatus.SERVER_ERROR)));

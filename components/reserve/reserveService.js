@@ -155,13 +155,13 @@ async function pastUse(email) {
 
 }
 
-async function unavaliablePeriods(farmID) {
+async function unbookablePeriods(farmID) {
     try {
         let reservedPeriods = await reserveProvider.reservedPeriodByFarmID(farmID);
 
         if (!reservedPeriods || reservedPeriods.length < 1) reservedPeriods = null;
 
-        return(response(resStatus_5000.RESERVE_UNAVALIABLE_PERIOD, reservedPeriods));
+        return(response(resStatus_5000.RESERVE_UNBOOKABLE_PERIOD, reservedPeriods));
     }
     catch (e) {
         return(res.send(errResponse(resStatus.SERVER_ERROR)));
@@ -177,5 +177,5 @@ module.exports = {
     editStatus,
     currentUse,
     pastUse,
-    unavaliablePeriods,
+    unbookablePeriods,
 };

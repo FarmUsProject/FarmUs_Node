@@ -23,5 +23,5 @@ module.exports = function(app){
     app.get('/reserve/past/list/:email', reserve.pastUse);
 
     // 8. 농장별 예약 불가 기간 조회
-    app.get('/reserve/unavailable/:farmid', reserve.unavaliablePeriod);
+    app.get('/reserve/unbookable/:farmid', reserve.unbookablePeriods);
 };
