@@ -19,16 +19,17 @@ module.exports = {
     DATE_START_FASTER_THAN_NOW : { "isSuccess": false, "code": 5004, "message": "시작 날짜는 오늘 날짜 이후로 설정할 수 있습니다."},
 
     //user
-    USER_OAUTH_SIGNUP_REDUNDANT_EMAIL : {"isSuccess" : false, "code" : 5100, "message" : "해당 이메일을 가진 회원은 이미 등록되어 있습니다. 로그인을 진행해주세요."},
-    USER_REDUNDANT_STAR :  {"isSuccess" : false, "code" : 5101, "message" : "이미 찜한 농장입니다."},
-    USER_NOT_FARMER :  {"isSuccess" : false, "code" : 5102, "message" : "농장주만 농장을 등록할 수 있어요."},
+    USER_REDUNDANT_STAR :  {"isSuccess" : false, "code" : 5100, "message" : "이미 찜한 농장입니다."},
+    USER_NOT_FARMER :  {"isSuccess" : false, "code" : 5101, "message" : "농장주만 농장을 등록할 수 있어요."},
+    USER_NAME_EMPTY :  {"isSuccess" : false, "code" : 5102, "message" : "이름을 입력해주세요."},
     USER_SIGNUP_SUCCESS : {"isSuccess" : true, "code" :  5150, "message" : "회원가입이 완료되었습니다."},
     USER_LOGIN_SUCCESS : {"isSuccess" : true, "code" :  5151, "message" : "로그인이 완료되었습니다."},
     USER_STAR_ADD_SUCCESS : { "isSuccess": true, "code": 5152, "message": "해당 농장을 찜 목록에 추가하였습니다." },
     USER_OAUTH_SIGNUP_SUCCESS : {"isSuccess" : true, "code" : 5153, "message" : "신규 소셜로그인 회원이 등록되었습니다."},
     USER_BIRTH_EDIT_SUCCESS : {"isSuccess" : true, "code" : 5154, "message" : "생일이 정상적으로 수정되었습니다."},
     USER_PASSWORD_EDIT_SUCCESS : {"isSuccess" : true, "code" : 5155, "message" : "비밀번호가 정상적으로 변경되었습니다."},
-    USER_EMAIL_AVAILABLE : {"isSuccess" : true, "code" : 5155, "message" : "사용가능한 이메일입니다."},
+    USER_EMAIL_AVAILABLE : {"isSuccess" : true, "code" : 5156, "message" : "사용가능한 이메일입니다."},
+    USER_OAUTH_SIGNUP_REDUNDANT_EMAIL : {"isSuccess" : true, "code" : 5157, "message" : "해당 이메일을 가진 회원은 이미 등록되어 있습니다."},
 
     //farm
     FARM_FARMID_NOT_EXIST  : { "isSuccess" : false, "code" : 5200, "message" : "해당 아이디를 가진 농장이 존재하지 않습니다."},
