@@ -58,6 +58,7 @@ module.exports = {
     RESERVE_USE_PAST_LIST : { "isSuccess": true, "code": 5360, "message": "과거 이용했던 농장 목록을 불러왔어요." },
     RESERVE_USE_CURRENT_LIST_EMPTY : { "isSuccess": true, "code": 5361, "message": "현재 이용 중인 농장이 없어요." },
     RESERVE_USE_PAST_LIST_EMPTY : { "isSuccess": true, "code": 5362, "message": "과거 이용했던 농장이 없어요." },
+    RESERVE_UNAVALIABLE_PERIOD : { "isSuccess": true, "code": 5363, "message": "해당 농장을 예약할 수 없는 기간들을 불러왔어요." },
     
     //district
     DISTRICT_AUTH_FAIL : { "isSuccess": false, "code": 5400, "message": "주소 유효성 검사에 실패하였습니다."},

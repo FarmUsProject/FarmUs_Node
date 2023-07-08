@@ -133,9 +133,9 @@ exports.editStatus = async function (req, res) {
  *  [GET] /reserve/current/list/:email
  */
 exports.currentUse = async function (req, res) {
-    // try {
+    try {
         let userEmail = req.params.email;
-        // const invalidation = await validator.oneParams(email);
+        // const invalidation = await validator.oneParams(userEmail);
         // if (invalidation) return (res.send(errResponse(invalidation)));
 
         if(validator.isValidEmail(userEmail) == false) 
@@ -144,10 +144,10 @@ exports.currentUse = async function (req, res) {
         const currentUseResult = await reserveService.currentUse(userEmail);
 
         return(res.send(currentUseResult));
-    // }
-    // catch (e) {
-    //     return(res.send(errResponse(resStatus.SERVER_ERROR)));
-    // }
+    }
+    catch (e) {
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
+    }
 
 }
 
@@ -157,7 +157,7 @@ exports.currentUse = async function (req, res) {
 exports.pastUse = async function (req, res) {
     try {
         let userEmail = req.params.email;
-        // const invalidation = await validator.oneParams(email);
+        // const invalidation = await validator.oneParams(userEmail);
         // if (invalidation) return (res.send(errResponse(invalidation)));
 
         if(validator.isValidEmail(userEmail) == false) 
@@ -166,6 +166,25 @@ exports.pastUse = async function (req, res) {
         const pastUseResult = await reserveService.pastUse(userEmail);
 
         return(res.send(pastUseResult));
+    }
+    catch (e) {
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
+    }
+
+}
+
+/**
+ *  [GET] /reserve/unavailable/:farmid
+ */
+exports.unavaliablePeriod = async function (req, res) {
+    try {
+        let farmID = req.params.farmid;
+        // const invalidation = await validator.oneParams(farmID);
+        // if (invalidation) return (res.send(errResponse(invalidation)));
+
+        const unavaliablePeriodResult = await reserveService.unavaliablePeriods(farmID);
+
+        return(res.send(unavaliablePeriodResult));
     }
     catch (e) {
         return(res.send(errResponse(resStatus.SERVER_ERROR)));
