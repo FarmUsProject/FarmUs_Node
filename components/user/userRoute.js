@@ -12,6 +12,7 @@ module.exports = function(app){
     // verificatoin
     app.post('/user/signup/verification',user.userAuthentication)
     app.post('/user/verification',user.vertifyCode)
+    app.get('/user/email/verification/:email', user.verfiyEmail)
 
     // find
     app.get('/user/find-account',user.findAccount)
@@ -37,5 +38,6 @@ module.exports = function(app){
 
     //9. 생일 등록 API
     app.post('/user/birth', user.birth)
+
 
 };

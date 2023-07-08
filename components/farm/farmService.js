@@ -8,34 +8,29 @@ const setDate = require('./../../helpers/setDate');
 const { response2, errResponse2 } = require('../../config/response2');
 const baseResponse = require('../../config/resStatus');
 const { eidtFarm } = require('./farmController');
+const resStatus = require('../../config/resStatus');
+const userProvider = require('./../user/userProvider');
 
 
-exports.Changeto_Owner = async (userid) => {
-    const User = userid;
+exports.postFarmer = async (email) => {
+    const connection = await pool.getConnection(async (conn)=>conn)
+    const res = await farmDao.userToFarmer(connection, email)
+    connection.release()
 
-    const connection = await pool.getConnections(async (conn) => conn);
-
-    const UserStatus_ChangeResult = await farmDao.ChangeUser_Status(
-        connection,
-        User
-    );
-    connection.release();
-
-    return UserStatus_ChangeResult;
-
+    return res;
 }
 
-async function newFarm(name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag) {
+exports.newFarm = async (name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag) => {
     const newFarmStatus = 'A';
     let newFarmID;
     let existedFarm;
     do {
         newFarmID = await randomNumber.createFarmID();
         existedFarm = await FarmProvider.farmbyfarmID(newFarmID);
-    } while (!existedFarm); //farmID
+    } while (existedFarm); //unique farmID
 
     const now = await setDate.now();
-    const newFarmInfo = [newFarmID, name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag, newFarmStatus, now, now];
+    const newFarmInfo = [newFarmID, name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag, newFarmStatus, now, now];
 
     const isSameFarm = await FarmProvider.isSameFarm(newFarmInfo); //중복체크
     if (isSameFarm) return errResponse(resStatus_5000.FARM_DUPLICATED_EXISTS);
@@ -87,4 +82,99 @@ exports.editFarmPictures = async(farmID, farmName, img, key) =>{
         console.log(err);
         return errResponse2(baseResponse.DB_ERROR)
     }
+}
+
+exports.getFarmDetail = async (farmID) => {
+    try {
+        const farmInformation = await FarmProvider.retrieveFarmInfo(farmID);
+        const farmPictureUrlInformation = await FarmProvider.farmPictureUrlbyFarmID(farmID);
+        const userInformation = await userProvider.usersbyEmail(farmInformation[0].Owner);
+
+        //최종 농장 세부사항
+        let farmDetail = farmInformation[0];
+
+        //농장 항목 삭제 : Owner, crateAt, updateAt 
+        delete farmDetail.Owner;
+        delete farmDetail.createAt;
+        delete farmDetail.updateAt;
+
+        // 농장 사진 추가 : Picture_url, Picture_key
+        let pictureObject;
+        if(farmPictureUrlInformation && farmPictureUrlInformation.length > 0 ) {
+            pictureObject = farmPictureUrlInformation.map(({ Picture_url, Picture_key }) => ({
+                Picture_url,
+                Picture_key
+              }));
+        }
+        else  pictureObject = null;
+        farmDetail.PictureObject = pictureObject;
+
+        //농장주 정보 추가 : Email, PhoneNumber, Name, NickName
+        let userInfo = { 
+            Email : userInformation[0].Email, 
+            PhoneNumber : userInformation[0].PhoneNumber, 
+            Name : userInformation[0].Name, 
+            NickName : userInformation[0].NickName,
+            Picture_url : userInformation[0].Picture_url || null,
+            Picture_key : userInformation[0].Picture_key || null
+        }
+        farmDetail.farmer = userInfo;
+
+        return response(resStatus_5000.FARM_DETAIL_GET_SUCCESS, farmDetail);
+
+    } catch(err) {
+        return errResponse(resStatus.DB_ERROR);
+    }
+}
+
+
+exports.getFarmList = async (email) => {
+    // try {
+        const farmList = await FarmProvider.retrieveFarmlist();
+        const farmPictureInformation = await FarmProvider.farmPictureUrl();
+        const userInformation = await userProvider.usersbyEmail(email);
+        let likeFarmIDs;
+
+        //picture_url & picture_key
+        farmList.forEach(farm => {
+            const matchingPictures = farmPictureInformation.filter(p => p.FarmID === farm.FarmID);
+            const pictureObjects = matchingPictures.map(p => ({
+              Picture_url: p.Picture_url,
+              Picture_key: p.Picture_key
+            }));
+            farm.Pictures = pictureObjects;
+          });
+        
+        //like
+        if (userInformation.length > 0 && userInformation[0].LikeFarmIDs) {
+            likeFarmIDs = userInformation[0].LikeFarmIDs.split(',').map(id => id.trim());
+            farmList.forEach(farm => {
+                if (likeFarmIDs.includes(farm.FarmID.toString())) {
+                    farm.Liked = true;
+                } else {
+                    farm.Liked = false;
+                }
+            });
+        }
+        else {
+            farmList.forEach(farm => {farm.Liked = false;});
+        }
+
+        //불필요한 항목 삭제
+        farmList.forEach((farm) => {
+            delete farm.Owner;
+            delete farm.LocationBig;
+            delete farm.LocationMid;
+            delete farm.LocationSmall;
+            delete farm.Description;
+            delete farm.createAt;
+            delete farm.updateAt;
+        })
+
+        // console.log(farmList, "farmList")
+        return response(resStatus_5000.FARM_LIST_AVAILABLE_FOR_RESERVATION, farmList);
+
+    // } catch (err) {
+    //     return errResponse(resStatus.DB_ERROR);
+    // }
 }

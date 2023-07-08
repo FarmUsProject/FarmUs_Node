@@ -65,7 +65,7 @@ async function updateUserStar(connection, starRequest) {
     //starRequest [newStarList, updateAt, email]
     const updateUserStarQuery = `
     UPDATE User
-    SET LikeFarmIDs = ? updateAt = ?
+    SET LikeFarmIDs = ?, updateAt = ?
     WHERE Email = ?;
     `;
     const updateUserStarResult = await connection.query(updateUserStarQuery, starRequest);
@@ -86,21 +86,21 @@ async function updateUserBirth(connection, birthRequest) {
 }
 
 
-async function selectUser(connection, name, phoneNumber){
+async function selectUser(connection, phoneNumber){
     const selectUserQuery = `
-    SELECT Name, Email
+    SELECT Name, Email, Status
     FROM User
-    WHERE Name = ? AND PhoneNumber = ?;`;
-    const [userRow] = await connection.query(selectUserQuery, [name, phoneNumber]);
+    WHERE PhoneNumber = ?;`;
+    const [userRow] = await connection.query(selectUserQuery,  phoneNumber);
     return userRow;
 }
 
-async function updatePassword(connection, email, pw) {
+async function updatePassword(connection, userInfo) {
     const updateUserQuery = `
     UPDATE User
-    SET Password = ?
+    SET Password = ?, Salt = ?
     WHERE Email = ?;`;
-    const updateUserRow = await connection.query(updateUserQuery, [pw, email]);
+    const updateUserRow = await connection.query(updateUserQuery, userInfo);
     return updateUserRow[0];
 }
 

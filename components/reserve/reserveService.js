@@ -16,26 +16,25 @@ async function request(userEmail, farmid,startAt, endAt) {
     const reserveInfo = await reserveProvider.clientsbyFarmID(farmid);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
     if (!farmInfo) return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
-    
-    if(!dateAvailability.isValidDatetype(startAt) || !dateAvailability.isValidDatetype(endAt))
-        return errResponse(resStatus_5000.DATE_TYPE_WEIRD);
 
     const newStartAt = new Date(startAt);
     const newEndAt = new Date(endAt)
 
     //date availability check
     const unAvailability = await dateAvailability.dateAvailabilityCheck(farmInfo.startAt, farmInfo.endAt, newStartAt, newEndAt);
-    console.log(unAvailability);
+
     if(unAvailability != 0)
-    return errResponse(unAvailability);
+        return errResponse(unAvailability);
     
     //date reservation check
-    reserveInfo.forEach(e => {
-        // console.log("e",e)
+    for (const e of reserveInfo) {
         const reservation_full = dateAvailability.reserveAvailabilityCheck(e.startAt, e.endAt, newStartAt, newEndAt);
-        if(reservation_full)
-            return errResponse(reservation_full);
-    });
+      
+        console.log(reservation_full);
+        if (reservation_full !== false) {
+          return response(reservation_full, {"reservedStartAt" : e.startAt, "reservedEndAt" : e.endAt});
+        }
+      }
 
     //new reserve id
     let newReserveID;
@@ -48,15 +47,16 @@ async function request(userEmail, farmid,startAt, endAt) {
 
     //ReserveID, FarmID, UserEmail, OwnerEmail, startAt, endAt, createAt, updateAt
     const now = await setDate.now();
-    const newReservationInfo = [newReserveID, farmInfo.FarmID, userEmail, farmInfo.Owner, newStartAt, newEndAt, now, now];
+    const newStatus = "H";
+    const newReservationInfo = [newReserveID, farmInfo.FarmID, userEmail, farmInfo.Owner, newStatus, newStartAt, newEndAt, now, now];
 
     const connection = await pool.getConnection(async conn => conn);
 
     const newReservation = await reserveDao.insertReservation(connection, newReservationInfo);
-
     connection.release();
 
-    return response(resStatus_5000.RESERVE_REQUEST_SUCCESS, null);
+    return response(resStatus_5000.RESERVE_REQUEST_SUCCESS, {"reserveID" : newReserveID.toString()});
+
 };
 
 async function clientsList(farmid) {
@@ -86,6 +86,8 @@ async function cancel(reserveId) {
     const reservedItem = await reserveProvider.itembyReserveId(reserveId);
     if (reservedItem.length < 1) return errResponse(resStatus_5000.RESERVE_RESERVEID_NOT_EXIST);
 
+    if (reservedItem[0].Status == "A") return errResponse(resStatus_5000.RESERVE_CANCEL_NOT_ALLOWED);
+
     const connection = await pool.getConnection(async conn => conn);
 
     const canceledReservation = await reserveDao.cancelReservation(connection, reserveId);
@@ -112,11 +114,11 @@ async function editStatus(reserveId, status) {
 
     switch (status) {
         case 'A':
-            return response(resStatus_5000.RESERVE_STATUS_ACCPET_SUCCESS);
+            return response(resStatus_5000.RESERVE_STATUS_ACCPET_SUCCESS, {"reserveID" : reserveId});
         case 'H':
-            return response(resStatus_5000.RESERVE_STATUS_HOLD_SUCCESS);
+            return response(resStatus_5000.RESERVE_STATUS_HOLD_SUCCESS, {"reserveID" : reserveId});
         case 'D':
-            return response(resStatus_5000.RESERVE_STATUS_DENIED_SUCCESS);
+            return response(resStatus_5000.RESERVE_STATUS_DENIED_SUCCESS, {"reserveID" :reserveId});
     }
 
     return errResponse(resStatus.DB_ERROR);

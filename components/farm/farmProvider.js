@@ -9,13 +9,14 @@ exports.retrieveFarmlist = async () =>{
     return farmListResult;
 }
 
-exports.retrieveFarmDetail = async (Farmidx) => {
+exports.retrieveFarmInfo = async (farmID) => {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const farmDetail = await farmDao.selectFarmDetail(connection, Farmidx);
+    const farmInfo = await farmDao.selectFarmbyFarmID(connection, farmID);
+
     connection.release();
 
-    return farmDetail;
+    return farmInfo[0];
 }
 
 exports.retrieveUsedFarmDetail = async (UsedArray) => {
@@ -64,4 +65,22 @@ exports.retrieveFarms = async(keyword) => {
     connection.release()
 
     return res
+}
+
+exports.farmPictureUrlbyFarmID = async (farmID) =>{
+    const connection = await pool.getConnection(async conn => conn);
+    const farmPicturesInfo = await farmDao.selectFarmPicturesUrlbyFarmID(connection, farmID);
+
+    connection.release();
+
+    return farmPicturesInfo[0];
+}
+
+exports.farmPictureUrl = async () =>{
+    const connection = await pool.getConnection(async conn => conn);
+    const farmPicturesInfo = await farmDao.selectFarmPicturesUrlKey(connection);
+
+    connection.release();
+
+    return farmPicturesInfo[0];
 }

@@ -7,19 +7,45 @@ const baseResponse = require('../../config/resStatus');
 const {FARMID_EMPTY, DELETED_FARM, USER_USERID_EMPTY, SUCCESS} = require("../../config/resStatus");
 const validator = require('./../../helpers/validator');
 const { response2, errResponse2 } = require('./../../config/response2');
+const jwt = require('jsonwebtoken');
+const { secretKey } = require('./../../config/secret');
+const resStatus_5000 = require('../../config/resStatus_5000');
+const districtClarity = require('./../../helpers/districtClarity');
+const dateAvailability = require('../../helpers/DateAvailability');
+const userProvider = require('../user/userProvider');
 
 exports.getFarmlist = async (req, res) => {
-    const getFarmResult = await farmProvider.retrieveFarmlist();
-    return res.render(response(resStatus.SUCCESS, getFarmResult));
+    // try{
+        const email = req.params.email;
+        const invalidation = await validator.oneParams(email);
+
+        if (invalidation) return (res.send(response(invalidation)));
+
+        const FarmListResponse = await farmService.getFarmList(email);
+
+        // console.log(FarmDetailResponse)
+        return res.send(FarmListResponse);
+    // }
+    // catch (e) {
+    //     res.send(errResponse(resStatus.SERVER_ERROR));
+    // }
 }
 
 exports.getFarmDetail = async (req, res) => {
-    const { farmid } = req.params;
+    try {
+        const farmID = req.params.farmid;
+        const invalidation = await validator.oneParams(farmID);
 
-    if(!farmid) return res.render(errResponse(FARMID_EMPTY));
+        if (invalidation) return (res.send(response(invalidation)));
 
-    const getFarmDetail = await farmProvider.retrieveFarmDetail(Farmidx);
-    return res.render(response(resStatus.SUCCESS, getFarmDetail));
+        const FarmDetailResponse = await farmService.getFarmDetail(farmID);
+
+        return res.send(FarmDetailResponse);
+
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 
 exports.getFarmUsedList = async (req, res) => {
@@ -44,22 +70,29 @@ exports.getFarmUseList = async (req, res) => {
 
 }
 
-exports.register_FarmOwner = async (req, res) =>{
-    const { userid }= req.params;
+exports.postFarmer = async (req, res) =>{
+    try{
+        const decoded = jwt.verify(req.headers.token, secretKey);
+        console.log(decoded);
+        if (decoded.role == 'F') return res.send(errResponse2(baseResponse.ALREADY_FARMER));
 
-    if(!userid) return res.render(errResponse(USER_USERID_EMPTY));
+        const farmer = await farmService.postFarmer(decoded.email);
+        if (!farmer) return res.send(response2(baseResponse.SIGNIN_INACTIVE_ACCOUNT))
 
-    const Register_Owner = await farmService.Changeto_Owner(userid);
+        return res.send(baseResponse.SUCCESS);
 
-    return res.render(Register_Owner);
+    }catch(err){
+        console.log(err);
+        return res.send(errResponse2(baseResponse.NOT_LOGIN));
+    }
 
 }
 
 exports.editFarm = async(req, res) =>{
     try{
-        const {farmId, name} = req.query;
+        const {farmId} = req.query;
+
         if (!farmId) return res.send(errResponse2(baseResponse.FARMID_EMPTY))
-        if (!name) return res.send(errResponse2(baseResponse.FARM_NAME_EMPTY))
 
         const eidtFarmInfoRes = await farmService.editFarmInfo(farmId, req.body)
 
@@ -78,7 +111,7 @@ exports.editFarm = async(req, res) =>{
             const file = req.files[i];
             const location = file.location;
             const key = file.key;
-            editFarmPicturesRes = await farmService.editFarmPictures(farmId, name, location, key);
+            editFarmPicturesRes = await farmService.editFarmPictures(farmId,location, key);
             if (!editFarmPicturesRes.result) break
         }
         return res.send(editFarmPicturesRes);
@@ -93,13 +126,32 @@ exports.editFarm = async(req, res) =>{
  */
 exports.newFarm = async function (req, res) {
     try {
-        const { name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag } = req.body;
-        const invalidation = await validator.newFarm(name, owner, startDate, endDate, price, squaredMeters, location);
+        const { name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall,description, category, tag } = req.body;
 
+        const invalidation = await validator.newFarm(name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid);
         if (invalidation) return res.send(errResponse(invalidation))
+        if (dateAvailability.isValidDatetype(startDate) == false || dateAvailability.isValidDatetype(endDate) == false)
+            return res.send(errResponse(resStatus_5000.DATE_TYPE_WEIRD));
 
-        const newFarmResponse = await farmService.newFarm(name, owner, startDate, endDate, price, squaredMeters, location, description, picture_url, category, tag);
+        const farmDateErrorMessage = dateAvailability.validFarmDate(new Date(), new Date(startDate), new Date(endDate))
+        if(farmDateErrorMessage != true)
+            return res.send(errResponse(farmDateErrorMessage));
 
+        const userInfo = await userProvider.usersbyEmail(owner);
+        if (!userInfo || userInfo.length < 1) return res.send(errResponse(resStatus.USER_USEREMAIL_NOT_EXIST));
+
+        if(userInfo[0].Role.toUpperCase() != 'F') return res.send(errResponse(resStatus_5000.USER_NOT_FARMER));
+
+
+        const districtClarityResponse = await districtClarity.checkLocation(locationBig, locationMid, locationSmall);
+
+        if(!districtClarityResponse.result) return res.send(districtClarityResponse);
+
+        const districtCode = districtClarityResponse.result;
+
+        let newFarmResponse = await farmService.newFarm(name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag);
+        if (newFarmResponse.result)
+            newFarmResponse.result = {"newFarmID" : newFarmResponse.result.newFarmID, "districtCode" : districtCode};
         return res.send(newFarmResponse)
 
     }

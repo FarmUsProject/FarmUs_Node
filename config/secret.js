@@ -31,6 +31,13 @@ const options = {
     expiresIn : process.env.EXPIRESIN,
     issuer : process.env.ISSUER
 }
+const KOR_DIST =  {
+    URL_AUTH :process.env.KOR_DIST_URL_AUTH,
+    URL_REQ :process.env.KOR_DIST_URL_REQ,
+    SERVICEID : process.env.KOR_DIST_SERVICEID,
+    SECRET_KEY : process.env.KOR_DIST_SECRET_KEY
+}
+
 module.exports = {
     googleSecret,
     NCP_SENS,
@@ -38,5 +45,6 @@ module.exports = {
     DB_ENV,
     S3_ACCESS,
     secretKey,
-    options
+    options,
+    KOR_DIST
 }

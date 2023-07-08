@@ -15,6 +15,7 @@ const validator = require('../../helpers/validator');
 const dateAvailability = require('../../helpers/DateAvailability');
 const sharp = require('sharp');
 const fs = require('fs');
+const resStatus_5000 = require('../../config/resStatus_5000');
 
 exports.getBefoFarmUsed_Array = async (req, res, error) => {
     const { userid } = req.params;
@@ -81,7 +82,7 @@ exports.signup = async function (req, res) {
  *  [POST] /user/star
  */
 exports.star = async function (req, res) {
-    try {
+    // try {
         const { email, farmid } = req.body;
         const invalidation = await validator.twoParams(email, farmid);
 
@@ -90,10 +91,10 @@ exports.star = async function (req, res) {
         const starResponse = await userService.addStar(email, farmid);
 
         return(res.send(starResponse));
-    }
-    catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
-    }
+    // }
+    // catch (e) {
+    //     res.send(errResponse(resStatus.SERVER_ERROR));
+    // }
 }
 
 /**
@@ -205,32 +206,26 @@ exports.userAuthentication = async function (req, res) {
 }
 
 exports.vertifyCode = async(req,res) => {
-    const {phoneNumber, usercode,name} = req.body
+    const {phoneNumber, usercode} = req.body
 
     if (!phoneNumber)
         return res.send(errResponse2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
-    if (!name)
-        return res.send(errResponse2(baseResponse.USER_NAME_EMPTY))
 
-    const user = await userProvider.retrieveUser(name, phoneNumber)
-    if (!user) return res.send(errResponse2(baseResponse.USER_NOT_EXIST))
+
+    const user = await userProvider.retrieveUser(phoneNumber)
+    if (user) {
+        if (user.Status == 'D') return res.send(errResponse2(baseResponse.SIGNIN_WITHDRAWAL_ACCOUNT))
+        else if (user.Status == 'B') return res.send(errResponse2(baseResponse.SIGNIN_INACTIVE_ACCOUNT))
+
+        return res.send(errResponse2(baseResponse.ALREADY_USER))
+    }
 
     const code = await client.get(phoneNumber)
     if (code == usercode){
-        console.log(code);
         //console.log(client);
         await client.del(phoneNumber)
 
-
-        const email = await client.get(name)
-        console.log(email);
-
-        if (email){ // 아이디찾기
-            await client.del(name)
-            return res.send({"name": name, "email": email})
-        }
-        else // 회원가입
-            return res.send({"name": name})
+        return res.send(baseResponse.SUCCESS)
 
     }else{
         console.log(code);
@@ -245,13 +240,15 @@ exports.findAccount = async(req,res) => {
         if (!name) return res.send(errResponse2(baseResponse.USER_NAME_EMPTY))
         if (!phoneNumber) return res.send(errResponse2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
 
-        const user = await userProvider.retrieveUser(name, phoneNumber)
-        if (!user) return res.send(errResponse2(baseResponse.USER_NOT_EXIST))
+        const user = await userProvider.retrieveUser(phoneNumber)
+        if (!user || user.Name != name) return res.send(errResponse2(baseResponse.USER_NOT_EXIST))
 
-        let userData = await client.set(name, user.Email, {EX: 185})
-        sendSMS(phoneNumber)
-        return res.send(response2(baseResponse.SUCCESS))
+        const userEmail = user.Email.split('@')
+        const block = userEmail[0].slice(0,-3) + '*'.repeat(3)
+        user.Email = block + '@' + userEmail[1]
+        user.result = true
 
+        return res.send(user)
     }catch(err){
         console.log(err);
         return res.send(errResponse2(baseResponse.SIGNUP_SMS_WRONG))
@@ -263,7 +260,7 @@ exports.findPassword = async(req,res) => {
     try {
         let tempPw = Math.random().toString(36).substring(2, 12);
         const  {userEmail}  = req.query;
-        //console.log(userEmail);
+        console.log(userEmail);
 
         if (!userEmail)
             return res.send(errResponse2(baseResponse.USER_USEREMAIL_EMPTY))
@@ -279,7 +276,7 @@ exports.findPassword = async(req,res) => {
         },
       });
 
-
+      console.log(tempPw);
       const setTempPw = await userService.editPassword(userEmail,tempPw)
 
       const mailOptions = {
@@ -345,8 +342,9 @@ exports.editUserPhoneNumber = async(req,res) =>{
 }
 
 exports.editUserPassword = async(req,res) =>{
-    // try {
-        const { email, password } = req.body;
+    try {
+        const {email}  = req.query;
+        const {password} = req.body
 
         const invalidation = await validator.login(email, password);
 
@@ -354,12 +352,10 @@ exports.editUserPassword = async(req,res) =>{
 
         const editPasswordResponse = await userService.editPassword(email, password);
 
-        return res.send(editPasswordResponse);
-
-    // }
-    // catch (e) {
-    //     res.send(errResponse(resStatus.SERVER_ERROR));
-    // }
+        return res.send(editPasswordResponse);}
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 
 exports.editUserProfileImg = async(req,res)=> {
@@ -412,4 +408,22 @@ exports.withdrawal = async(req,res) => {
     const userWithdrawFarm = await farmService.deleteUserFarm(userEmail)
 
     return res.send(userWithdraw)
+}
+
+exports.verfiyEmail = async (req, res) => {
+
+    try {
+        const userEmail = req.params.email;
+        // if (!userEmail || userEmail.length < 1) return res.send(errResponse(resStatus.SIGNUP_EMAIL_EMPTY))
+        if(validator.isValidEmail(userEmail) == false) return res.send(errResponse(resStatus.SIGNIN_EMAIL_ERROR_TYPE));
+
+        const userInfo = await userProvider.usersbyEmail(userEmail);
+
+        if (userInfo && userInfo.length > 0) return res.send(errResponse(resStatus.SIGNUP_REDUNDANT_EMAIL));
+
+        else return res.send(response(resStatus_5000.USER_EMAIL_AVAILABLE));
+
+    } catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
