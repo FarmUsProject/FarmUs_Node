@@ -47,7 +47,8 @@ async function request(userEmail, farmid,startAt, endAt) {
 
     //ReserveID, FarmID, UserEmail, OwnerEmail, startAt, endAt, createAt, updateAt
     const now = await setDate.now();
-    const newStatus = "H";
+    const newStatus = "A"; //ALPHA version
+    // const newStatus = "H"; //BETA version
     const newReservationInfo = [newReserveID, farmInfo.FarmID, userEmail, farmInfo.Owner, newStatus, newStartAt, newEndAt, now, now];
 
     const connection = await pool.getConnection(async conn => conn);
