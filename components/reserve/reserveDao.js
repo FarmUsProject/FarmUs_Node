@@ -70,11 +70,43 @@ async function editReservationStatus(connection, updatedStatusInfo) {
     return updatedStatusResult;
 }
 
+async function currentUseList(connection, email) {
+   const currentUseListQuery = `
+   SELECT Reserveid, Farmid, UserEmail, OwnerEmail, startAt, endAt
+   FROM Reservation
+   WHERE NOW() > startAt
+     AND NOW() < endAt
+     AND Status = 'A'
+     AND UserEmail = ?;
+   `;
+
+   const currentUseListResult = await connection.query(currentUseListQuery, email);
+
+   return currentUseListResult;
+}
+
+async function pastUseList(connection, email) {
+    const pastUseListQuery = `
+    SELECT Reserveid, Farmid, UserEmail, OwnerEmail, startAt, endAt
+    FROM Reservation
+    WHERE NOW() > startAt
+      AND NOW() > endAt
+      AND Status = 'A'
+      AND UserEmail = ?;
+    `;
+
+    const pastUseListResult = await connection.query(pastUseListQuery, email);
+
+    return pastUseListResult;
+ }
+
 module.exports = {
     insertReservation,
     selectReservedClients,
     selectReservedFarms,
     selectReservedItem,
     cancelReservation,
-    editReservationStatus
+    editReservationStatus,
+    currentUseList,
+    pastUseList,
 }

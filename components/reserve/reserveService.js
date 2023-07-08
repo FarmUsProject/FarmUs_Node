@@ -125,10 +125,46 @@ async function editStatus(reserveId, status) {
 
 }
 
+async function currentUse(email) {
+    // try {
+        const currentUseFarms = await reserveProvider.currentUseListByEmail(email);
+
+        console.log(currentUseFarms, "currentUseFarms");
+
+        if (!currentUseFarms || currentUseFarms.length < 1) return response(resStatus_5000.RESERVE_USE_CURRENT_LIST_EMPTY, null);
+
+        return response(resStatus_5000.RESERVE_USE_CURRENT_LIST, currentUseFarms);
+
+    // }
+    // catch (e) {
+    //     return errResponse(resStatus.DB_ERROR);
+    // }
+
+}
+
+async function pastUse(email) {
+    try {
+        const pastUseFarms = await reserveProvider.pastUseListByEmail(email);
+
+        console.log(pastUseFarms, "pastUseFarms");
+
+        if (!pastUseFarms || pastUseFarms.length < 1) return response(resStatus_5000.RESERVE_USE_PAST_LIST_EMPTY, null);
+
+        return response(resStatus_5000.RESERVE_USE_PAST_LIST, pastUseFarms);
+
+    }
+    catch (e) {
+        return errResponse(resStatus.DB_ERROR);
+    }
+
+}
+
 module.exports = {
     request,
     clientsList,
     farmsList,
     cancel,
-    editStatus
+    editStatus,
+    currentUse,
+    pastUse
 };

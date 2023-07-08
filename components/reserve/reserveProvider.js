@@ -28,9 +28,28 @@ async function itembyReserveId (reserveID) {
     return reservedItem;
 }
 
+async function currentUseListByEmail (email) {
+    const connection = await pool.getConnection(async conn => conn);
+    const [currentUseFarms] = await reserveDao.currentUseList(connection, email);
+
+    connection.release();
+
+    return currentUseFarms;
+}
+
+async function pastUseListByEmail (email) {
+    const connection = await pool.getConnection(async conn => conn);
+    const [pastUseList] = await reserveDao.pastUseList(connection, email);
+
+    connection.release();
+
+    return pastUseList;
+}
 
 module.exports = {
     farmsbyEmail,
     clientsbyFarmID,
-    itembyReserveId
+    itembyReserveId,
+    currentUseListByEmail,
+    pastUseListByEmail,
 };
