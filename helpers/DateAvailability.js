@@ -12,10 +12,12 @@ const dateAvailability = {
  * @param {Date} newEnd 새로운 기간 마지막점
  * @returns resStatus_5000 (available : false)
     */
-    dateAvailabilityCheck: async function (targetStart, targetEnd, newStart, newEnd) {
-        //targetStart - newStart - newEnd - targetwEnd : date 순서
+    dateAvailabilityCheck: async function (newStart, newEnd) {
+        //now - newStart - newEnd : date 순서
 
-        if (targetStart.getTime() > newStart.getTime() || targetEnd.getTime() < newEnd.getTime())
+        //현재보다 과거는 예약 불가
+        const now = new Date();
+        if (now.getTime() > newStart.getTime() || now.getTime() > newEnd.getTime())
             return resStatus_5000.RESERVE_DATE_OFF_PERIOD_OF_FARM;
 
         if (newStart.getTime() > newEnd.getTime())

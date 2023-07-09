@@ -62,3 +62,11 @@ exports.starListbyEmail = async(email)=>{
     return starByEmail;
 }
 
+exports.nonSocialUsersbyEmail= async(email)=>{
+    const connection = await pool.getConnection(async conn => conn);
+    const [userInfo] = await userDao.selectnonSocialUserbyEmail(connection, email);
+
+    connection.release();
+
+    return userInfo;
+}

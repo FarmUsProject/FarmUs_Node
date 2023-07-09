@@ -62,8 +62,8 @@ const districtClarity = {
             let locationCode = null;
             locationCode = await this.getLocationCode(locationCode, locationBig);
             locationCode = await this.getLocationCode(locationCode, locationMid);
-            if (locationSmall) // tmp
-                locationCode = await this.getLocationCode(locationCode, locationSmall);
+            // if (locationSmall) // tmp (읍면동 검사)
+            //     locationCode = await this.getLocationCode(locationCode, locationSmall);
             if (!locationCode || locationCode.length < 5) //tmp 
                 return errResponse(resStatus_5000.DISTRICT_NOT_EXIST);
             return response(resStatus_5000.DISTRICT_CLEAR, locationCode);

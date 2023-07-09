@@ -21,7 +21,7 @@ async function request(userEmail, farmid,startAt, endAt) {
     const newEndAt = new Date(endAt)
 
     //date availability check
-    const unAvailability = await dateAvailability.dateAvailabilityCheck(farmInfo.startAt, farmInfo.endAt, newStartAt, newEndAt);
+    const unAvailability = await dateAvailability.dateAvailabilityCheck(newStartAt, newEndAt);
 
     if(unAvailability != 0)
         return errResponse(unAvailability);
@@ -47,7 +47,8 @@ async function request(userEmail, farmid,startAt, endAt) {
 
     //ReserveID, FarmID, UserEmail, OwnerEmail, startAt, endAt, createAt, updateAt
     const now = await setDate.now();
-    const newStatus = "H";
+    const newStatus = "A"; //ALPHA version
+    // const newStatus = "H"; //BETA version
     const newReservationInfo = [newReserveID, farmInfo.FarmID, userEmail, farmInfo.Owner, newStatus, newStartAt, newEndAt, now, now];
 
     const connection = await pool.getConnection(async conn => conn);
@@ -125,10 +126,57 @@ async function editStatus(reserveId, status) {
 
 }
 
+async function currentUse(email) {
+    try {
+        const currentUseFarms = await reserveProvider.currentUseListByEmail(email);
+
+        if (!currentUseFarms || currentUseFarms.length < 1) return response(resStatus_5000.RESERVE_USE_CURRENT_LIST_EMPTY, null);
+
+        return response(resStatus_5000.RESERVE_USE_CURRENT_LIST, currentUseFarms);
+
+    }
+    catch (e) {
+        return errResponse(resStatus.DB_ERROR);
+    }
+
+}
+
+async function pastUse(email) {
+    try {
+        const pastUseFarms = await reserveProvider.pastUseListByEmail(email);
+
+        if (!pastUseFarms || pastUseFarms.length < 1) return response(resStatus_5000.RESERVE_USE_PAST_LIST_EMPTY, null);
+
+        return response(resStatus_5000.RESERVE_USE_PAST_LIST, pastUseFarms);
+
+    }
+    catch (e) {
+        return errResponse(resStatus.DB_ERROR);
+    }
+
+}
+
+async function unbookablePeriods(farmID) {
+    try {
+        let reservedPeriods = await reserveProvider.reservedPeriodByFarmID(farmID);
+
+        if (!reservedPeriods || reservedPeriods.length < 1) reservedPeriods = null;
+
+        return(response(resStatus_5000.RESERVE_UNBOOKABLE_PERIOD, reservedPeriods));
+    }
+    catch (e) {
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
+    }
+
+}
+
 module.exports = {
     request,
     clientsList,
     farmsList,
     cancel,
-    editStatus
+    editStatus,
+    currentUse,
+    pastUse,
+    unbookablePeriods,
 };
