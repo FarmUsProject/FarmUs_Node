@@ -70,11 +70,58 @@ async function editReservationStatus(connection, updatedStatusInfo) {
     return updatedStatusResult;
 }
 
+async function currentUseList(connection, email) {
+   const currentUseListQuery = `
+   SELECT Reserveid, Farmid, UserEmail, OwnerEmail, startAt, endAt
+   FROM Reservation
+   WHERE DATE(NOW()) >= DATE(startAt)
+     AND DATE(NOW()) <= DATE(endAt)
+     AND Status = 'A'
+     AND UserEmail = ?;
+   `;
+
+   const currentUseListResult = await connection.query(currentUseListQuery, email);
+
+   return currentUseListResult;
+}
+
+async function pastUseList(connection, email) {
+    const pastUseListQuery = `
+    SELECT Reserveid, Farmid, UserEmail, OwnerEmail, startAt, endAt
+    FROM Reservation
+    WHERE DATE(NOW()) > DATE(startAt)
+      AND DATE(NOW()) > DATE(endAt)
+      AND Status = 'A'
+      AND UserEmail = ?;
+    `;
+
+    const pastUseListResult = await connection.query(pastUseListQuery, email);
+
+    return pastUseListResult;
+ }
+
+ async function reservedPeriods(connection, farmID) {
+    const reservedPeriodsQuery = `
+    SELECT startAt, endAt
+    FROM Reservation
+    WHERE DATE(NOW()) <= DATE(endAt)
+      AND Status = 'A'
+      AND FarmID = ?;
+    `;
+
+    const reservedPeriodsResult = await connection.query(reservedPeriodsQuery, farmID);
+
+    return reservedPeriodsResult;
+ }
+
 module.exports = {
     insertReservation,
     selectReservedClients,
     selectReservedFarms,
     selectReservedItem,
     cancelReservation,
-    editReservationStatus
+    editReservationStatus,
+    currentUseList,
+    pastUseList,
+    reservedPeriods,
 }

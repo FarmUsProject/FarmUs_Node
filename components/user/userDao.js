@@ -152,6 +152,18 @@ async function eidtProfileImg(connection, email, img, key){
     return updateUserRow[0]
 }
 
+async function selectnonSocialUserbyEmail(connection, email) {
+    const selectnonSocialUserbyEmailQuery = `
+    SELECT *
+    FROM User
+    WHERE Email = ?
+      AND Status = 'A';
+    `;
+    const userInfo = await connection.query(selectnonSocialUserbyEmailQuery, email);
+
+    return userInfo;
+}
+
 module.exports = {
     selectUserbyEmail,
     selectUserbyPhoneNumber,
@@ -167,5 +179,6 @@ module.exports = {
     withdrawalUser,
     eidtProfileImg,
     SelectionUsedFarmArray,
-    SelectionUseFarmArray
+    SelectionUseFarmArray,
+    selectnonSocialUserbyEmail
 }

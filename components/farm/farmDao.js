@@ -69,10 +69,10 @@ exports.selectFarmbyFarmID = async(connection, farmID) =>{
 }
 
 exports.insertFarm = async(connection, newFarmInfo) => {
-    //newFarmInfo [newFarmID, name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag, newFarmStatus, createAt, updateAt] : 16 fields
+    //newFarmInfo [newFarmID, name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description, newFarmStatus, createAt, updateAt] : 12 fields
     const insertFarmQuery = `
-    INSERT INTO Farm(FarmID, Name, Owner, startAt, endAt, Price, SquaredMeters, LocationBig, LocationMid, LocationSmall, Description, Category, Tag, Status, createAt, updateAt)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    INSERT INTO Farm(FarmID, Name, Owner, Price, SquaredMeters, LocationBig, LocationMid, LocationSmall, Description, Status, createAt, updateAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
     const farmInfo = await connection.query(insertFarmQuery, newFarmInfo);
 
@@ -80,37 +80,30 @@ exports.insertFarm = async(connection, newFarmInfo) => {
 }
 
 exports.selectFarmbyFarmInfo = async(connection, sameFarmInfo) =>{
-    //newFarmInfo [newFarmID, name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag, newFarmStatus, createAt, updateAt]
-    const duplicatedInfo = sameFarmInfo.slice(1,10);
+    // sameFarmInfo [name, owner, price, squaredMeters, locationBig, locationMid, locationSmall];
+
     const selectFarmbyFarmInfoQuery =`
     SELECT *
     FROM Farm
-    WHERE NAME = ? AND Owner = ? AND startAT = ? AND endAt = ? AND Price = ? AND SquaredMeters = ? AND LocationBig = ? AND LocationMid = ? AND LocationSmall = ?
+    WHERE NAME = ? AND Owner = ? AND Price = ? AND SquaredMeters = ? AND LocationBig = ? AND LocationMid = ? AND LocationSmall = ?
     `;
-    const sameFarm = await connection.query(selectFarmbyFarmInfoQuery, duplicatedInfo);
+    const sameFarm = await connection.query(selectFarmbyFarmInfoQuery, sameFarmInfo);
 
     return sameFarm;
 }
 
 exports.searchFarm = async(connection, keyword) => {
     const searchFarmQuery = `
-    SELECT f.FarmID,
-    f.Name,
-    f.Price,
-    f.SquaredMeters,
-    f.LocationBig,
-    f.LocationMid,
-    f.LocationSmall,
-    f.Likes,
-    MAX(fp.Picture_url) AS Picture_url
-  FROM Farm f
-  LEFT JOIN (
-    SELECT FarmID, MAX(Picture_url) AS Picture_url
-    FROM FarmPictures
-    GROUP BY FarmID
-  ) fp ON f.FarmID = fp.FarmID
-  WHERE f.Name LIKE ? OR f.LocationBig LIKE ? OR f.LocationMid LIKE ? OR f.LocationSmall LIKE ?;`;
-
+    SELECT FarmID,
+			Name,
+			Price,
+			SquaredMeters,
+			LocationBig,
+			LocationMid,
+			LocationSmall,
+			Likes
+    FROM Farm
+    WHERE Name LIKE ? OR LocationBig LIKE ? OR LocationMid LIKE ? OR LocationSmall LIKE ?;`
     console.log(keyword);
     const [farmRow] = await connection.query(searchFarmQuery,[keyword,keyword,keyword,keyword])
     console.log(farmRow);

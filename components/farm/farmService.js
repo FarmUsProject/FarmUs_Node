@@ -20,7 +20,12 @@ exports.postFarmer = async (email) => {
     return res;
 }
 
-exports.newFarm = async (name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag) => {
+exports.newFarm = async (name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description, file) => {
+
+    const sameFarmInfo = [name, owner, price, squaredMeters, locationBig, locationMid, locationSmall];
+    const isSameFarm = await FarmProvider.isSameFarm(sameFarmInfo); //중복체크
+    if (isSameFarm) return errResponse(resStatus_5000.FARM_DUPLICATED_EXISTS);
+
     const newFarmStatus = 'A';
     let newFarmID;
     let existedFarm;
@@ -30,14 +35,37 @@ exports.newFarm = async (name, owner, startDate, endDate, price, squaredMeters, 
     } while (existedFarm); //unique farmID
 
     const now = await setDate.now();
-    const newFarmInfo = [newFarmID, name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag, newFarmStatus, now, now];
 
-    const isSameFarm = await FarmProvider.isSameFarm(newFarmInfo); //중복체크
-    if (isSameFarm) return errResponse(resStatus_5000.FARM_DUPLICATED_EXISTS);
+    const newFarmInfo = [newFarmID, name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description, newFarmStatus, now, now];
 
     const connection = await pool.getConnection(async conn => conn);
 
     const newFarm = await farmDao.insertFarm(connection, newFarmInfo);
+
+
+    /**
+     * ------------------------file handling-------------------------
+    */
+
+    const farmID = newFarmID;
+    file = null; //file : req.body로 받음
+    const picture_url = null;
+    const picture_key = null;
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * ---------------------------------------------------------------
+    */
 
     connection.release();
 
