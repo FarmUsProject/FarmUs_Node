@@ -102,10 +102,10 @@ exports.searchFarm = async(connection, keyword) => {
     f.LocationMid,
     f.LocationSmall,
     f.Likes,
-    fp.Picture_url
+    MAX(fp.Picture_url) AS Picture_url
   FROM Farm f
   LEFT JOIN (
-    SELECT FarmID, Picture_url
+    SELECT FarmID, MAX(Picture_url) AS Picture_url
     FROM FarmPictures
     GROUP BY FarmID
   ) fp ON f.FarmID = fp.FarmID
@@ -114,6 +114,7 @@ exports.searchFarm = async(connection, keyword) => {
     console.log(keyword);
     const [farmRow] = await connection.query(searchFarmQuery,[keyword,keyword,keyword,keyword])
     console.log(farmRow);
+    return farmRow.length > 0 ? farmRow : [];
     return farmRow
 }
 
