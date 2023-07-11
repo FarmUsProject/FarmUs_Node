@@ -94,16 +94,19 @@ exports.selectFarmbyFarmInfo = async(connection, sameFarmInfo) =>{
 
 exports.searchFarm = async(connection, keyword) => {
     const searchFarmQuery = `
-    SELECT FarmID,
+    SELECT f.FarmID,
 			Name,
 			Price,
 			SquaredMeters,
 			LocationBig,
 			LocationMid,
 			LocationSmall,
-			Likes
-    FROM Farm
-    WHERE Name LIKE ? OR LocationBig LIKE ? OR LocationMid LIKE ? OR LocationSmall LIKE ?;`
+			Likes,
+            MIN(Picture_url) as Picture_url
+    FROM Farm f left join FarmPictures fp on f.FarmID = fp.FarmID
+    WHERE f.Name LIKE ? OR f.LocationBig LIKE ? OR f.LocationMid LIKE ? OR f.LocationSmall LIKE ?
+    GROUP BY f.FarmID
+    ;`
     console.log(keyword);
     const [farmRow] = await connection.query(searchFarmQuery,[keyword,keyword,keyword,keyword])
     console.log(farmRow);
