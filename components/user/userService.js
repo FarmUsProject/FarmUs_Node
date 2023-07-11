@@ -14,17 +14,18 @@ const setDate = require('./../../helpers/setDate');
 
 exports.login = async(email, password) =>{
 
-    const userInfo = await userProvider.selectnonSocialUserbyEmail(email);
+    const userInfo = await userProvider.retrieveUserEmail(email);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
+    console.log(userInfo);
 
-    const userPassword = userInfo[0].Password;
-    const userSalt = userInfo[0].Salt;
+    const userPassword = userInfo.Password;
+    const userSalt = userInfo.Salt;
 
     const verify = await encryptedPassword.verifyPassword(password, userSalt, userPassword);
 
     if (!verify) return errResponse(resStatus.SIGNIN_PASSWORD_WRONG);
 
-    const jwtResponse = await jwtLogin(userInfo[0]);
+    const jwtResponse = await jwtLogin(userInfo);
 
     return response(resStatus_5000.USER_LOGIN_SUCCESS, jwtResponse);
 };

@@ -53,6 +53,7 @@ exports.login = async function (req, res) {
 
     }
     catch (e) {
+        console.log(e)
         res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
