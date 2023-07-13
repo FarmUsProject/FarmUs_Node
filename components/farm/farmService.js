@@ -20,7 +20,7 @@ exports.postFarmer = async (email) => {
     return res;
 }
 
-exports.newFarm = async (name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description, file) => {
+exports.newFarm = async (name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description) => {
 
     const sameFarmInfo = [name, owner, price, squaredMeters, locationBig, locationMid, locationSmall];
     const isSameFarm = await FarmProvider.isSameFarm(sameFarmInfo); //중복체크
@@ -46,12 +46,6 @@ exports.newFarm = async (name, owner, price, squaredMeters, locationBig, locatio
     /**
      * ------------------------file handling-------------------------
     */
-
-    const farmID = newFarmID;
-    file = null; //file : req.body로 받음
-    const picture_url = null;
-    const picture_key = null;
-
 
 
 
@@ -92,7 +86,7 @@ exports.editFarmInfo = async(farmID, farmInfo) =>{
         const res = await farmDao.eidtMyFarm(connection, farmID, farmInfo)
         connection.release()
 
-        return response2(baseResponse.SUCCESS)
+        return res
     }catch(err){
         console.log(err);
         return errResponse2(baseResponse.DB_ERROR)
@@ -105,7 +99,7 @@ exports.editFarmPictures = async(farmID, farmName, img, key) =>{
         const res = await farmDao.editFarmPicture(connection, farmID, farmName, img, key)
         connection.release()
 
-        return response2(baseResponse.SUCCESS)
+        return res
     }catch(err){
         console.log(err);
         return errResponse2(baseResponse.DB_ERROR)
@@ -121,7 +115,7 @@ exports.getFarmDetail = async (farmID) => {
         //최종 농장 세부사항
         let farmDetail = farmInformation[0];
 
-        //농장 항목 삭제 : Owner, crateAt, updateAt 
+        //농장 항목 삭제 : Owner, crateAt, updateAt
         delete farmDetail.Owner;
         delete farmDetail.createAt;
         delete farmDetail.updateAt;
@@ -138,10 +132,10 @@ exports.getFarmDetail = async (farmID) => {
         farmDetail.PictureObject = pictureObject;
 
         //농장주 정보 추가 : Email, PhoneNumber, Name, NickName
-        let userInfo = { 
-            Email : userInformation[0].Email, 
-            PhoneNumber : userInformation[0].PhoneNumber, 
-            Name : userInformation[0].Name, 
+        let userInfo = {
+            Email : userInformation[0].Email,
+            PhoneNumber : userInformation[0].PhoneNumber,
+            Name : userInformation[0].Name,
             NickName : userInformation[0].NickName,
             Picture_url : userInformation[0].Picture_url || null,
             Picture_key : userInformation[0].Picture_key || null
@@ -172,7 +166,7 @@ exports.getFarmList = async (email) => {
             }));
             farm.Pictures = pictureObjects;
           });
-        
+
         //like
         if (userInformation.length > 0 && userInformation[0].LikeFarmIDs) {
             likeFarmIDs = userInformation[0].LikeFarmIDs.split(',').map(id => id.trim());
