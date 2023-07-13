@@ -68,6 +68,8 @@ module.exports = {
     NOT_LOGIN : {'result': false, 'code': 6009, "message": "로그인을 먼저 진행해 주세요."},
     ALREADY_USER : {'result': false, 'code': 6010, "message": "이미 가입한 회원입니다."},
 
+    WRONG_FARMID : {'result': false, 'code': 6011, "message": "잘못된 농장 ID"},
+
     REDIS_ERROR : {'result': false, 'code':6900, 'message': "REDIS 에러"}
 
 }

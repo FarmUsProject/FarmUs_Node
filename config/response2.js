@@ -1,8 +1,6 @@
 const response2 = ({result, code, message}) => {
     return {
-         result: result,
-         code: code,
-         message: message,
+         result: result
     }
 };
 

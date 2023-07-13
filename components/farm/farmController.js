@@ -61,7 +61,6 @@ exports.getFarmUsedList = async (req, res) => {
 
 exports.getFarmUseList = async (req, res) => {
     const { userid } = req.params;
-
     if(!userid) return res.render(errResponse(USER_USERID_EMPTY));
 
     const FarmUseArray = User.retrieveCurFarmArray(userid);
@@ -95,26 +94,17 @@ exports.editFarm = async(req, res) =>{
         if (!farmId) return res.send(errResponse2(baseResponse.FARMID_EMPTY))
 
         const eidtFarmInfoRes = await farmService.editFarmInfo(farmId, req.body)
+        console.log(eidtFarmInfoRes);
+        if (!eidtFarmInfoRes.affectedRows) return res.send(errResponse2(baseResponse.WRONG_FARMID))
 
-        // req.files의 originalname
-        /*
-        const locations = req.files.map(file => file.location);
-        const keys = req.files.map(file => file.key);
-
-        console.log("Locations:", locations);
-        console.log("Keys:", keys);
-        */
-       if (!eidtFarmInfoRes.result) return res.send(eidtFarmInfoRes)
-
-        let editFarmPicturesRes;
         for (let i = 0; i < req.files.length; i++) {
             const file = req.files[i];
             const location = file.location;
             const key = file.key;
-            editFarmPicturesRes = await farmService.editFarmPictures(farmId,location, key);
-            if (!editFarmPicturesRes.result) break
+            const editFarmPicturesRes = await farmService.editFarmPictures(farmId,location, key);
         }
-        return res.send(editFarmPicturesRes);
+        return res.send(response2(baseResponse.SUCCESS));
+
     }catch(err){
         return res.send(err)
     }
@@ -126,9 +116,11 @@ exports.editFarm = async(req, res) =>{
  */
 exports.newFarm = async function (req, res) {
     try {
-        const { name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description, file} = req.body;
-
+        const { name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description} = req.body;
+        //console.log(req);
+        console.log(req.body);
         const invalidation = await validator.newFarm(name, owner, price, squaredMeters, locationBig, locationMid);
+
         if (invalidation) return res.send(errResponse(invalidation))
 
         // Date Availability 유효성 검사
@@ -150,13 +142,21 @@ exports.newFarm = async function (req, res) {
 
         const districtCode = districtClarityResponse.result;
 
-        let newFarmResponse = await farmService.newFarm(name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description, file);
+        let newFarmResponse = await farmService.newFarm(name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description);
+        for (let i = 0; i < req.files.length; i++) {
+            const file = req.files[i];
+            const location = file.location;
+            const key = file.key;
+            const editFarmPicturesRes = await farmService.editFarmPictures(newFarmResponse.result.newFarmID,location, key);
+        }
+
         if (newFarmResponse.result)
             newFarmResponse.result = {"newFarmID" : newFarmResponse.result.newFarmID, "districtCode" : districtCode};
         return res.send(newFarmResponse)
 
     }
     catch (e) {
+        console.log(e);
         res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
