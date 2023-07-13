@@ -61,7 +61,6 @@ exports.getFarmUsedList = async (req, res) => {
 
 exports.getFarmUseList = async (req, res) => {
     const { userid } = req.params;
-
     if(!userid) return res.render(errResponse(USER_USERID_EMPTY));
 
     const FarmUseArray = User.retrieveCurFarmArray(userid);
@@ -118,7 +117,7 @@ exports.editFarm = async(req, res) =>{
 exports.newFarm = async function (req, res) {
     try {
         const { name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description} = req.body;
-        console.log(req);
+        //console.log(req);
         console.log(req.body);
         const invalidation = await validator.newFarm(name, owner, price, squaredMeters, locationBig, locationMid);
 
@@ -148,7 +147,7 @@ exports.newFarm = async function (req, res) {
             const file = req.files[i];
             const location = file.location;
             const key = file.key;
-            const editFarmPicturesRes = await farmService.editFarmPictures(farmId,location, key);
+            const editFarmPicturesRes = await farmService.editFarmPictures(newFarmResponse.result.newFarmID,location, key);
         }
 
         if (newFarmResponse.result)

@@ -4,7 +4,7 @@ module.exports = function (app) {
     const farm = require('./farmController');
 
     //농장 등록
-    app.post('/farm/postings', farm.newFarm);
+    app.post('/farm/postings',uploadImg, farm.newFarm);
 
     //농장목록 조회
     app.get("/farm/list/:email", farm.getFarmlist);
