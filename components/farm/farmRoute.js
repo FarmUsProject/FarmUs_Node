@@ -25,6 +25,9 @@ module.exports = function (app) {
     //농장 검색
     app.get('/farm/search',farm.findFarms);
 
+    //농장 필터링
+    app.get('/farm',farm.filter)
+
     //농장 글 수정
     app.patch('/farm/editInfo',uploadImg ,farm.editFarm);
 
