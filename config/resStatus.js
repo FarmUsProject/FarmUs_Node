@@ -69,6 +69,9 @@ module.exports = {
     ALREADY_USER : {'result': false, 'code': 6010, "message": "이미 가입한 회원입니다."},
 
     WRONG_FARMID : {'result': false, 'code': 6011, "message": "잘못된 농장 ID"},
+    EMPTY_PICTURE_KEY : {'result': false, 'code': 6012, "message": "사진 키값이 비어있습니다."},
+    ALREADY_DELETE_PICTURE : {'result': false, 'code': 6013, "message": "이미 삭제된 사진입니다."},
+
 
     REDIS_ERROR : {'result': false, 'code':6900, 'message': "REDIS 에러"}
 

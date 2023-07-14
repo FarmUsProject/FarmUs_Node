@@ -1,5 +1,6 @@
 //const { connection } = require("mongoose");
 
+const { connection } = require("mongoose");
 const { login } = require("../../helpers/validator");
 
 exports.selectFarm = async (connection) => {
@@ -140,6 +141,15 @@ exports.eidtMyFarm = async(connection, farmID, farmInfo) =>{
     console.log("res",res);
     return res
 
+}
+
+exports.deletePhoto = async(connection, key) => {
+    const deleteFarmPicture = `
+    DELETE FROM FarmPictures
+    WHERE Picture_key = ?;
+    `
+    const res = await connection.query(deleteFarmPicture,key)
+    return res
 }
 
 exports.editFarmPicture = async(connection, farmID, img, key) => {
