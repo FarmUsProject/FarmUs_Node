@@ -57,6 +57,18 @@ exports.isSameFarm = async(farmInfo)=>{
 }
 
 // 농장 검색관련
+exports.farmFilter = async(locationBig, locationMid) => {
+    const connection = await pool.getConnection(async (conn) => conn)
+    let res = []
+    if (locationMid){
+        res = await farmDao.filtering(connection, locationBig, locationMid)
+    }else{
+        res = await farmDao.filteringBig(connection, locationBig)
+    }
+    connection.release()
+    return res
+}
+
 exports.retrieveFarms = async(keyword) => {
     const connection = await pool.getConnection(async (conn) => conn);
     const newKeyword = '%'+keyword+'%'

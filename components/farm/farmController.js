@@ -164,7 +164,6 @@ exports.newFarm = async function (req, res) {
 exports.findFarms = async (req,res) => {
     try{
         const {keyword} = req.query
-
         if (!keyword) return res.send(errResponse2(baseResponse.FARM_NOT_KEYWORD))
 
         const farms = await farmProvider.retrieveFarms(keyword)
@@ -175,6 +174,24 @@ exports.findFarms = async (req,res) => {
         console.log(err);
     }
 
+}
+
+exports.filter = async(req,res) => {
+    try{
+        const {locationBig, locationMid} = req.query
+        if (!locationBig)
+            return res.send(errResponse2(baseResponse.SET_REGION))
+
+        const searchRes = {"result" : true}
+        const farms = await farmProvider.farmFilter(locationBig, locationMid)
+        searchRes.farms = farms
+
+        return res.send(searchRes)
+
+    }catch (e) {
+        console.log(e);
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 
 exports.deletePhoto = async(req,res) => {

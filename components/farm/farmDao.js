@@ -114,7 +114,46 @@ exports.searchFarm = async(connection, keyword) => {
     const [farmRow] = await connection.query(searchFarmQuery,[keyword,keyword,keyword,keyword])
     console.log(farmRow);
     return farmRow.length > 0 ? farmRow : [];
-    return farmRow
+}
+
+exports.filtering = async(connection, locationBig, locationMid) => {
+    const filteringQuery = `
+     SELECT f.FarmID,
+			Name,
+			Price,
+			SquaredMeters,
+			LocationBig,
+			LocationMid,
+			LocationSmall,
+			Likes,
+            MIN(Picture_url) as Picture_url
+    FROM Farm f
+    LEFT JOIN FarmPictures fp ON f.FarmID = fp.FarmID
+    WHERE f.LocationBig LIKE ? AND f.LocationMid LIKE ?
+    GROUP BY f.FarmID, Name, Price, SquaredMeters, LocationBig, LocationMid, LocationSmall, Likes;
+    `
+    const [farmRow] = await connection.query(filteringQuery,[locationBig,locationMid])
+    return farmRow.length > 0 ? farmRow : [];
+}
+
+exports.filteringBig = async(connection, locationBig) => {
+    const filteringQuery = `
+     SELECT f.FarmID,
+			Name,
+			Price,
+			SquaredMeters,
+			LocationBig,
+			LocationMid,
+			LocationSmall,
+			Likes,
+            MIN(Picture_url) as Picture_url
+    FROM Farm f
+    LEFT JOIN FarmPictures fp ON f.FarmID = fp.FarmID
+    WHERE f.LocationBig LIKE ?
+    GROUP BY f.FarmID, Name, Price, SquaredMeters, LocationBig, LocationMid, LocationSmall, Likes;
+    `
+    const [farmRow] = await connection.query(filteringQuery,locationBig)
+    return farmRow.length > 0 ? farmRow : [];
 }
 
 exports.withdrawalUserFarm = async(connection, email) => {
