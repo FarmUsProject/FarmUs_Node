@@ -1,4 +1,5 @@
 const uploadImg = require('./farmMiddleware/imgUpload')
+const deleteImg = require('./farmMiddleware/imgDelete')
 
 module.exports = function (app) {
     const farm = require('./farmController');
@@ -26,4 +27,7 @@ module.exports = function (app) {
 
     //농장 글 수정
     app.patch('/farm/editInfo',uploadImg ,farm.editFarm);
+
+    //농장 사진 삭제
+    app.delete('/farm/deletePhoto',deleteImg, farm.deletePhoto);
 };
