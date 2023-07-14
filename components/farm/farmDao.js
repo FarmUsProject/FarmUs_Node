@@ -1,6 +1,5 @@
 //const { connection } = require("mongoose");
 
-const { connection } = require("mongoose");
 const { login } = require("../../helpers/validator");
 
 exports.selectFarm = async (connection) => {
