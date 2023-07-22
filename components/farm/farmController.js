@@ -210,3 +210,17 @@ exports.deletePhoto = async(req,res) => {
         res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
+
+exports.getPhoneNumber = async(req,res) => {
+    try{
+        const {farmID} = req.query
+        if (!farmID) return res.send(errResponse2(baseResponse.FARMID_EMPTY))
+
+        const Owner = await farmProvider.getOwner(farmID)
+        Owner.result = true
+        return res.send(Owner)
+    }catch(e){
+        console.log(e);
+        res.send(errResponse(resStatus.INACCURATE_OWNER));
+    }
+}

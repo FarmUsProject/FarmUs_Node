@@ -73,7 +73,7 @@ module.exports = {
     ALREADY_DELETE_PICTURE : {'result': false, 'code': 6013, "message": "이미 삭제된 사진입니다."},
     SET_REGION : {'result': false, 'code': 6014, "message": "지역을 설정해 주세요"},
 
-
+    INACCURATE_OWNER: {'result': false, 'code': 6015, "message": "FarmID가 잘못되었거나 농장주가 존재하지 않습니다."},
 
     REDIS_ERROR : {'result': false, 'code':6900, 'message': "REDIS 에러"}
 

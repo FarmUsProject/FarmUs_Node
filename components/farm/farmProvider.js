@@ -104,3 +104,10 @@ exports.deletePhoto = async (key) => {
 
     return deleteFarmPicture
 }
+
+exports.getOwner = async(farmID) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const Owner = await farmDao.getOwnerbyFarmID(connection,farmID);
+    connection.release();
+    return Owner;
+}
