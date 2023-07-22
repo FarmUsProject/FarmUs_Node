@@ -134,7 +134,6 @@ exports.getFarmDetail = async (farmID) => {
         //농장주 정보 추가 : Email, PhoneNumber, Name, NickName
         let userInfo = {
             Email : userInformation[0].Email,
-            PhoneNumber : userInformation[0].PhoneNumber,
             Name : userInformation[0].Name,
             NickName : userInformation[0].NickName,
             Picture_url : userInformation[0].Picture_url || null,

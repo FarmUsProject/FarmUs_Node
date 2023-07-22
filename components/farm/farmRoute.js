@@ -33,4 +33,7 @@ module.exports = function (app) {
 
     //농장 사진 삭제
     app.delete('/farm/deletePhoto',deleteImg, farm.deletePhoto);
+
+    //농장주 핸드폰 번호 조회
+    app.get('/farm/farmerPhoneNumber', farm.getPhoneNumber);
 };

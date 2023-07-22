@@ -1,7 +1,5 @@
 //const { connection } = require("mongoose");
 
-const { login } = require("../../helpers/validator");
-
 exports.selectFarm = async (connection) => {
     const selectFarmListQuery = `
     SELECT *
@@ -230,4 +228,19 @@ exports.selectFarmPicturesUrlKey = async(connection) =>{
     const pictureUrls = await connection.query(selectFarmPicturesUrlQuery);
 
     return pictureUrls;
+}
+
+exports.getOwnerbyFarmID = async(connection,farmID) =>{
+    const getOwnerbyFarmIDQuery = `
+    SELECT PhoneNumber
+    FROM User
+    WHERE Email = (
+        SELECT Owner
+        FROM Farm
+        WHERE FarmID = ?
+    );
+    `
+
+    const [phoneNumber] = await connection.query(getOwnerbyFarmIDQuery, farmID)
+    return phoneNumber[0];
 }
