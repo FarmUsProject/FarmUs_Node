@@ -25,11 +25,11 @@ async function request(userEmail, farmid,startAt, endAt) {
 
     if(unAvailability != 0)
         return errResponse(unAvailability);
-    
+
     //date reservation check
     for (const e of reserveInfo) {
         const reservation_full = dateAvailability.reserveAvailabilityCheck(e.startAt, e.endAt, newStartAt, newEndAt);
-      
+
         console.log(reservation_full);
         if (reservation_full !== false) {
           return response(reservation_full, {"reservedStartAt" : e.startAt, "reservedEndAt" : e.endAt});
@@ -136,6 +136,7 @@ async function currentUse(email) {
 
     }
     catch (e) {
+        console.log(e);
         return errResponse(resStatus.DB_ERROR);
     }
 

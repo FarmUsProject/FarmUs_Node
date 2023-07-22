@@ -138,7 +138,7 @@ exports.currentUse = async function (req, res) {
         // const invalidation = await validator.oneParams(userEmail);
         // if (invalidation) return (res.send(errResponse(invalidation)));
 
-        if(validator.isValidEmail(userEmail) == false) 
+        if(validator.isValidEmail(userEmail) == false)
             return res.send(errResponse(resStatus.SIGNIN_EMAIL_ERROR_TYPE));
 
         const currentUseResult = await reserveService.currentUse(userEmail);
@@ -160,7 +160,7 @@ exports.pastUse = async function (req, res) {
         // const invalidation = await validator.oneParams(userEmail);
         // if (invalidation) return (res.send(errResponse(invalidation)));
 
-        if(validator.isValidEmail(userEmail) == false) 
+        if(validator.isValidEmail(userEmail) == false)
             return res.send(errResponse(resStatus.SIGNIN_EMAIL_ERROR_TYPE));
 
         const pastUseResult = await reserveService.pastUse(userEmail);
