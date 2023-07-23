@@ -72,16 +72,17 @@ async function editReservationStatus(connection, updatedStatusInfo) {
 
 async function currentUseList(connection, email) {
    const currentUseListQuery = `
-    SELECT R.Reserveid, R.Farmid, R.UserEmail, R.OwnerEmail, R.startAt, R.endAt, FP.Picture_url
+    SELECT R.ReserveID, R.FarmID, R.UserEmail, R.OwnerEmail, R.startAt, R.endAt, F.Name, FP.Picture_url
     FROM Reservation R
+    LEFT JOIN Farm F ON R.FarmID = F.FarmID
     LEFT JOIN FarmPictures FP ON R.FarmID = FP.FarmID
     WHERE DATE(NOW()) >= DATE(R.startAt)
-        AND DATE(NOW()) <= DATE(R.endAt)
+        AND (DATE(NOW()) <= DATE(R.endAt) OR R.endAt IS NULL)
         AND R.Status = 'A'
         AND R.UserEmail = ?
     ORDER BY FP.createAt DESC
     LIMIT 1;
-   `;
+`;
 
    const currentUseListResult = await connection.query(currentUseListQuery, email);
 
@@ -90,8 +91,9 @@ async function currentUseList(connection, email) {
 
 async function pastUseList(connection, email) {
     const pastUseListQuery = `
-    SELECT R.Reserveid, R.Farmid, R.UserEmail, R.OwnerEmail, R.startAt, R.endAt, FP.Picture_url
+    SELECT R.Reserveid, R.Farmid, R.UserEmail, R.OwnerEmail, R.startAt, R.endAt, F.Name, FP.Picture_url
     FROM Reservation R
+    LEFT JOIN Farm F ON R.FarmID = F.FARMID
     LEFT JOIN FarmPictures FP ON R.FarmID = FP.FarmID
     WHERE DATE(NOW()) > DATE(R.startAt)
         AND DATE(NOW()) > DATE(R.endAt)
