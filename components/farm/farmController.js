@@ -13,6 +13,7 @@ const resStatus_5000 = require('../../config/resStatus_5000');
 const districtClarity = require('./../../helpers/districtClarity');
 const dateAvailability = require('../../helpers/DateAvailability');
 const userProvider = require('../user/userProvider');
+const jwtLogin = require('./../../config/jwtLogin');
 
 exports.getFarmlist = async (req, res) => {
     try{
@@ -72,11 +73,23 @@ exports.getFarmUseList = async (req, res) => {
 exports.postFarmer = async (req, res) =>{
     try{
         const decoded = jwt.verify(req.headers.token, secretKey);
-        console.log(decoded);
+        //console.log("decoded")
+        //console.log(decoded);
+        //console.log("======");
         if (decoded.role == 'F') return res.send(errResponse2(baseResponse.ALREADY_FARMER));
 
         const farmer = await farmService.postFarmer(decoded.email);
-        if (!farmer) return res.send(response2(baseResponse.SIGNIN_INACTIVE_ACCOUNT))
+        if (!farmer) return res.send(errResponse2(baseResponse.SIGNIN_INACTIVE_ACCOUNT))
+
+        const userInfo = await userProvider.retrieveUserEmail(decoded.email);
+        const newJwtResponse = await jwtLogin(userInfo)
+/*
+        const decoded2 = jwt.verify(newJwtResponse.accesstoken, secretKey)
+        console.log("decoded2")
+        console.log(decoded2);
+        console.log("======");
+        */
+        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
 
         return res.send(baseResponse.SUCCESS);
 
