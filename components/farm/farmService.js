@@ -117,8 +117,8 @@ exports.getFarmDetail = async (farmID) => {
 
         //농장 항목 삭제 : Owner, crateAt, updateAt
         delete farmDetail.Owner;
-        delete farmDetail.createAt;
-        delete farmDetail.updateAt;
+        //delete farmDetail.createAt;
+        //delete farmDetail.updateAt;
 
         // 농장 사진 추가 : Picture_url, Picture_key
         let pictureObject;

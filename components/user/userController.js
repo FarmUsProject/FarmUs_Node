@@ -16,6 +16,9 @@ const dateAvailability = require('../../helpers/DateAvailability');
 const sharp = require('sharp');
 const fs = require('fs');
 const resStatus_5000 = require('../../config/resStatus_5000');
+const jwtLogin = require('./../../config/jwtLogin');
+
+
 
 exports.getBefoFarmUsed_Array = async (req, res, error) => {
     const { userid } = req.params;
@@ -313,7 +316,11 @@ exports.editUserNickName = async(req,res) =>{
 
     const eidtUser = await userService.editNickName(email, nickname)
 
-    return res.send(eidtUser)
+    const userInfo = await userProvider.retrieveUserEmail(email);
+    const newJwtResponse = await jwtLogin(userInfo)
+
+    baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
+    return res.send(baseResponse.SUCCESS)
 }
 
 exports.editUserName = async(req,res) =>{
@@ -325,7 +332,11 @@ exports.editUserName = async(req,res) =>{
 
     const eidtUser = await userService.editName(email, name)
 
-    return res.send(eidtUser)
+    const userInfo = await userProvider.retrieveUserEmail(email);
+    const newJwtResponse = await jwtLogin(userInfo)
+
+    baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
+    return res.send(baseResponse.SUCCESS)
 }
 
 exports.editUserPhoneNumber = async(req,res) =>{
@@ -339,7 +350,11 @@ exports.editUserPhoneNumber = async(req,res) =>{
 
     const eidtUser = await userService.editPhoneNumber(email, phoneNumber)
 
-    return res.send(eidtUser)
+    const userInfo = await userProvider.retrieveUserEmail(email);
+    const newJwtResponse = await jwtLogin(userInfo)
+
+    baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
+    return res.send(baseResponse.SUCCESS)
 }
 
 exports.editUserPassword = async(req,res) =>{
@@ -389,10 +404,16 @@ exports.editUserProfileImg = async(req,res)=> {
         //console.log(id);
 
         const eidtImage = await userService.eidtProfileImg(email, req.file.location, req.file.key)
+        const userInfo = await userProvider.retrieveUserEmail(email);
+        const newJwtResponse = await jwtLogin(userInfo)
 
-        return res.send(eidtImage)
+        baseResponse.SUCCESS.photoUrl = req.file.location
+        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
+        return res.send(baseResponse.SUCCESS)
+
     } catch(err){
         console.log(err);
+        res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
 
