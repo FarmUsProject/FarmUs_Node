@@ -237,3 +237,21 @@ exports.getPhoneNumber = async(req,res) => {
         res.send(errResponse(resStatus.INACCURATE_OWNER));
     }
 }
+
+exports.getLikes = async(req,res) =>{
+    try{
+        const {email} = req.query
+        if (!email) return res.send(errResponse2(baseResponse.SIGNUP_EMAIL_EMPTY))
+
+        const user = await userProvider.retrieveUserEmail(email)
+        if (!user.LikeFarmIDs) return res.send([])
+
+        const likesArray = user.LikeFarmIDs.split(',').map(item => item.trim());
+        const likeFarms = await farmProvider.getFarmArray(likesArray)
+
+        return res.send(likeFarms)
+    }catch(e){
+        console.log(e);
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}

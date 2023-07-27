@@ -244,3 +244,25 @@ exports.getOwnerbyFarmID = async(connection,farmID) =>{
     const [phoneNumber] = await connection.query(getOwnerbyFarmIDQuery, farmID)
     return phoneNumber[0];
 }
+
+exports.getFarmsbyFarmIDs = async(connection, farmIds) =>{
+    const getFarmsbyFarmIDsQuery = `
+    SELECT f.FarmID,
+			Name,
+			Price,
+			SquaredMeters,
+			LocationBig,
+			LocationMid,
+			LocationSmall,
+			Likes,
+            MIN(Picture_url) as Picture_url
+    FROM Farm f
+    LEFT JOIN FarmPictures fp ON f.FarmID = fp.FarmID
+    WHERE f.FarmID IN (?)
+    GROUP BY f.FarmID, Name, Price, SquaredMeters, LocationBig, LocationMid, LocationSmall, Likes;
+    `
+
+    const [farms] = await connection.query(getFarmsbyFarmIDsQuery, [farmIds])
+    console.log(farms);
+    return farms;
+}
