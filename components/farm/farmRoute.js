@@ -36,4 +36,7 @@ module.exports = function (app) {
 
     //농장주 핸드폰 번호 조회
     app.get('/farm/farmerPhoneNumber', farm.getPhoneNumber);
+
+    //좋아요 농장 목록 반환
+    app.get('/farm/likes',farm.getLikes);
 };

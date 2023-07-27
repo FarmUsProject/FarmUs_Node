@@ -53,7 +53,14 @@ exports.isSameFarm = async(farmInfo)=>{
 
     if (sameFarm.length > 0)  return true;
     else false;
+}
 
+exports.getFarmArray = async(farmIDs) => {
+    const connection = await pool.getConnection(async conn => conn)
+    const FarmArray = await farmDao.getFarmsbyFarmIDs(connection, farmIDs)
+    connection.release()
+
+    return FarmArray
 }
 
 // 농장 검색관련

@@ -35,6 +35,9 @@ exports.signUp = async(email, password, phoneNumber, nickName, name, role) =>{
     const userInfo = await userProvider.usersbyEmail(email);
     if (userInfo.length >= 1) return errResponse(resStatus.SIGNUP_REDUNDANT_EMAIL);
 
+    const user = await userProvider.retrieveUser(phoneNumber);
+    if (user) return errResponse(baseResponse.ALREADY_USER)
+
     const encryptedData = await encryptedPassword.createHashedPassword(password);
     const hashedPassword = encryptedData.hashedPassword;
     const salt = encryptedData.salt;
