@@ -39,5 +39,6 @@ module.exports = function(app){
     //9. 생일 등록 API
     app.post('/user/birth', user.birth)
 
+    app.delete('user/likes', user.unliked)
 
 };

@@ -101,6 +101,14 @@ exports.likes = async function (req, res) {
     // }
 }
 
+exports.unliked = async(req,res)=>{
+    const { email, farmid } = req.body;
+    const invalidation = await validator.twoParams(email, farmid);
+    if (invalidation) return(res.send(errResponse(invalidation)));
+
+    const result = await userService.unLike(email, farmid)
+}
+
 /**
  *  [POST] /user/birth
  */

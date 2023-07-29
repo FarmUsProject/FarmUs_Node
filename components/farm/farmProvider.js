@@ -64,7 +64,7 @@ exports.getFarmArray = async(farmIDs) => {
 }
 
 // 농장 검색관련
-exports.farmFilter = async(locationBig, locationMid) => {
+exports.farmFilter = async(locationBig, locationMid, likeFarms) => {
     const connection = await pool.getConnection(async (conn) => conn)
     let res = []
     if (locationMid){
@@ -72,14 +72,31 @@ exports.farmFilter = async(locationBig, locationMid) => {
     }else{
         res = await farmDao.filteringBig(connection, locationBig)
     }
+
+    const likeFarmsArray = likeFarms.split(', ');
+    res.forEach(farm => {
+        if (likeFarmsArray.includes(String(farm.FarmID))){
+         farm.Liked = true
+        }else{
+         farm.Liked = false
+        }
+     });
     connection.release()
     return res
 }
 
-exports.retrieveFarms = async(keyword) => {
+exports.retrieveFarms = async(keyword,likeFarms) => {
     const connection = await pool.getConnection(async (conn) => conn);
     const newKeyword = '%'+keyword+'%'
     const res = await farmDao.searchFarm(connection, newKeyword)
+    const likeFarmsArray = likeFarms.split(', ');
+    res.forEach(farm => {
+       if (likeFarmsArray.includes(String(farm.FarmID))){
+        farm.Liked = true
+       }else{
+        farm.Liked = false
+       }
+    });
 
     connection.release()
 

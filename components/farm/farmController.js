@@ -179,7 +179,12 @@ exports.findFarms = async (req,res) => {
         const {keyword} = req.query
         if (!keyword) return res.send(errResponse2(baseResponse.FARM_NOT_KEYWORD))
 
-        const farms = await farmProvider.retrieveFarms(keyword)
+        const decoded = jwt.verify(req.headers.token, secretKey);
+        const user = await userProvider.retrieveUserEmail(decoded.email);
+
+        const likeFarms = user.LikeFarmIDs
+        const farms = await farmProvider.retrieveFarms(keyword,likeFarms)
+
         const searchRes = {"result" : true}
         searchRes.farms = farms
         return res.send(searchRes)
@@ -195,8 +200,13 @@ exports.filter = async(req,res) => {
         if (!locationBig)
             return res.send(errResponse2(baseResponse.SET_REGION))
 
+        const decoded = jwt.verify(req.headers.token, secretKey);
+        const user = await userProvider.retrieveUserEmail(decoded.email);
+
+        const likeFarms = user.LikeFarmIDs
+        const farms = await farmProvider.farmFilter(locationBig, locationMid, likeFarms)
+
         const searchRes = {"result" : true}
-        const farms = await farmProvider.farmFilter(locationBig, locationMid)
         searchRes.farms = farms
 
         return res.send(searchRes)
