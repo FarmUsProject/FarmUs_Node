@@ -52,7 +52,7 @@ exports.signUp = async(email, password, phoneNumber, nickName, name, role) =>{
     return response(resStatus_5000.USER_SIGNUP_SUCCESS, {"email" : email, "role" : role});
 };
 
-exports.addStar= async(email, farmId) =>{
+exports.addLike= async(email, farmId) =>{
     const userInfo = await userProvider.usersbyEmail(email);
     const farmInfo = await farmProvider.farmbyfarmID(farmId);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
@@ -73,26 +73,28 @@ exports.addStar= async(email, farmId) =>{
     else newstarList = farmId;
     console.log("newstarList", newstarList);
 
-    const now = await setDate.now();
-    const starRequest = [newstarList, now, email];
+    const starRequest = [newstarList, email];
 
     const connection = await pool.getConnection(async conn => conn);
-    const starList = await userDao.updateUserStar(connection, starRequest);
+    const starList = await userDao.updateUserLikes(connection, starRequest);
 
     /**
-     * PLUS # OF FARM STAR
+     * PLUS # OF FARM Like
     */
-    let updatedStarNumber = 0;
+    let updatedStarNumber = farmInfo.Likes + 1;
     try {
 
-        if (farmInfo.Star && farmInfo.Star > 0) {
-            updatedStarNumber += farmInfo.Star;
+/*
+        if (farmInfo.Likes && farmInfo.Likes > 0) {
+            //updatedStarNumber += farmInfo.Likes;
+
         }
         else updatedStarNumber = 1;
+        */
         // console.log("updatedStarNumber", updatedStarNumber);
-        const now = await setDate.now();
-        const updatedStarNumberInfo = [updatedStarNumber, now, farmId]
-        const updatedStar = await farmDao.updateFarmStar(connection, updatedStarNumberInfo);
+
+        const updatedStarNumberInfo = [updatedStarNumber, farmId]
+        const updatedStar = await farmDao.updateFarmLikes(connection, updatedStarNumberInfo);
 
         connection.release();
 
@@ -101,7 +103,31 @@ exports.addStar= async(email, farmId) =>{
         return errResponse(resStatus_5000.FARM_UPDATE_STAR_ERROR);
     }
 
-    return response(resStatus_5000.USER_STAR_ADD_SUCCESS, {"currentStarList" : newstarList, "updatedStarNumber" : updatedStarNumber});
+    return response(baseResponse.SUCCESS);
+}
+
+exports.unLike = async(email, farmID) =>{
+    try{
+        const userInfo = await userProvider.usersbyEmail(email);
+        const farmInfo = await farmProvider.farmbyfarmID(farmID);
+        if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
+        if (!farmInfo)  return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
+
+        const likeFarmsArray = userInfo[0].LikeFarmIDs.split(', ');
+        const indexToDelete = likeFarmsArray.indexOf(String(farmID));
+        if (indexToDelete !== -1) {
+            likeFarmsArray.splice(indexToDelete, 1);
+        }
+        const likeFarms = likeFarmsArray.join(', ');
+
+        const updateFarm = await farmProvider.deleteLike(farmInfo.Likes-1,farmID)
+        const updateUser = await userProvider.updateUserLikes(likeFarms, email)
+
+        return response2(baseResponse.SUCCESS)
+    }catch(e){
+        console.log(e);
+        return errResponse2(baseResponse.SERVER_ERROR)
+    }
 }
 
 exports.editBirth = async(email, birth) =>{

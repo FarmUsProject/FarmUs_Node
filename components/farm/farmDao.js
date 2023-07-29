@@ -197,14 +197,14 @@ exports.editFarmPicture = async(connection, farmID, img, key) => {
     return postFarmPicture[0]
 }
 
-exports.updateFarmStar = async(connection, updatedStarNumberInfo) => {
+exports.updateFarmLikes = async(connection, updatedStarNumberInfo) => {
     // updatedStarNumberInfo = [StarNumber, updateAt, farmID]
+    console.log(updatedStarNumberInfo);
     const updateFarmStarQuery = `
     UPDATE Farm
-    SET Star = ?, updateAt = ?
+    SET Likes = ?
     WHERE FarmID = ?
     `
-
     const updatedStarNumber = await connection.query(updateFarmStarQuery, updatedStarNumberInfo);
     return updatedStarNumber;
 }

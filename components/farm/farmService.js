@@ -169,6 +169,7 @@ exports.getFarmList = async (email) => {
         //like
         if (userInformation.length > 0 && userInformation[0].LikeFarmIDs) {
             likeFarmIDs = userInformation[0].LikeFarmIDs.split(',').map(id => id.trim());
+            console.log(likeFarmIDs);
             farmList.forEach(farm => {
                 if (likeFarmIDs.includes(farm.FarmID.toString())) {
                     farm.Liked = true;
