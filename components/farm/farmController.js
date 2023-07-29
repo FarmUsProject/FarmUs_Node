@@ -244,6 +244,7 @@ exports.getLikes = async(req,res) =>{
         if (!email) return res.send(errResponse2(baseResponse.SIGNUP_EMAIL_EMPTY))
 
         const user = await userProvider.retrieveUserEmail(email)
+        console.log(user);
         if (!user.LikeFarmIDs) return res.send([])
 
         const likesArray = user.LikeFarmIDs.split(',').map(item => item.trim());

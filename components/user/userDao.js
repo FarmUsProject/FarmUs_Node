@@ -61,11 +61,11 @@ async function selectStarbyEmail(connection, email) {
     return starList;
 }
 
-async function updateUserStar(connection, starRequest) {
+async function updateUserLikes(connection, starRequest) {
     //starRequest [newStarList, updateAt, email]
     const updateUserStarQuery = `
     UPDATE User
-    SET LikeFarmIDs = ?, updateAt = ?
+    SET LikeFarmIDs = ?
     WHERE Email = ?;
     `;
     const updateUserStarResult = await connection.query(updateUserStarQuery, starRequest);
@@ -169,7 +169,7 @@ module.exports = {
     selectUserbyPhoneNumber,
     insertUser,
     selectStarbyEmail,
-    updateUserStar,
+    updateUserLikes,
     updateUserBirth,
     selectUser,
     updatePassword,

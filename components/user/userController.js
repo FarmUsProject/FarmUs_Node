@@ -85,14 +85,14 @@ exports.signup = async function (req, res) {
 /**
  *  [POST] /user/star
  */
-exports.star = async function (req, res) {
+exports.likes = async function (req, res) {
     // try {
         const { email, farmid } = req.body;
         const invalidation = await validator.twoParams(email, farmid);
 
         if (invalidation) return(res.send(errResponse(invalidation)));
 
-        const starResponse = await userService.addStar(email, farmid);
+        const starResponse = await userService.addLike(email, farmid);
 
         return(res.send(starResponse));
     // }
