@@ -135,3 +135,10 @@ exports.getOwner = async(farmID) => {
     connection.release();
     return Owner;
 }
+
+exports.deleteLike = async(likeFarms, farmID) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const updateLike = await farmDao.updateFarmLikes(connection,[likeFarms,farmID])
+    connection.release()
+    return updateLike
+}

@@ -199,6 +199,7 @@ exports.editFarmPicture = async(connection, farmID, img, key) => {
 
 exports.updateFarmLikes = async(connection, updatedStarNumberInfo) => {
     // updatedStarNumberInfo = [StarNumber, updateAt, farmID]
+    console.log(updatedStarNumberInfo);
     const updateFarmStarQuery = `
     UPDATE Farm
     SET Likes = ?

@@ -107,6 +107,7 @@ exports.unliked = async(req,res)=>{
     if (invalidation) return(res.send(errResponse(invalidation)));
 
     const result = await userService.unLike(email, farmid)
+    return res.send(result)
 }
 
 /**

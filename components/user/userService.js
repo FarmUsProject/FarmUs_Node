@@ -107,48 +107,27 @@ exports.addLike= async(email, farmId) =>{
 }
 
 exports.unLike = async(email, farmID) =>{
-    const userInfo = await userProvider.usersbyEmail(email);
-    const farmInfo = await farmProvider.farmbyfarmID(farmId);
-    if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
-    if (!farmInfo)  return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
+    try{
+        const userInfo = await userProvider.usersbyEmail(email);
+        const farmInfo = await farmProvider.farmbyfarmID(farmID);
+        if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
+        if (!farmInfo)  return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
 
-    let newstarList;
-    const userStarList = await userProvider.starListbyEmail(email);
-    if (userStarList[0].LikeFarmIDs && userStarList[0].LikeFarmIDs.length > 0) {
-        let startListString = userStarList[0].LikeFarmIDs;
-        const existedArr = startListString.split(",");
-        existedArr
-        for (let e of existedArr) {
-            e = e.trim();
-            if(e.localeCompare(farmId) === 0 ) return errResponse(resStatus_5000.USER_REDUNDANT_STAR);
+        const likeFarmsArray = userInfo[0].LikeFarmIDs.split(', ');
+        const indexToDelete = likeFarmsArray.indexOf(String(farmID));
+        if (indexToDelete !== -1) {
+            likeFarmsArray.splice(indexToDelete, 1);
         }
-        newstarList = userStarList[0].LikeFarmIDs + ", " + farmId;
+        const likeFarms = likeFarmsArray.join(', ');
+
+        const updateFarm = await farmProvider.deleteLike(farmInfo.Likes-1,farmID)
+        const updateUser = await userProvider.updateUserLikes(likeFarms, email)
+
+        return response2(baseResponse.SUCCESS)
+    }catch(e){
+        console.log(e);
+        return errResponse2(baseResponse.SERVER_ERROR)
     }
-    else newstarList = farmId;
-    console.log("newstarList", newstarList);
-
-    const starRequest = [newstarList, email];
-
-    const connection = await pool.getConnection(async conn => conn);
-    const starList = await userDao.updateUserLikes(connection, starRequest);
-
-    /**
-     * PLUS # OF FARM Like
-    */
-    let updatedStarNumber = farmInfo.Likes + 1;
-    try {
-
-        const updatedStarNumberInfo = [updatedStarNumber, farmId]
-        const updatedStar = await farmDao.updateFarmLikes(connection, updatedStarNumberInfo);
-
-        connection.release();
-
-    }
-    catch (e) {
-        return errResponse(resStatus_5000.FARM_UPDATE_STAR_ERROR);
-    }
-
-    return response(baseResponse.SUCCESS);
 }
 
 exports.editBirth = async(email, birth) =>{
