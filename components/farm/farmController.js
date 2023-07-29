@@ -72,6 +72,7 @@ exports.getFarmUseList = async (req, res) => {
 
 exports.postFarmer = async (req, res) =>{
     try{
+        if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
         const decoded = jwt.verify(req.headers.token, secretKey);
         //console.log("decoded")
         //console.log(decoded);
@@ -179,6 +180,7 @@ exports.findFarms = async (req,res) => {
         const {keyword} = req.query
         if (!keyword) return res.send(errResponse2(baseResponse.FARM_NOT_KEYWORD))
 
+        if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
         const decoded = jwt.verify(req.headers.token, secretKey);
         const user = await userProvider.retrieveUserEmail(decoded.email);
 
@@ -200,6 +202,7 @@ exports.filter = async(req,res) => {
         if (!locationBig)
             return res.send(errResponse2(baseResponse.SET_REGION))
 
+        if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
         const decoded = jwt.verify(req.headers.token, secretKey);
         const user = await userProvider.retrieveUserEmail(decoded.email);
 
