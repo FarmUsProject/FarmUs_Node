@@ -1,22 +1,6 @@
 const { pool } = require('../../config/database');
 const userDao = require('./userDao');
 
-exports.retrieveUsedFarmArray = async (userid) =>{
-    const connection  = await pool.getConnection(async (conn) => conn);
-    const UsedFarmArray =  await userDao.SelectionUsedFarmArray(connection, userid);
-    connection.release();
-
-    return UsedFarmArray;
-}
-
-exports.retrieveCurFarmArray = async (userid) =>{
-    const connection  = await pool.getConnection(async (conn) => conn);
-    const UseFarmArray =  await userDao.SelectionUseFarmArray(connection, userid);
-    connection.release();
-
-    return UseFarmArray;
-}
-
 exports.retrieveUserEmail = async function (userEmail) {
     const connection = await pool.getConnection(async (conn) => conn);
     const [res] = await userDao.selectUserbyEmail(connection, userEmail);

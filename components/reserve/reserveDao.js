@@ -91,7 +91,7 @@ async function currentUseList(connection, email) {
 
 async function pastUseList(connection, email) {
     const pastUseListQuery = `
-    SELECT R.Reserveid, R.Farmid, R.UserEmail, R.OwnerEmail, R.startAt, R.endAt, F.Name, FP.Picture_url
+    SELECT R.ReserveID, R.FarmID, R.UserEmail, R.OwnerEmail, R.startAt, R.endAt, F.Name, FP.Picture_url
     FROM Reservation R
     LEFT JOIN Farm F ON R.FarmID = F.FARMID
     LEFT JOIN FarmPictures FP ON R.FarmID = FP.FarmID

@@ -13,12 +13,6 @@ module.exports = function (app) {
     //농장 세부사항 조회
     app.get("/farm/detail/:farmid", farm.getFarmDetail);
 
-    //과거 이용 내역 조회
-    app.get("/farm/befolist:userid", farm.getFarmUsedList);
-
-    //현재 이용 내역 조회
-    app.get("/farm/curlist:userid", farm.getFarmUseList);
-
     //농장주 등록
     app.patch("/farm/register", farm.postFarmer);
 
