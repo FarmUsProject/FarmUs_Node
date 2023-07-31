@@ -49,27 +49,6 @@ exports.getFarmDetail = async (req, res) => {
     }
 }
 
-exports.getFarmUsedList = async (req, res) => {
-    const { userid } = req.params;
-
-    if(!userid) return res.render(errResponse(USER_USERID_EMPTY));
-
-    const FarmUsedArray = User.retrieveUsedFarmArray(userid);
-    const getUsedFarm_Detail = await farmProvider.retrieveFarmDetail(FarmUsedArray);
-    return res.render(getUsedFarm_Detail);
-
-}
-
-exports.getFarmUseList = async (req, res) => {
-    const { userid } = req.params;
-    if(!userid) return res.render(errResponse(USER_USERID_EMPTY));
-
-    const FarmUseArray = User.retrieveCurFarmArray(userid);
-    const getUseFarm_Detail = await farmProvider.retrieveUseFarmDetail(FarmUseArray);
-    return res.render(getUseFarm_Detail);
-
-}
-
 exports.postFarmer = async (req, res) =>{
     try{
         if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
