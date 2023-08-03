@@ -1,56 +1,32 @@
-const { pool } = require('../../config/database');
 const userDao = require('./userDao');
+const withConnection = require('../../config/connection')
 
-exports.retrieveUserEmail = async function (userEmail) {
-    const connection = await pool.getConnection(async (conn) => conn);
+exports.retrieveUserEmail = withConnection(async (connection, userEmail) =>{
     const [res] = await userDao.selectUserbyEmail(connection, userEmail);
-
-    connection.release();
-
     return res[0];
-};
+});
 
-exports.retrieveUser = async (phoneNumber) =>{
-    const connection = await pool.getConnection(async (conn) => conn);
+exports.retrieveUser = withConnection(async (connection, phoneNumber) =>{
     const res = await userDao.selectUser(connection, phoneNumber);
-
-    connection.release();
-
     return res[0];
-}
+});
 
-exports.usersbyEmail= async(email)=>{
-    const connection = await pool.getConnection(async conn => conn);
+exports.usersbyEmail= withConnection(async (connection, email)=>{
     const [userInfo] = await userDao.selectUserbyEmail(connection, email);
-
-    connection.release();
-
     return userInfo;
-}
+});
 
-exports.userbyPhoneNumber = async(phoneNumber)=>{
-    const connection = await pool.getConnection(async conn => conn);
+exports.userbyPhoneNumber = withConnection(async (connection, phoneNumber)=>{
     const [userInfo] = await userDao.selectUserbyPhoneNumber(connection, phoneNumber);
-
-    connection.release();
-
     return userInfo;
-}
+});
 
-exports.starListbyEmail = async(email)=>{
-    const connection = await pool.getConnection(async conn => conn);
+exports.starListbyEmail = withConnection(async (connection, email)=>{
     const [starByEmail] = await userDao.selectStarbyEmail(connection, email);
-
-    connection.release();
-
     return starByEmail;
-}
+});
 
-exports.nonSocialUsersbyEmail= async(email)=>{
-    const connection = await pool.getConnection(async conn => conn);
+exports.nonSocialUsersbyEmail= withConnection(async (connection, email)=>{
     const [userInfo] = await userDao.selectnonSocialUserbyEmail(connection, email);
-
-    connection.release();
-
     return userInfo;
-}
+});

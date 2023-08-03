@@ -1,136 +1,93 @@
-const { pool } = require('./../../config/database');
 const farmDao = require('./farmDao');
+const withConnection = require('../../config/connection')
 
-exports.retrieveFarmlist = async () =>{
-    const connection  = await pool.getConnection(async (conn) => conn);
-    const farmListResult =  await farmDao.selectFarm(connection);
-    connection.release();
-
+exports.retrieveFarmlist = withConnection(async (connection) => {
+    const farmListResult = await farmDao.selectFarm(connection);
     return farmListResult;
-}
+});
 
-exports.retrieveFarmInfo = async (farmID) => {
-    const connection = await pool.getConnection(async (conn) => conn);
-
+exports.retrieveFarmInfo = withConnection(async (connection, farmID) => {
     const farmInfo = await farmDao.selectFarmbyFarmID(connection, farmID);
-
-    connection.release();
-
     return farmInfo[0];
-}
+});
 
-exports.retrieveUsedFarmDetail = async (UsedArray) => {
-    const connection = await pool.getConnection(async (conn) => conn);
-
+exports.retrieveUsedFarmDetail = withConnection(async (connection, UsedArray) => {
     const UsedFarmDetail = await farmDao.selectUsedFarmDetail(connection, UsedArray);
-    connection.release();
-
     return UsedFarmDetail;
-}
+});
 
-exports.retrieveUseFarmDetail = async (UsedArray) => {
-    const connection = await pool.getConnection(async (conn) => conn);
-
+exports.retrieveUseFarmDetail = withConnection(async (connection, UsedArray) => {
     const UseFarmDetail = await farmDao.selectUseFarmDetail(connection, UsedArray);
-    connection.release();
-
     return UseFarmDetail;
-}
+});
 
-exports.farmbyfarmID =async(farmID) =>{
-    const connection = await pool.getConnection(async conn => conn);
+exports.farmbyfarmID = withConnection(async (connection, farmID) => {
     const [farmInfo] = await farmDao.selectFarmbyFarmID(connection, farmID);
-
-    connection.release();
-
     return farmInfo[0];
-}
+});
 
-exports.isSameFarm = async(farmInfo)=>{
-    const connection = await pool.getConnection(async conn => conn);
+exports.isSameFarm = withConnection(async (connection, farmInfo) => {
     const [sameFarm] = await farmDao.selectFarmbyFarmInfo(connection, farmInfo);
-    connection.release();
+    if (sameFarm.length > 0) return true;
+    else return false;
+});
 
-    if (sameFarm.length > 0)  return true;
-    else false;
-}
+exports.getFarmArray = withConnection(async (connection, farmIDs) => {
+    const FarmArray = await farmDao.getFarmsbyFarmIDs(connection, farmIDs);
+    return FarmArray;
+});
 
-exports.getFarmArray = async(farmIDs) => {
-    const connection = await pool.getConnection(async conn => conn)
-    const FarmArray = await farmDao.getFarmsbyFarmIDs(connection, farmIDs)
-    connection.release()
-
-    return FarmArray
-}
-
-// 농장 검색관련
-exports.farmFilter = async(locationBig, locationMid, likeFarms) => {
-    const connection = await pool.getConnection(async (conn) => conn)
-    let res = []
-    if (locationMid){
-        res = await farmDao.filtering(connection, locationBig, locationMid)
-    }else{
-        res = await farmDao.filteringBig(connection, locationBig)
+exports.farmFilter = withConnection(async (connection, locationBig, locationMid, likeFarms) => {
+    let res = [];
+    if (locationMid) {
+        res = await farmDao.filtering(connection, locationBig, locationMid);
+    } else {
+        res = await farmDao.filteringBig(connection, locationBig);
     }
 
     const likeFarmsArray = likeFarms.split(', ');
-    res.forEach(farm => {
-        if (likeFarmsArray.includes(String(farm.FarmID))){
-         farm.Liked = true
-        }else{
-         farm.Liked = false
+    res.forEach((farm) => {
+        if (likeFarmsArray.includes(String(farm.FarmID))) {
+            farm.Liked = true;
+        } else {
+            farm.Liked = false;
         }
-     });
-    connection.release()
-    return res
-}
-
-exports.retrieveFarms = async(keyword,likeFarms) => {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const newKeyword = '%'+keyword+'%'
-    const res = await farmDao.searchFarm(connection, newKeyword)
-    const likeFarmsArray = likeFarms.split(', ');
-    res.forEach(farm => {
-       if (likeFarmsArray.includes(String(farm.FarmID))){
-        farm.Liked = true
-       }else{
-        farm.Liked = false
-       }
     });
 
-    connection.release()
+    return res;
+});
 
-    return res
-}
+exports.retrieveFarms = withConnection(async (connection, keyword, likeFarms) => {
+    const newKeyword = '%' + keyword + '%';
+    const res = await farmDao.searchFarm(connection, newKeyword);
+    const likeFarmsArray = likeFarms.split(', ');
+    res.forEach((farm) => {
+        if (likeFarmsArray.includes(String(farm.FarmID))) {
+            farm.Liked = true;
+        } else {
+            farm.Liked = false;
+        }
+    });
 
-exports.farmPictureUrlbyFarmID = async (farmID) =>{
-    const connection = await pool.getConnection(async conn => conn);
+    return res;
+});
+
+exports.farmPictureUrlbyFarmID = withConnection(async (connection, farmID) => {
     const farmPicturesInfo = await farmDao.selectFarmPicturesUrlbyFarmID(connection, farmID);
-
-    connection.release();
-
     return farmPicturesInfo[0];
-}
+});
 
-exports.farmPictureUrl = async () =>{
-    const connection = await pool.getConnection(async conn => conn);
+exports.farmPictureUrl = withConnection(async (connection) => {
     const farmPicturesInfo = await farmDao.selectFarmPicturesUrlKey(connection);
-
-    connection.release();
-
     return farmPicturesInfo[0];
-}
+});
 
-exports.getOwner = async(farmID) => {
-    const connection = await pool.getConnection(async conn => conn);
-    const Owner = await farmDao.getOwnerbyFarmID(connection,farmID);
-    connection.release();
+exports.getOwner = withConnection(async (connection, farmID) => {
+    const Owner = await farmDao.getOwnerbyFarmID(connection, farmID);
     return Owner;
-}
+});
 
-exports.getOwnerFarms = async(email) =>{
-    const connection = await pool.getConnection(async conn => conn);
-    const farms = await farmDao.getFarmsbyOwner(connection,email)
-    connection.release()
-    return farms
-}
+exports.getOwnerFarms = withConnection(async (connection, email) => {
+    const farms = await farmDao.getFarmsbyOwner(connection, email);
+    return farms;
+});

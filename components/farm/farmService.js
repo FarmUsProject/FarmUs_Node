@@ -41,26 +41,6 @@ exports.newFarm = async (name, owner, price, squaredMeters, locationBig, locatio
     const connection = await pool.getConnection(async conn => conn);
 
     const newFarm = await farmDao.insertFarm(connection, newFarmInfo);
-
-
-    /**
-     * ------------------------file handling-------------------------
-    */
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * ---------------------------------------------------------------
-    */
-
     connection.release();
 
     return response(resStatus_5000.FARM_NEW_SAVE_SUCCESS, { "newFarmID": newFarmID });
