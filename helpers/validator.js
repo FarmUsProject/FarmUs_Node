@@ -25,7 +25,7 @@ const validator = {
 
     if (!phoneNumber) return resStatus.SIGNUP_PHONENUMBER_EMPTY
     // if (!nickName) return resStatus.SIGNUP_NICKNAME_EMPTY
-    if (!name) return resStatus.SIGNUP_NICKNAME_EMPTY
+    if (!name) return resStatus_5000.USER_NAME_EMPTY
     if (!role) return resStatus.USER_STATUS_EMPTY
     // if (nickName.length > 20) return resStatus.SIGNUP_NICKNAME_LENGTH
     if (name.length > 20) return resStatus.SIGNUP_NICKNAME_LENGTH
@@ -36,17 +36,17 @@ const validator = {
 
   oauthSignup : async (email, phoneNumber, name, role) => {
 
-    if (!email) return resStatus.SIGNIN_EMAIL_EMPTY
+    if (!email) return resStatus.SIGNUP_EMAIL_EMPTY
 
     if (!phoneNumber) return resStatus.SIGNUP_PHONENUMBER_EMPTY
 
-    if (!name) return resStatus.SIGNUP_NICKNAME_EMPTY
+    if (!name) return resStatus_5000.USER_NAME_EMPTY
 
     return false;
   },
 
-  newFarm: async (name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid) => {
-    if (!name || !owner || !startDate || !endDate || !price || !squaredMeters || !locationBig || !locationMid)
+  newFarm: async (name, owner, price, squaredMeters, locationBig, locationMid) => {
+    if (!name || !owner || !price || !squaredMeters || !locationBig || !locationMid)
       return resStatus_5000.FARM_NEW_DATA_SHORTAGE;
 
     return false;
@@ -75,6 +75,7 @@ const validator = {
 
   isValidEmail: (email) => {
     const emailPattern = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
+
     return emailPattern.test(email);
   }
 }

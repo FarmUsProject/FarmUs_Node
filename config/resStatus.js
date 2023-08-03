@@ -68,6 +68,13 @@ module.exports = {
     NOT_LOGIN : {'result': false, 'code': 6009, "message": "로그인을 먼저 진행해 주세요."},
     ALREADY_USER : {'result': false, 'code': 6010, "message": "이미 가입한 회원입니다."},
 
+    WRONG_FARMID : {'result': false, 'code': 6011, "message": "잘못된 농장 ID"},
+    EMPTY_PICTURE_KEY : {'result': false, 'code': 6012, "message": "사진 키값이 비어있습니다."},
+    ALREADY_DELETE_PICTURE : {'result': false, 'code': 6013, "message": "이미 삭제된 사진입니다."},
+    SET_REGION : {'result': false, 'code': 6014, "message": "지역을 설정해 주세요"},
+
+    INACCURATE_OWNER: {'result': false, 'code': 6015, "message": "FarmID가 잘못되었거나 농장주가 존재하지 않습니다."},
+
     REDIS_ERROR : {'result': false, 'code':6900, 'message': "REDIS 에러"}
 
 }

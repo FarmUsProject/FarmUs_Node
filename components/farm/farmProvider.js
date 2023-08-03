@@ -53,14 +53,50 @@ exports.isSameFarm = async(farmInfo)=>{
 
     if (sameFarm.length > 0)  return true;
     else false;
+}
 
+exports.getFarmArray = async(farmIDs) => {
+    const connection = await pool.getConnection(async conn => conn)
+    const FarmArray = await farmDao.getFarmsbyFarmIDs(connection, farmIDs)
+    connection.release()
+
+    return FarmArray
 }
 
 // 농장 검색관련
-exports.retrieveFarms = async(keyword) => {
+exports.farmFilter = async(locationBig, locationMid, likeFarms) => {
+    const connection = await pool.getConnection(async (conn) => conn)
+    let res = []
+    if (locationMid){
+        res = await farmDao.filtering(connection, locationBig, locationMid)
+    }else{
+        res = await farmDao.filteringBig(connection, locationBig)
+    }
+
+    const likeFarmsArray = likeFarms.split(', ');
+    res.forEach(farm => {
+        if (likeFarmsArray.includes(String(farm.FarmID))){
+         farm.Liked = true
+        }else{
+         farm.Liked = false
+        }
+     });
+    connection.release()
+    return res
+}
+
+exports.retrieveFarms = async(keyword,likeFarms) => {
     const connection = await pool.getConnection(async (conn) => conn);
     const newKeyword = '%'+keyword+'%'
     const res = await farmDao.searchFarm(connection, newKeyword)
+    const likeFarmsArray = likeFarms.split(', ');
+    res.forEach(farm => {
+       if (likeFarmsArray.includes(String(farm.FarmID))){
+        farm.Liked = true
+       }else{
+        farm.Liked = false
+       }
+    });
 
     connection.release()
 
@@ -83,4 +119,18 @@ exports.farmPictureUrl = async () =>{
     connection.release();
 
     return farmPicturesInfo[0];
+}
+
+exports.getOwner = async(farmID) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const Owner = await farmDao.getOwnerbyFarmID(connection,farmID);
+    connection.release();
+    return Owner;
+}
+
+exports.getOwnerFarms = async(email) =>{
+    const connection = await pool.getConnection(async conn => conn);
+    const farms = await farmDao.getFarmsbyOwner(connection,email)
+    connection.release()
+    return farms
 }

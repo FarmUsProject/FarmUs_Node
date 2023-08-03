@@ -10,15 +10,14 @@ async function jwtLogin(user) {
         nickName: user.NickName,
         email: user.Email,
         role: user.Role,
+        phoneNumber : user.PhoneNumber,
+        profile : user.Picture_url
     };
     return ({
         accesstoken: jwt.sign(payload, secretKey, options),
-        name: user.Name,
-        nickName: user.NickName,
-        email: user.Email,
-        role: user.Role,
+        profile : user.Picture_url,
         status: true,
     })
 }
 
-module.exports = jwtLogin; 
+module.exports = jwtLogin;

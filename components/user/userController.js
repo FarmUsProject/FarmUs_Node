@@ -16,6 +16,9 @@ const dateAvailability = require('../../helpers/DateAvailability');
 const sharp = require('sharp');
 const fs = require('fs');
 const resStatus_5000 = require('../../config/resStatus_5000');
+const jwtLogin = require('./../../config/jwtLogin');
+
+
 
 exports.getBefoFarmUsed_Array = async (req, res, error) => {
     const { userid } = req.params;
@@ -53,6 +56,7 @@ exports.login = async function (req, res) {
 
     }
     catch (e) {
+        console.log(e)
         res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
@@ -81,20 +85,29 @@ exports.signup = async function (req, res) {
 /**
  *  [POST] /user/star
  */
-exports.star = async function (req, res) {
+exports.likes = async function (req, res) {
     // try {
         const { email, farmid } = req.body;
         const invalidation = await validator.twoParams(email, farmid);
 
         if (invalidation) return(res.send(errResponse(invalidation)));
 
-        const starResponse = await userService.addStar(email, farmid);
+        const starResponse = await userService.addLike(email, farmid);
 
         return(res.send(starResponse));
     // }
     // catch (e) {
     //     res.send(errResponse(resStatus.SERVER_ERROR));
     // }
+}
+
+exports.unliked = async(req,res)=>{
+    const { email, farmid } = req.query;
+    const invalidation = await validator.twoParams(email, farmid);
+    if (invalidation) return(res.send(errResponse(invalidation)));
+
+    const result = await userService.unLike(email, farmid)
+    return res.send(result)
 }
 
 /**
@@ -312,7 +325,11 @@ exports.editUserNickName = async(req,res) =>{
 
     const eidtUser = await userService.editNickName(email, nickname)
 
-    return res.send(eidtUser)
+    const userInfo = await userProvider.retrieveUserEmail(email);
+    const newJwtResponse = await jwtLogin(userInfo)
+
+    baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
+    return res.send(baseResponse.SUCCESS)
 }
 
 exports.editUserName = async(req,res) =>{
@@ -324,7 +341,11 @@ exports.editUserName = async(req,res) =>{
 
     const eidtUser = await userService.editName(email, name)
 
-    return res.send(eidtUser)
+    const userInfo = await userProvider.retrieveUserEmail(email);
+    const newJwtResponse = await jwtLogin(userInfo)
+
+    baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
+    return res.send(baseResponse.SUCCESS)
 }
 
 exports.editUserPhoneNumber = async(req,res) =>{
@@ -338,7 +359,11 @@ exports.editUserPhoneNumber = async(req,res) =>{
 
     const eidtUser = await userService.editPhoneNumber(email, phoneNumber)
 
-    return res.send(eidtUser)
+    const userInfo = await userProvider.retrieveUserEmail(email);
+    const newJwtResponse = await jwtLogin(userInfo)
+
+    baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
+    return res.send(baseResponse.SUCCESS)
 }
 
 exports.editUserPassword = async(req,res) =>{
@@ -388,10 +413,16 @@ exports.editUserProfileImg = async(req,res)=> {
         //console.log(id);
 
         const eidtImage = await userService.eidtProfileImg(email, req.file.location, req.file.key)
+        const userInfo = await userProvider.retrieveUserEmail(email);
+        const newJwtResponse = await jwtLogin(userInfo)
 
-        return res.send(eidtImage)
+        baseResponse.SUCCESS.photoUrl = req.file.location
+        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
+        return res.send(baseResponse.SUCCESS)
+
     } catch(err){
         console.log(err);
+        res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
 

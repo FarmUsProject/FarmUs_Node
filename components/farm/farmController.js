@@ -13,9 +13,11 @@ const resStatus_5000 = require('../../config/resStatus_5000');
 const districtClarity = require('./../../helpers/districtClarity');
 const dateAvailability = require('../../helpers/DateAvailability');
 const userProvider = require('../user/userProvider');
+const jwtLogin = require('./../../config/jwtLogin');
+const { TimeSeriesAggregationType } = require('redis');
 
 exports.getFarmlist = async (req, res) => {
-    // try{
+    try{
         const email = req.params.email;
         const invalidation = await validator.oneParams(email);
 
@@ -25,10 +27,10 @@ exports.getFarmlist = async (req, res) => {
 
         // console.log(FarmDetailResponse)
         return res.send(FarmListResponse);
-    // }
-    // catch (e) {
-    //     res.send(errResponse(resStatus.SERVER_ERROR));
-    // }
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 
 exports.getFarmDetail = async (req, res) => {
@@ -48,36 +50,27 @@ exports.getFarmDetail = async (req, res) => {
     }
 }
 
-exports.getFarmUsedList = async (req, res) => {
-    const { userid } = req.params;
-
-    if(!userid) return res.render(errResponse(USER_USERID_EMPTY));
-
-    const FarmUsedArray = User.retrieveUsedFarmArray(userid);
-    const getUsedFarm_Detail = await farmProvider.retrieveFarmDetail(FarmUsedArray);
-    return res.render(getUsedFarm_Detail);
-
-}
-
-exports.getFarmUseList = async (req, res) => {
-    const { userid } = req.params;
-
-    if(!userid) return res.render(errResponse(USER_USERID_EMPTY));
-
-    const FarmUseArray = User.retrieveCurFarmArray(userid);
-    const getUseFarm_Detail = await farmProvider.retrieveUseFarmDetail(FarmUseArray);
-    return res.render(getUseFarm_Detail);
-
-}
-
 exports.postFarmer = async (req, res) =>{
     try{
+        if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
         const decoded = jwt.verify(req.headers.token, secretKey);
-        console.log(decoded);
+        //console.log("decoded")
+        //console.log(decoded);
+        //console.log("======");
         if (decoded.role == 'F') return res.send(errResponse2(baseResponse.ALREADY_FARMER));
 
         const farmer = await farmService.postFarmer(decoded.email);
-        if (!farmer) return res.send(response2(baseResponse.SIGNIN_INACTIVE_ACCOUNT))
+        if (!farmer) return res.send(errResponse2(baseResponse.SIGNIN_INACTIVE_ACCOUNT))
+
+        const userInfo = await userProvider.retrieveUserEmail(decoded.email);
+        const newJwtResponse = await jwtLogin(userInfo)
+/*
+        const decoded2 = jwt.verify(newJwtResponse.accesstoken, secretKey)
+        console.log("decoded2")
+        console.log(decoded2);
+        console.log("======");
+        */
+        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
 
         return res.send(baseResponse.SUCCESS);
 
@@ -95,26 +88,17 @@ exports.editFarm = async(req, res) =>{
         if (!farmId) return res.send(errResponse2(baseResponse.FARMID_EMPTY))
 
         const eidtFarmInfoRes = await farmService.editFarmInfo(farmId, req.body)
+        console.log(eidtFarmInfoRes);
+        if (!eidtFarmInfoRes.affectedRows) return res.send(errResponse2(baseResponse.WRONG_FARMID))
 
-        // req.files의 originalname
-        /*
-        const locations = req.files.map(file => file.location);
-        const keys = req.files.map(file => file.key);
-
-        console.log("Locations:", locations);
-        console.log("Keys:", keys);
-        */
-       if (!eidtFarmInfoRes.result) return res.send(eidtFarmInfoRes)
-
-        let editFarmPicturesRes;
         for (let i = 0; i < req.files.length; i++) {
             const file = req.files[i];
             const location = file.location;
             const key = file.key;
-            editFarmPicturesRes = await farmService.editFarmPictures(farmId,location, key);
-            if (!editFarmPicturesRes.result) break
+            const editFarmPicturesRes = await farmService.editFarmPictures(farmId,location, key);
         }
-        return res.send(editFarmPicturesRes);
+        return res.send(response2(baseResponse.SUCCESS));
+
     }catch(err){
         return res.send(err)
     }
@@ -126,16 +110,19 @@ exports.editFarm = async(req, res) =>{
  */
 exports.newFarm = async function (req, res) {
     try {
-        const { name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall,description, category, tag } = req.body;
+        const { name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description} = req.body;
+        //console.log(req);
+        console.log(req.body);
+        const invalidation = await validator.newFarm(name, owner, price, squaredMeters, locationBig, locationMid);
 
-        const invalidation = await validator.newFarm(name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid);
         if (invalidation) return res.send(errResponse(invalidation))
-        if (dateAvailability.isValidDatetype(startDate) == false || dateAvailability.isValidDatetype(endDate) == false)
-            return res.send(errResponse(resStatus_5000.DATE_TYPE_WEIRD));
 
-        const farmDateErrorMessage = dateAvailability.validFarmDate(new Date(), new Date(startDate), new Date(endDate))
-        if(farmDateErrorMessage != true)
-            return res.send(errResponse(farmDateErrorMessage));
+        // Date Availability 유효성 검사
+        // if (dateAvailability.isValidDatetype(startDate) == false || dateAvailability.isValidDatetype(endDate) == false)
+        //     return res.send(errResponse(resStatus_5000.DATE_TYPE_WEIRD));
+        // const farmDateErrorMessage = dateAvailability.validFarmDate(new Date(), new Date(startDate), new Date(endDate))
+        // if(farmDateErrorMessage != true)
+        //     return res.send(errResponse(farmDateErrorMessage));
 
         const userInfo = await userProvider.usersbyEmail(owner);
         if (!userInfo || userInfo.length < 1) return res.send(errResponse(resStatus.USER_USEREMAIL_NOT_EXIST));
@@ -149,13 +136,21 @@ exports.newFarm = async function (req, res) {
 
         const districtCode = districtClarityResponse.result;
 
-        let newFarmResponse = await farmService.newFarm(name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag);
+        let newFarmResponse = await farmService.newFarm(name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description);
+        for (let i = 0; i < req.files.length; i++) {
+            const file = req.files[i];
+            const location = file.location;
+            const key = file.key;
+            const editFarmPicturesRes = await farmService.editFarmPictures(newFarmResponse.result.newFarmID,location, key);
+        }
+
         if (newFarmResponse.result)
             newFarmResponse.result = {"newFarmID" : newFarmResponse.result.newFarmID, "districtCode" : districtCode};
         return res.send(newFarmResponse)
 
     }
     catch (e) {
+        console.log(e);
         res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
@@ -163,13 +158,110 @@ exports.newFarm = async function (req, res) {
 exports.findFarms = async (req,res) => {
     try{
         const {keyword} = req.query
-
         if (!keyword) return res.send(errResponse2(baseResponse.FARM_NOT_KEYWORD))
 
-        const farms = await farmProvider.retrieveFarms(keyword)
-        return res.send(farms)
+        if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+        const decoded = jwt.verify(req.headers.token, secretKey);
+        const user = await userProvider.retrieveUserEmail(decoded.email);
+
+        const likeFarms = user.LikeFarmIDs
+        const farms = await farmProvider.retrieveFarms(keyword,likeFarms)
+
+        const searchRes = {"result" : true}
+        searchRes.farms = farms
+        return res.send(searchRes)
     }catch(err){
         console.log(err);
     }
 
+}
+
+exports.filter = async(req,res) => {
+    try{
+        const {locationBig, locationMid} = req.query
+        if (!locationBig)
+            return res.send(errResponse2(baseResponse.SET_REGION))
+
+        if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+        const decoded = jwt.verify(req.headers.token, secretKey);
+        const user = await userProvider.retrieveUserEmail(decoded.email);
+
+        const likeFarms = user.LikeFarmIDs
+        const farms = await farmProvider.farmFilter(locationBig, locationMid, likeFarms)
+
+        const searchRes = {"result" : true}
+        searchRes.farms = farms
+
+        return res.send(searchRes)
+
+    }catch (e) {
+        console.log(e);
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}
+
+exports.deletePhoto = async(req,res) => {
+    try{
+        const {Picture_key} = req.body
+        if (!Picture_key) return res.send(errResponse2(baseResponse.EMPTY_PICTURE_KEY))
+
+        const [deleteRes] = await farmService.deletePhoto(Picture_key)
+        if (deleteRes.affectedRows)
+            return res.send(response2(baseResponse.SUCCESS))
+
+        return res.send(errResponse2(baseResponse.ALREADY_DELETE_PICTURE))
+
+    }catch (e) {
+        console.log(e);
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}
+
+exports.getPhoneNumber = async(req,res) => {
+    try{
+        const {farmID} = req.query
+        if (!farmID) return res.send(errResponse2(baseResponse.FARMID_EMPTY))
+
+        const Owner = await farmProvider.getOwner(farmID)
+        Owner.result = true
+        return res.send(Owner)
+    }catch(e){
+        console.log(e);
+        res.send(errResponse(resStatus.INACCURATE_OWNER));
+    }
+}
+
+exports.getLikes = async(req,res) =>{
+    try{
+        const {email} = req.query
+        if (!email) return res.send(errResponse2(baseResponse.SIGNUP_EMAIL_EMPTY))
+
+        const user = await userProvider.retrieveUserEmail(email)
+        console.log(user);
+        if (!user.LikeFarmIDs) return res.send({"result":false})
+
+        const likesArray = user.LikeFarmIDs.split(',').map(item => item.trim());
+        const likeFarms = await farmProvider.getFarmArray(likesArray)
+
+        baseResponse.SUCCESS.farmSize = likeFarms.length
+        baseResponse.SUCCESS.farmList = likeFarms
+
+        return res.send(baseResponse.SUCCESS)
+    }catch(e){
+        console.log(e);
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}
+
+exports.getMyFarm = async(req,res)=>{
+    try{
+        if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+        const decoded = jwt.verify(req.headers.token, secretKey);
+
+        const farms = await farmProvider.getOwnerFarms(decoded.email)
+        return res.send(farms)
+    }catch(e){
+        console.log(e);
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }

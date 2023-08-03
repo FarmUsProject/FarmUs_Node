@@ -20,7 +20,12 @@ exports.postFarmer = async (email) => {
     return res;
 }
 
-exports.newFarm = async (name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag) => {
+exports.newFarm = async (name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description) => {
+
+    const sameFarmInfo = [name, owner, price, squaredMeters, locationBig, locationMid, locationSmall];
+    const isSameFarm = await FarmProvider.isSameFarm(sameFarmInfo); //중복체크
+    if (isSameFarm) return errResponse(resStatus_5000.FARM_DUPLICATED_EXISTS);
+
     const newFarmStatus = 'A';
     let newFarmID;
     let existedFarm;
@@ -30,14 +35,31 @@ exports.newFarm = async (name, owner, startDate, endDate, price, squaredMeters, 
     } while (existedFarm); //unique farmID
 
     const now = await setDate.now();
-    const newFarmInfo = [newFarmID, name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag, newFarmStatus, now, now];
 
-    const isSameFarm = await FarmProvider.isSameFarm(newFarmInfo); //중복체크
-    if (isSameFarm) return errResponse(resStatus_5000.FARM_DUPLICATED_EXISTS);
+    const newFarmInfo = [newFarmID, name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description, newFarmStatus, now, now];
 
     const connection = await pool.getConnection(async conn => conn);
 
     const newFarm = await farmDao.insertFarm(connection, newFarmInfo);
+
+
+    /**
+     * ------------------------file handling-------------------------
+    */
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * ---------------------------------------------------------------
+    */
 
     connection.release();
 
@@ -64,7 +86,7 @@ exports.editFarmInfo = async(farmID, farmInfo) =>{
         const res = await farmDao.eidtMyFarm(connection, farmID, farmInfo)
         connection.release()
 
-        return response2(baseResponse.SUCCESS)
+        return res
     }catch(err){
         console.log(err);
         return errResponse2(baseResponse.DB_ERROR)
@@ -77,7 +99,7 @@ exports.editFarmPictures = async(farmID, farmName, img, key) =>{
         const res = await farmDao.editFarmPicture(connection, farmID, farmName, img, key)
         connection.release()
 
-        return response2(baseResponse.SUCCESS)
+        return res
     }catch(err){
         console.log(err);
         return errResponse2(baseResponse.DB_ERROR)
@@ -93,10 +115,10 @@ exports.getFarmDetail = async (farmID) => {
         //최종 농장 세부사항
         let farmDetail = farmInformation[0];
 
-        //농장 항목 삭제 : Owner, crateAt, updateAt 
+        //농장 항목 삭제 : Owner, crateAt, updateAt
         delete farmDetail.Owner;
-        delete farmDetail.createAt;
-        delete farmDetail.updateAt;
+        //delete farmDetail.createAt;
+        //delete farmDetail.updateAt;
 
         // 농장 사진 추가 : Picture_url, Picture_key
         let pictureObject;
@@ -110,10 +132,9 @@ exports.getFarmDetail = async (farmID) => {
         farmDetail.PictureObject = pictureObject;
 
         //농장주 정보 추가 : Email, PhoneNumber, Name, NickName
-        let userInfo = { 
-            Email : userInformation[0].Email, 
-            PhoneNumber : userInformation[0].PhoneNumber, 
-            Name : userInformation[0].Name, 
+        let userInfo = {
+            Email : userInformation[0].Email,
+            Name : userInformation[0].Name,
             NickName : userInformation[0].NickName,
             Picture_url : userInformation[0].Picture_url || null,
             Picture_key : userInformation[0].Picture_key || null
@@ -144,10 +165,11 @@ exports.getFarmList = async (email) => {
             }));
             farm.Pictures = pictureObjects;
           });
-        
+
         //like
         if (userInformation.length > 0 && userInformation[0].LikeFarmIDs) {
             likeFarmIDs = userInformation[0].LikeFarmIDs.split(',').map(id => id.trim());
+            console.log(likeFarmIDs);
             farmList.forEach(farm => {
                 if (likeFarmIDs.includes(farm.FarmID.toString())) {
                     farm.Liked = true;
@@ -177,4 +199,19 @@ exports.getFarmList = async (email) => {
     // } catch (err) {
     //     return errResponse(resStatus.DB_ERROR);
     // }
+}
+
+exports.deleteLike = async(likeFarms, farmID) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const updateLike = await farmDao.updateFarmLikes(connection,[likeFarms,farmID])
+    connection.release()
+    return updateLike
+}
+
+exports.deletePhoto = async (key) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const deleteFarmPicture = await farmDao.deletePhoto(connection,key);
+    connection.release();
+
+    return deleteFarmPicture
 }

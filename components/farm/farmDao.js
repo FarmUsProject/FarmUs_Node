@@ -1,7 +1,5 @@
 //const { connection } = require("mongoose");
 
-const { login } = require("../../helpers/validator");
-
 exports.selectFarm = async (connection) => {
     const selectFarmListQuery = `
     SELECT *
@@ -69,10 +67,10 @@ exports.selectFarmbyFarmID = async(connection, farmID) =>{
 }
 
 exports.insertFarm = async(connection, newFarmInfo) => {
-    //newFarmInfo [newFarmID, name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag, newFarmStatus, createAt, updateAt] : 16 fields
+    //newFarmInfo [newFarmID, name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description, newFarmStatus, createAt, updateAt] : 12 fields
     const insertFarmQuery = `
-    INSERT INTO Farm(FarmID, Name, Owner, startAt, endAt, Price, SquaredMeters, LocationBig, LocationMid, LocationSmall, Description, Category, Tag, Status, createAt, updateAt)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    INSERT INTO Farm(FarmID, Name, Owner, Price, SquaredMeters, LocationBig, LocationMid, LocationSmall, Description, Status, createAt, updateAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
     const farmInfo = await connection.query(insertFarmQuery, newFarmInfo);
 
@@ -80,41 +78,80 @@ exports.insertFarm = async(connection, newFarmInfo) => {
 }
 
 exports.selectFarmbyFarmInfo = async(connection, sameFarmInfo) =>{
-    //newFarmInfo [newFarmID, name, owner, startDate, endDate, price, squaredMeters, locationBig, locationMid, locationSmall, description, category, tag, newFarmStatus, createAt, updateAt]
-    const duplicatedInfo = sameFarmInfo.slice(1,10);
+    // sameFarmInfo [name, owner, price, squaredMeters, locationBig, locationMid, locationSmall];
+
     const selectFarmbyFarmInfoQuery =`
     SELECT *
     FROM Farm
-    WHERE NAME = ? AND Owner = ? AND startAT = ? AND endAt = ? AND Price = ? AND SquaredMeters = ? AND LocationBig = ? AND LocationMid = ? AND LocationSmall = ?
+    WHERE NAME = ? AND Owner = ? AND Price = ? AND SquaredMeters = ? AND LocationBig = ? AND LocationMid = ? AND LocationSmall = ?
     `;
-    const sameFarm = await connection.query(selectFarmbyFarmInfoQuery, duplicatedInfo);
+    const sameFarm = await connection.query(selectFarmbyFarmInfoQuery, sameFarmInfo);
 
     return sameFarm;
 }
 
 exports.searchFarm = async(connection, keyword) => {
+
     const searchFarmQuery = `
     SELECT f.FarmID,
-    f.Name,
-    f.Price,
-    f.SquaredMeters,
-    f.LocationBig,
-    f.LocationMid,
-    f.LocationSmall,
-    f.Likes,
-    fp.Picture_url
-  FROM Farm f
-  LEFT JOIN (
-    SELECT FarmID, Picture_url
-    FROM FarmPictures
-    GROUP BY FarmID
-  ) fp ON f.FarmID = fp.FarmID
-  WHERE f.Name LIKE ? OR f.LocationBig LIKE ? OR f.LocationMid LIKE ? OR f.LocationSmall LIKE ?;`;
+			Name,
+			Price,
+			SquaredMeters,
+			LocationBig,
+			LocationMid,
+			LocationSmall,
+			Likes,
+            MIN(Picture_url) as Picture_url
+    FROM Farm f
+    LEFT JOIN FarmPictures fp ON f.FarmID = fp.FarmID
+    WHERE f.Name LIKE ? OR f.LocationBig LIKE ? OR f.LocationMid LIKE ? OR f.LocationSmall LIKE ?
+    GROUP BY f.FarmID, Name, Price, SquaredMeters, LocationBig, LocationMid, LocationSmall, Likes;
+`;
 
     console.log(keyword);
     const [farmRow] = await connection.query(searchFarmQuery,[keyword,keyword,keyword,keyword])
     console.log(farmRow);
-    return farmRow
+    return farmRow.length > 0 ? farmRow : [];
+}
+
+exports.filtering = async(connection, locationBig, locationMid) => {
+    const filteringQuery = `
+     SELECT f.FarmID,
+			Name,
+			Price,
+			SquaredMeters,
+			LocationBig,
+			LocationMid,
+			LocationSmall,
+			Likes,
+            MIN(Picture_url) as Picture_url
+    FROM Farm f
+    LEFT JOIN FarmPictures fp ON f.FarmID = fp.FarmID
+    WHERE f.LocationBig LIKE ? AND f.LocationMid LIKE ?
+    GROUP BY f.FarmID, Name, Price, SquaredMeters, LocationBig, LocationMid, LocationSmall, Likes;
+    `
+    const [farmRow] = await connection.query(filteringQuery,[locationBig,locationMid])
+    return farmRow.length > 0 ? farmRow : [];
+}
+
+exports.filteringBig = async(connection, locationBig) => {
+    const filteringQuery = `
+     SELECT f.FarmID,
+			Name,
+			Price,
+			SquaredMeters,
+			LocationBig,
+			LocationMid,
+			LocationSmall,
+			Likes,
+            MIN(Picture_url) as Picture_url
+    FROM Farm f
+    LEFT JOIN FarmPictures fp ON f.FarmID = fp.FarmID
+    WHERE f.LocationBig LIKE ?
+    GROUP BY f.FarmID, Name, Price, SquaredMeters, LocationBig, LocationMid, LocationSmall, Likes;
+    `
+    const [farmRow] = await connection.query(filteringQuery,locationBig)
+    return farmRow.length > 0 ? farmRow : [];
 }
 
 exports.withdrawalUserFarm = async(connection, email) => {
@@ -142,6 +179,15 @@ exports.eidtMyFarm = async(connection, farmID, farmInfo) =>{
 
 }
 
+exports.deletePhoto = async(connection, key) => {
+    const deleteFarmPicture = `
+    DELETE FROM FarmPictures
+    WHERE Picture_key = ?;
+    `
+    const res = await connection.query(deleteFarmPicture,key)
+    return res
+}
+
 exports.editFarmPicture = async(connection, farmID, img, key) => {
     const saveFarmPicturesQuery= `
     INSERT INTO FarmPictures(FarmID, Picture_url, Picture_key)
@@ -151,14 +197,14 @@ exports.editFarmPicture = async(connection, farmID, img, key) => {
     return postFarmPicture[0]
 }
 
-exports.updateFarmStar = async(connection, updatedStarNumberInfo) => {
+exports.updateFarmLikes = async(connection, updatedStarNumberInfo) => {
     // updatedStarNumberInfo = [StarNumber, updateAt, farmID]
+    console.log(updatedStarNumberInfo);
     const updateFarmStarQuery = `
     UPDATE Farm
-    SET Star = ?, updateAt = ?
+    SET Likes = ?
     WHERE FarmID = ?
     `
-
     const updatedStarNumber = await connection.query(updateFarmStarQuery, updatedStarNumberInfo);
     return updatedStarNumber;
 }
@@ -182,4 +228,61 @@ exports.selectFarmPicturesUrlKey = async(connection) =>{
     const pictureUrls = await connection.query(selectFarmPicturesUrlQuery);
 
     return pictureUrls;
+}
+
+exports.getOwnerbyFarmID = async(connection,farmID) =>{
+    const getOwnerbyFarmIDQuery = `
+    SELECT PhoneNumber
+    FROM User
+    WHERE Email = (
+        SELECT Owner
+        FROM Farm
+        WHERE FarmID = ?
+    );
+    `
+
+    const [phoneNumber] = await connection.query(getOwnerbyFarmIDQuery, farmID)
+    return phoneNumber[0];
+}
+
+exports.getFarmsbyFarmIDs = async(connection, farmIds) =>{
+    const getFarmsbyFarmIDsQuery = `
+    SELECT f.FarmID,
+			Name,
+			Price,
+			SquaredMeters,
+			LocationBig,
+			LocationMid,
+			LocationSmall,
+			Likes,
+            MIN(Picture_url) as Picture_url
+    FROM Farm f
+    LEFT JOIN FarmPictures fp ON f.FarmID = fp.FarmID
+    WHERE f.FarmID IN (?)
+    GROUP BY f.FarmID, Name, Price, SquaredMeters, LocationBig, LocationMid, LocationSmall, Likes;
+    `
+
+    const [farms] = await connection.query(getFarmsbyFarmIDsQuery, [farmIds])
+    console.log(farms);
+    return farms;
+}
+
+exports.getFarmsbyOwner = async(connection, owner) =>{
+    const getFarmsbyOwnerQuery = `
+    SELECT f.FarmID,
+			Name,
+			Price,
+			SquaredMeters,
+			LocationBig,
+			LocationMid,
+			LocationSmall,
+			Likes,
+            MIN(Picture_url) as Picture_url
+    FROM Farm f
+    LEFT JOIN FarmPictures fp ON f.FarmID = fp.FarmID
+    WHERE f.Owner = ?
+    GROUP BY f.FarmID, Name, Price, SquaredMeters, LocationBig, LocationMid, LocationSmall, Likes;`
+
+    const [farms] = await connection.query(getFarmsbyOwnerQuery, owner)
+    return farms;
 }

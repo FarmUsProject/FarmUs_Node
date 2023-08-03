@@ -70,11 +70,66 @@ async function editReservationStatus(connection, updatedStatusInfo) {
     return updatedStatusResult;
 }
 
+async function currentUseList(connection, email) {
+   const currentUseListQuery = `
+    SELECT R.ReserveID, R.FarmID, R.UserEmail, R.OwnerEmail, R.startAt, R.endAt, F.Name, FP.Picture_url
+    FROM Reservation R
+    LEFT JOIN Farm F ON R.FarmID = F.FarmID
+    LEFT JOIN FarmPictures FP ON R.FarmID = FP.FarmID
+    WHERE DATE(NOW()) >= DATE(R.startAt)
+        AND (DATE(NOW()) <= DATE(R.endAt) OR R.endAt IS NULL)
+        AND R.Status = 'A'
+        AND R.UserEmail = ?
+    ORDER BY FP.createAt DESC
+    LIMIT 1;
+`;
+
+   const currentUseListResult = await connection.query(currentUseListQuery, email);
+
+   return currentUseListResult;
+}
+
+async function pastUseList(connection, email) {
+    const pastUseListQuery = `
+    SELECT R.ReserveID, R.FarmID, R.UserEmail, R.OwnerEmail, R.startAt, R.endAt, F.Name, FP.Picture_url
+    FROM Reservation R
+    LEFT JOIN Farm F ON R.FarmID = F.FARMID
+    LEFT JOIN FarmPictures FP ON R.FarmID = FP.FarmID
+    WHERE DATE(NOW()) > DATE(R.startAt)
+        AND DATE(NOW()) > DATE(R.endAt)
+        AND R.Status = 'A'
+        AND R.UserEmail = ?
+    ORDER BY FP.createAt DESC
+    LIMIT 1;
+    `;
+
+    const pastUseListResult = await connection.query(pastUseListQuery, email);
+
+    return pastUseListResult;
+ }
+
+ async function reservedPeriods(connection, farmID) {
+    const reservedPeriodsQuery = `
+    SELECT startAt, endAt
+    FROM Reservation
+    WHERE DATE(NOW()) <= DATE(endAt)
+      AND Status = 'A'
+      AND FarmID = ?;
+    `;
+
+    const reservedPeriodsResult = await connection.query(reservedPeriodsQuery, farmID);
+
+    return reservedPeriodsResult;
+ }
+
 module.exports = {
     insertReservation,
     selectReservedClients,
     selectReservedFarms,
     selectReservedItem,
     cancelReservation,
-    editReservationStatus
+    editReservationStatus,
+    currentUseList,
+    pastUseList,
+    reservedPeriods,
 }

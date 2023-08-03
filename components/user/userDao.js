@@ -61,11 +61,11 @@ async function selectStarbyEmail(connection, email) {
     return starList;
 }
 
-async function updateUserStar(connection, starRequest) {
+async function updateUserLikes(connection, starRequest) {
     //starRequest [newStarList, updateAt, email]
     const updateUserStarQuery = `
     UPDATE User
-    SET LikeFarmIDs = ?, updateAt = ?
+    SET LikeFarmIDs = ?
     WHERE Email = ?;
     `;
     const updateUserStarResult = await connection.query(updateUserStarQuery, starRequest);
@@ -152,12 +152,24 @@ async function eidtProfileImg(connection, email, img, key){
     return updateUserRow[0]
 }
 
+async function selectnonSocialUserbyEmail(connection, email) {
+    const selectnonSocialUserbyEmailQuery = `
+    SELECT *
+    FROM User
+    WHERE Email = ?
+      AND Status = 'A';
+    `;
+    const userInfo = await connection.query(selectnonSocialUserbyEmailQuery, email);
+
+    return userInfo;
+}
+
 module.exports = {
     selectUserbyEmail,
     selectUserbyPhoneNumber,
     insertUser,
     selectStarbyEmail,
-    updateUserStar,
+    updateUserLikes,
     updateUserBirth,
     selectUser,
     updatePassword,
@@ -167,5 +179,6 @@ module.exports = {
     withdrawalUser,
     eidtProfileImg,
     SelectionUsedFarmArray,
-    SelectionUseFarmArray
+    SelectionUseFarmArray,
+    selectnonSocialUserbyEmail
 }

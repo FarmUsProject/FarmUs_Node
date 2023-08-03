@@ -68,8 +68,9 @@ exports.farmsList = async function (req, res) {
         return(res.send(errResponse(resStatus.SERVER_ERROR)));
     }
 }
+
 /**
- * [PUT] /reserve/cancel:reserveid
+ * [PUT] /reserve/cancel/:reserveid
 */
 exports.cancel = async function (req, res) {
     try {
@@ -89,9 +90,8 @@ exports.cancel = async function (req, res) {
     }
 }
 
-
 /**
- *  [PUT] /reserve/status/:id/:status
+ *  [PUT] /reserve/:status/:reserveid
  */
 exports.editStatus = async function (req, res) {
     try {
@@ -122,6 +122,69 @@ exports.editStatus = async function (req, res) {
 
         return(res.send(editStatusResult));
 
+    }
+    catch (e) {
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
+    }
+
+}
+
+/**
+ *  [GET] /reserve/current/list/:email
+ */
+exports.currentUse = async function (req, res) {
+    try {
+        let userEmail = req.params.email;
+        // const invalidation = await validator.oneParams(userEmail);
+        // if (invalidation) return (res.send(errResponse(invalidation)));
+
+        if(validator.isValidEmail(userEmail) == false)
+            return res.send(errResponse(resStatus.SIGNIN_EMAIL_ERROR_TYPE));
+
+        const currentUseResult = await reserveService.currentUse(userEmail);
+
+        return(res.send(currentUseResult));
+    }
+    catch (e) {
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
+    }
+
+}
+
+/**
+ *  [GET] /reserve/past/list/:email
+ */
+exports.pastUse = async function (req, res) {
+    try {
+        let userEmail = req.params.email;
+        // const invalidation = await validator.oneParams(userEmail);
+        // if (invalidation) return (res.send(errResponse(invalidation)));
+
+        if(validator.isValidEmail(userEmail) == false)
+            return res.send(errResponse(resStatus.SIGNIN_EMAIL_ERROR_TYPE));
+
+        const pastUseResult = await reserveService.pastUse(userEmail);
+
+        return(res.send(pastUseResult));
+    }
+    catch (e) {
+        return(res.send(errResponse(resStatus.SERVER_ERROR)));
+    }
+
+}
+
+/**
+ *  [GET] /reserve/unbookable/:farmid
+ */
+exports.unbookablePeriods = async function (req, res) {
+    try {
+        let farmID = req.params.farmid;
+        // const invalidation = await validator.oneParams(farmID);
+        // if (invalidation) return (res.send(errResponse(invalidation)));
+
+        const unbookablePeriodsResult = await reserveService.unbookablePeriods(farmID);
+
+        return(res.send(unbookablePeriodsResult));
     }
     catch (e) {
         return(res.send(errResponse(resStatus.SERVER_ERROR)));

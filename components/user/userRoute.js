@@ -34,10 +34,12 @@ module.exports = function(app){
     app.get("farm/get_curArray:userid", user.getCurFarmUse_Array);
 
     // 8. 농장 찜하기 API
-    app.post('/user/star', user.star)
+    app.post('/user/likes', user.likes)
 
     //9. 생일 등록 API
     app.post('/user/birth', user.birth)
 
+    // 농장 찜 취소
+    app.delete('/user/likes', user.unliked)
 
 };

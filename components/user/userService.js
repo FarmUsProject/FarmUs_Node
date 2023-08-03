@@ -1,6 +1,7 @@
 const userProvider = require('./../user/userProvider');
 const userDao = require('./../user/userDao');
 const farmProvider = require('./../farm/farmProvider');
+const farmService = require('./../farm/farmService');
 const farmDao = require('./../farm/farmDao');
 const { response, errResponse } = require('../../config/response');
 const { response2, errResponse2 } = require('../../config/response2');
@@ -14,17 +15,18 @@ const setDate = require('./../../helpers/setDate');
 
 exports.login = async(email, password) =>{
 
-    const userInfo = await userProvider.usersbyEmail(email);
+    const userInfo = await userProvider.retrieveUserEmail(email);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
+    console.log(userInfo);
 
-    const userPassword = userInfo[0].Password;
-    const userSalt = userInfo[0].Salt;
+    const userPassword = userInfo.Password;
+    const userSalt = userInfo.Salt;
 
     const verify = await encryptedPassword.verifyPassword(password, userSalt, userPassword);
 
     if (!verify) return errResponse(resStatus.SIGNIN_PASSWORD_WRONG);
 
-    const jwtResponse = await jwtLogin(userInfo[0]);
+    const jwtResponse = await jwtLogin(userInfo);
 
     return response(resStatus_5000.USER_LOGIN_SUCCESS, jwtResponse);
 };
@@ -33,6 +35,9 @@ exports.login = async(email, password) =>{
 exports.signUp = async(email, password, phoneNumber, nickName, name, role) =>{
     const userInfo = await userProvider.usersbyEmail(email);
     if (userInfo.length >= 1) return errResponse(resStatus.SIGNUP_REDUNDANT_EMAIL);
+
+    const user = await userProvider.retrieveUser(phoneNumber);
+    if (user) return errResponse(baseResponse.ALREADY_USER)
 
     const encryptedData = await encryptedPassword.createHashedPassword(password);
     const hashedPassword = encryptedData.hashedPassword;
@@ -48,7 +53,7 @@ exports.signUp = async(email, password, phoneNumber, nickName, name, role) =>{
     return response(resStatus_5000.USER_SIGNUP_SUCCESS, {"email" : email, "role" : role});
 };
 
-exports.addStar= async(email, farmId) =>{
+exports.addLike= async(email, farmId) =>{
     const userInfo = await userProvider.usersbyEmail(email);
     const farmInfo = await farmProvider.farmbyfarmID(farmId);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
@@ -69,26 +74,28 @@ exports.addStar= async(email, farmId) =>{
     else newstarList = farmId;
     console.log("newstarList", newstarList);
 
-    const now = await setDate.now();
-    const starRequest = [newstarList, now, email];
+    const starRequest = [newstarList, email];
 
     const connection = await pool.getConnection(async conn => conn);
-    const starList = await userDao.updateUserStar(connection, starRequest);
+    const starList = await userDao.updateUserLikes(connection, starRequest);
 
     /**
-     * PLUS # OF FARM STAR
+     * PLUS # OF FARM Like
     */
-    let updatedStarNumber = 0;
+    let updatedStarNumber = farmInfo.Likes + 1;
     try {
 
-        if (farmInfo.Star && farmInfo.Star > 0) {
-            updatedStarNumber += farmInfo.Star;
+/*
+        if (farmInfo.Likes && farmInfo.Likes > 0) {
+            //updatedStarNumber += farmInfo.Likes;
+
         }
         else updatedStarNumber = 1;
+        */
         // console.log("updatedStarNumber", updatedStarNumber);
-        const now = await setDate.now();
-        const updatedStarNumberInfo = [updatedStarNumber, now, farmId]
-        const updatedStar = await farmDao.updateFarmStar(connection, updatedStarNumberInfo);
+
+        const updatedStarNumberInfo = [updatedStarNumber, farmId]
+        const updatedStar = await farmDao.updateFarmLikes(connection, updatedStarNumberInfo);
 
         connection.release();
 
@@ -97,7 +104,38 @@ exports.addStar= async(email, farmId) =>{
         return errResponse(resStatus_5000.FARM_UPDATE_STAR_ERROR);
     }
 
-    return response(resStatus_5000.USER_STAR_ADD_SUCCESS, {"currentStarList" : newstarList, "updatedStarNumber" : updatedStarNumber});
+    return response(baseResponse.SUCCESS);
+}
+exports.updateUserLikes = async(likeFarms, email) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const [updateUser] = await userDao.updateUserLikes(connection, [likeFarms, email]);
+    connection.release();
+
+    return updateUser
+}
+
+exports.unLike = async(email, farmID) =>{
+    try{
+        const userInfo = await userProvider.usersbyEmail(email);
+        const farmInfo = await farmProvider.farmbyfarmID(farmID);
+        if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
+        if (!farmInfo)  return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
+
+        const likeFarmsArray = userInfo[0].LikeFarmIDs.split(', ');
+        const indexToDelete = likeFarmsArray.indexOf(String(farmID));
+        if (indexToDelete !== -1) {
+            likeFarmsArray.splice(indexToDelete, 1);
+        }
+        const likeFarms = likeFarmsArray.join(', ');
+
+        const updateFarm = await farmService.deleteLike(farmInfo.Likes-1,farmID)
+        const updateUser = await exports.updateUserLikes(likeFarms, email)
+
+        return response2(baseResponse.SUCCESS)
+    }catch(e){
+        console.log(e);
+        return errResponse2(baseResponse.SERVER_ERROR)
+    }
 }
 
 exports.editBirth = async(email, birth) =>{
@@ -207,3 +245,4 @@ exports.eidtProfileImg = async(email, img, key) => {
         return errResponse2(baseResponse.DB_ERROR)
     }
 }
+
