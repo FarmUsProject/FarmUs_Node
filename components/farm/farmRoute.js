@@ -33,4 +33,7 @@ module.exports = function (app) {
 
     //좋아요 농장 목록 반환
     app.get('/farm/likes',farm.getLikes);
+
+    //보유 농장 조회
+    app.get('/farm/myfarm', farm.getMyFarm);
 };

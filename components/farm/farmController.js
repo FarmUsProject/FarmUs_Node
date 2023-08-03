@@ -14,6 +14,7 @@ const districtClarity = require('./../../helpers/districtClarity');
 const dateAvailability = require('../../helpers/DateAvailability');
 const userProvider = require('../user/userProvider');
 const jwtLogin = require('./../../config/jwtLogin');
+const { TimeSeriesAggregationType } = require('redis');
 
 exports.getFarmlist = async (req, res) => {
     try{
@@ -243,6 +244,19 @@ exports.getLikes = async(req,res) =>{
         const likeFarms = await farmProvider.getFarmArray(likesArray)
 
         return res.send(likeFarms)
+    }catch(e){
+        console.log(e);
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}
+
+exports.getMyFarm = async(req,res)=>{
+    try{
+        if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+        const decoded = jwt.verify(req.headers.token, secretKey);
+
+        const farms = await farmProvider.getOwnerFarms(decoded.email)
+        return res.send(farms)
     }catch(e){
         console.log(e);
         res.send(errResponse(resStatus.SERVER_ERROR));
