@@ -238,12 +238,15 @@ exports.getLikes = async(req,res) =>{
 
         const user = await userProvider.retrieveUserEmail(email)
         console.log(user);
-        if (!user.LikeFarmIDs) return res.send([])
+        if (!user.LikeFarmIDs) return res.send({"result":false})
 
         const likesArray = user.LikeFarmIDs.split(',').map(item => item.trim());
         const likeFarms = await farmProvider.getFarmArray(likesArray)
 
-        return res.send(likeFarms)
+        baseResponse.SUCCESS.farmSize = likeFarms.length
+        baseResponse.SUCCESS.farmList = likeFarms
+
+        return res.send(baseResponse.SUCCESS)
     }catch(e){
         console.log(e);
         res.send(errResponse(resStatus.SERVER_ERROR));
