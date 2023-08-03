@@ -102,7 +102,7 @@ exports.likes = async function (req, res) {
 }
 
 exports.unliked = async(req,res)=>{
-    const { email, farmid } = req.body;
+    const { email, farmid } = req.query;
     const invalidation = await validator.twoParams(email, farmid);
     if (invalidation) return(res.send(errResponse(invalidation)));
 
