@@ -1,6 +1,7 @@
 const userProvider = require('./../user/userProvider');
 const userDao = require('./../user/userDao');
 const farmProvider = require('./../farm/farmProvider');
+const farmService = require('./../farm/farmService');
 const farmDao = require('./../farm/farmDao');
 const { response, errResponse } = require('../../config/response');
 const { response2, errResponse2 } = require('../../config/response2');
@@ -105,6 +106,13 @@ exports.addLike= async(email, farmId) =>{
 
     return response(baseResponse.SUCCESS);
 }
+exports.updateUserLikes = async(likeFarms, email) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const [updateUser] = await userDao.updateUserLikes(connection, [likeFarms, email]);
+    connection.release();
+
+    return updateUser
+}
 
 exports.unLike = async(email, farmID) =>{
     try{
@@ -120,8 +128,8 @@ exports.unLike = async(email, farmID) =>{
         }
         const likeFarms = likeFarmsArray.join(', ');
 
-        const updateFarm = await farmProvider.deleteLike(farmInfo.Likes-1,farmID)
-        const updateUser = await userProvider.updateUserLikes(likeFarms, email)
+        const updateFarm = await farmService.deleteLike(farmInfo.Likes-1,farmID)
+        const updateUser = await exports.updateUserLikes(likeFarms, email)
 
         return response2(baseResponse.SUCCESS)
     }catch(e){
@@ -237,3 +245,4 @@ exports.eidtProfileImg = async(email, img, key) => {
         return errResponse2(baseResponse.DB_ERROR)
     }
 }
+

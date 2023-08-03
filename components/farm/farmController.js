@@ -14,6 +14,7 @@ const districtClarity = require('./../../helpers/districtClarity');
 const dateAvailability = require('../../helpers/DateAvailability');
 const userProvider = require('../user/userProvider');
 const jwtLogin = require('./../../config/jwtLogin');
+const { TimeSeriesAggregationType } = require('redis');
 
 exports.getFarmlist = async (req, res) => {
     try{
@@ -204,7 +205,7 @@ exports.deletePhoto = async(req,res) => {
         const {Picture_key} = req.body
         if (!Picture_key) return res.send(errResponse2(baseResponse.EMPTY_PICTURE_KEY))
 
-        const [deleteRes] = await farmProvider.deletePhoto(Picture_key)
+        const [deleteRes] = await farmService.deletePhoto(Picture_key)
         if (deleteRes.affectedRows)
             return res.send(response2(baseResponse.SUCCESS))
 
@@ -243,6 +244,19 @@ exports.getLikes = async(req,res) =>{
         const likeFarms = await farmProvider.getFarmArray(likesArray)
 
         return res.send(likeFarms)
+    }catch(e){
+        console.log(e);
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}
+
+exports.getMyFarm = async(req,res)=>{
+    try{
+        if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+        const decoded = jwt.verify(req.headers.token, secretKey);
+
+        const farms = await farmProvider.getOwnerFarms(decoded.email)
+        return res.send(farms)
     }catch(e){
         console.log(e);
         res.send(errResponse(resStatus.SERVER_ERROR));
