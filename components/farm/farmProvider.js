@@ -121,14 +121,6 @@ exports.farmPictureUrl = async () =>{
     return farmPicturesInfo[0];
 }
 
-exports.deletePhoto = async (key) => {
-    const connection = await pool.getConnection(async conn => conn);
-    const deleteFarmPicture = await farmDao.deletePhoto(connection,key);
-    connection.release();
-
-    return deleteFarmPicture
-}
-
 exports.getOwner = async(farmID) => {
     const connection = await pool.getConnection(async conn => conn);
     const Owner = await farmDao.getOwnerbyFarmID(connection,farmID);

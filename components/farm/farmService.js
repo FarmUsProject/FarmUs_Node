@@ -207,3 +207,11 @@ exports.deleteLike = async(likeFarms, farmID) => {
     connection.release()
     return updateLike
 }
+
+exports.deletePhoto = async (key) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const deleteFarmPicture = await farmDao.deletePhoto(connection,key);
+    connection.release();
+
+    return deleteFarmPicture
+}

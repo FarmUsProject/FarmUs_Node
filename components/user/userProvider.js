@@ -54,11 +54,3 @@ exports.nonSocialUsersbyEmail= async(email)=>{
 
     return userInfo;
 }
-
-exports.updateUserLikes = async(likeFarms, email) => {
-    const connection = await pool.getConnection(async conn => conn);
-    const [updateUser] = await userDao.updateUserLikes(connection, [likeFarms, email]);
-    connection.release();
-
-    return updateUser
-}

@@ -205,7 +205,7 @@ exports.deletePhoto = async(req,res) => {
         const {Picture_key} = req.body
         if (!Picture_key) return res.send(errResponse2(baseResponse.EMPTY_PICTURE_KEY))
 
-        const [deleteRes] = await farmProvider.deletePhoto(Picture_key)
+        const [deleteRes] = await farmService.deletePhoto(Picture_key)
         if (deleteRes.affectedRows)
             return res.send(response2(baseResponse.SUCCESS))
 
