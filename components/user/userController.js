@@ -18,27 +18,6 @@ const fs = require('fs');
 const resStatus_5000 = require('../../config/resStatus_5000');
 const jwtLogin = require('./../../config/jwtLogin');
 
-
-
-exports.getBefoFarmUsed_Array = async (req, res, error) => {
-    const { userid } = req.params;
-
-    if (!userid) return res.render(errResponse(FARMID_EMPTY));
-
-    const getUsedFarmArray = userProvider.retrieveUsedFarmArray(userid);
-    res.render(getUsedFarmArray);
-}
-
-exports.getCurFarmUse_Array = async (req, res, error) => {
-    const { userid } = req.params;
-
-    if (!userid) return res.render(errResponse(FARMID_EMPTY));
-
-    const getCurFarmArray = userProvider.retrieveCurFarmArray(userid);
-    res.render(getCurFarmArray);
-
-}
-
 /**
  * [POST] /user/login
  */
@@ -82,11 +61,8 @@ exports.signup = async function (req, res) {
     }
 }
 
-/**
- *  [POST] /user/star
- */
 exports.likes = async function (req, res) {
-    // try {
+    try {
         const { email, farmid } = req.body;
         const invalidation = await validator.twoParams(email, farmid);
 
@@ -95,24 +71,26 @@ exports.likes = async function (req, res) {
         const starResponse = await userService.addLike(email, farmid);
 
         return(res.send(starResponse));
-    // }
-    // catch (e) {
-    //     res.send(errResponse(resStatus.SERVER_ERROR));
-    // }
+    }
+    catch (e) {
+        res.send(errResponse(resStatus.SERVER_ERROR));
+    }
 }
 
 exports.unliked = async(req,res)=>{
-    const { email, farmid } = req.query;
-    const invalidation = await validator.twoParams(email, farmid);
-    if (invalidation) return(res.send(errResponse(invalidation)));
+    try{
+        const { email, farmid } = req.query;
+        const invalidation = await validator.twoParams(email, farmid);
+        if (invalidation) return(res.send(errResponse(invalidation)));
 
-    const result = await userService.unLike(email, farmid)
-    return res.send(result)
+        const result = await userService.unLike(email, farmid)
+        return res.send(result)
+    }catch(e){
+        res.send(errResponse(resStatus.SERVER_ERROR))
+    }
+
 }
 
-/**
- *  [POST] /user/birth
- */
 exports.birth = async function (req, res) {
     try {
         const { email, birth } = req.body;
@@ -132,9 +110,6 @@ exports.birth = async function (req, res) {
     }
 }
 
-/**
- * [GET] /app/test
- */
 let client = {}
 const connectRedis = async() => {
     try{
@@ -224,25 +199,26 @@ exports.vertifyCode = async(req,res) => {
     if (!phoneNumber)
         return res.send(errResponse2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
 
+    try{
+        const user = await userProvider.retrieveUser(phoneNumber)
+        if (user) {
+            if (user.Status == 'D') return res.send(errResponse2(baseResponse.SIGNIN_WITHDRAWAL_ACCOUNT))
+            else if (user.Status == 'B') return res.send(errResponse2(baseResponse.SIGNIN_INACTIVE_ACCOUNT))
 
-    const user = await userProvider.retrieveUser(phoneNumber)
-    if (user) {
-        if (user.Status == 'D') return res.send(errResponse2(baseResponse.SIGNIN_WITHDRAWAL_ACCOUNT))
-        else if (user.Status == 'B') return res.send(errResponse2(baseResponse.SIGNIN_INACTIVE_ACCOUNT))
+            return res.send(errResponse2(baseResponse.ALREADY_USER))
+        }
 
-        return res.send(errResponse2(baseResponse.ALREADY_USER))
-    }
-
-    const code = await client.get(phoneNumber)
-    if (code == usercode){
-        //console.log(client);
-        await client.del(phoneNumber)
-
-        return res.send(baseResponse.SUCCESS)
-
-    }else{
-        console.log(code);
-        return res.send(response2(baseResponse.SIGNUP_SMS_CODE_WRONG))
+        const code = await client.get(phoneNumber)
+        if (code == usercode){
+            await client.del(phoneNumber)
+            return res.send(baseResponse.SUCCESS)
+        }else{
+            console.log(code);
+            return res.send(response2(baseResponse.SIGNUP_SMS_CODE_WRONG))
+        }
+    }catch(e){
+        console.log(e);
+        return res.send(response2(baseResponse.SERVER_ERROR))
     }
 }
 
@@ -266,7 +242,6 @@ exports.findAccount = async(req,res) => {
         console.log(err);
         return res.send(errResponse2(baseResponse.SIGNUP_SMS_WRONG))
     }
-
 }
 
 exports.findPassword = async(req,res) => {
@@ -311,9 +286,8 @@ exports.findPassword = async(req,res) => {
       return res.send(response2(baseResponse.SUCCESS))
     } catch (err) {
       console.log(err);
-      return res.send(errResponse2(baseResponse.DB_ERROR))
+      return res.send(errResponse2(baseResponse.SERVER_ERROR))
     }
-
 }
 
 exports.editUserNickName = async(req,res) =>{
@@ -323,13 +297,19 @@ exports.editUserNickName = async(req,res) =>{
     if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
     if (!nickname) return res.send(errResponse2(baseResponse.USER_NICKNAME_EMPTY))
 
-    const eidtUser = await userService.editNickName(email, nickname)
+    try{
+        const editUser = await userService.editNickName(email, nickname)
+        if (!editUser) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
 
-    const userInfo = await userProvider.retrieveUserEmail(email);
-    const newJwtResponse = await jwtLogin(userInfo)
+        const userInfo = await userProvider.retrieveUserEmail(email);
+        const newJwtResponse = await jwtLogin(userInfo)
 
-    baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
-    return res.send(baseResponse.SUCCESS)
+        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
+        return res.send(baseResponse.SUCCESS)
+    }catch(e){
+        return res.send(errResponse2(baseResponse.SERVER_ERROR))
+    }
+
 }
 
 exports.editUserName = async(req,res) =>{
@@ -339,13 +319,18 @@ exports.editUserName = async(req,res) =>{
     if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
     if (!name) return res.send(response2(baseResponse.USER_NAME_EMPTY))
 
-    const eidtUser = await userService.editName(email, name)
+    try{
+        const editUser = await userService.editName(email, name)
+        if (!editUser) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
 
-    const userInfo = await userProvider.retrieveUserEmail(email);
-    const newJwtResponse = await jwtLogin(userInfo)
+        const userInfo = await userProvider.retrieveUserEmail(email);
+        const newJwtResponse = await jwtLogin(userInfo)
 
-    baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
-    return res.send(baseResponse.SUCCESS)
+        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
+        return res.send(baseResponse.SUCCESS)
+    }catch(e){
+        return res.send(errResponse2(baseResponse.SERVER_ERROR))
+    }
 }
 
 exports.editUserPhoneNumber = async(req,res) =>{
@@ -357,13 +342,18 @@ exports.editUserPhoneNumber = async(req,res) =>{
 
     if (phoneNumber.length != 11) return res.send(response2(baseResponse.SIGNUP_PHONENUMBER_LENGTH))
 
-    const eidtUser = await userService.editPhoneNumber(email, phoneNumber)
+    try{
+        const editUser = await userService.editPhoneNumber(email, phoneNumber)
+        if (!editUser) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
 
-    const userInfo = await userProvider.retrieveUserEmail(email);
-    const newJwtResponse = await jwtLogin(userInfo)
+        const userInfo = await userProvider.retrieveUserEmail(email);
+        const newJwtResponse = await jwtLogin(userInfo)
 
-    baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
-    return res.send(baseResponse.SUCCESS)
+        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
+        return res.send(baseResponse.SUCCESS)
+    }catch(e){
+        return res.send(errResponse2(baseResponse.SERVER_ERROR))
+    }
 }
 
 exports.editUserPassword = async(req,res) =>{
@@ -372,12 +362,12 @@ exports.editUserPassword = async(req,res) =>{
         const {password} = req.body
 
         const invalidation = await validator.login(email, password);
-
         if (invalidation) return res.send(errResponse(invalidation));
 
         const editPasswordResponse = await userService.editPassword(email, password);
+        if(!editPasswordResponse) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
 
-        return res.send(editPasswordResponse);}
+        return res.send(baseResponse.SUCCESS);}
     catch (e) {
         res.send(errResponse(resStatus.SERVER_ERROR));
     }
@@ -413,6 +403,8 @@ exports.editUserProfileImg = async(req,res)=> {
         //console.log(id);
 
         const eidtImage = await userService.eidtProfileImg(email, req.file.location, req.file.key)
+        if (!eidtImage) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
+
         const userInfo = await userProvider.retrieveUserEmail(email);
         const newJwtResponse = await jwtLogin(userInfo)
 
@@ -427,33 +419,32 @@ exports.editUserProfileImg = async(req,res)=> {
 }
 
 exports.withdrawal = async(req,res) => {
-    //console.log(req);
-    //const {userEmail}  = req.header('userEmail');
     const {userEmail}  = req.query;
-
     if (!userEmail) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
-
     console.log(userEmail);
+    try{
+        console.log("TEST");
+        const userWithdrawFarm = await farmService.deleteUserFarm(userEmail)
+        const userWithdraw = await userService.deleteUser(userEmail)
+        if (!userWithdraw) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
 
-    const userWithdraw = await userService.deleteUser(userEmail)
-    const userWithdrawFarm = await farmService.deleteUserFarm(userEmail)
 
-    return res.send(userWithdraw)
+        return res.send(baseResponse.SUCCESS)
+    }catch(e){
+        console.log(e);
+        return res.send(errResponse2(baseResponse.SERVER_ERROR))
+    }
 }
 
 exports.verfiyEmail = async (req, res) => {
-
     try {
         const userEmail = req.params.email;
-        // if (!userEmail || userEmail.length < 1) return res.send(errResponse(resStatus.SIGNUP_EMAIL_EMPTY))
         if(validator.isValidEmail(userEmail) == false) return res.send(errResponse(resStatus.SIGNIN_EMAIL_ERROR_TYPE));
 
         const userInfo = await userProvider.usersbyEmail(userEmail);
-
         if (userInfo && userInfo.length > 0) return res.send(errResponse(resStatus.SIGNUP_REDUNDANT_EMAIL));
 
         else return res.send(response(resStatus_5000.USER_EMAIL_AVAILABLE));
-
     } catch (e) {
         res.send(errResponse(resStatus.SERVER_ERROR));
     }

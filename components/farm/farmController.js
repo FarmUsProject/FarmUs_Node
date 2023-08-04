@@ -25,11 +25,10 @@ exports.getFarmlist = async (req, res) => {
 
         const FarmListResponse = await farmService.getFarmList(email);
 
-        // console.log(FarmDetailResponse)
         return res.send(FarmListResponse);
     }
     catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
+        return res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
 
@@ -43,10 +42,9 @@ exports.getFarmDetail = async (req, res) => {
         const FarmDetailResponse = await farmService.getFarmDetail(farmID);
 
         return res.send(FarmDetailResponse);
-
     }
     catch (e) {
-        res.send(errResponse(resStatus.SERVER_ERROR));
+        return res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
 
@@ -54,9 +52,7 @@ exports.postFarmer = async (req, res) =>{
     try{
         if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
         const decoded = jwt.verify(req.headers.token, secretKey);
-        //console.log("decoded")
-        //console.log(decoded);
-        //console.log("======");
+
         if (decoded.role == 'F') return res.send(errResponse2(baseResponse.ALREADY_FARMER));
 
         const farmer = await farmService.postFarmer(decoded.email);
@@ -64,16 +60,10 @@ exports.postFarmer = async (req, res) =>{
 
         const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
-/*
-        const decoded2 = jwt.verify(newJwtResponse.accesstoken, secretKey)
-        console.log("decoded2")
-        console.log(decoded2);
-        console.log("======");
-        */
+
         baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
 
         return res.send(baseResponse.SUCCESS);
-
     }catch(err){
         console.log(err);
         return res.send(errResponse2(baseResponse.NOT_LOGIN));
@@ -100,9 +90,8 @@ exports.editFarm = async(req, res) =>{
         return res.send(response2(baseResponse.SUCCESS));
 
     }catch(err){
-        return res.send(err)
+        return res.send(errResponse2(baseResponse.SERVER_ERROR))
     }
-
 }
 
 /**
@@ -172,6 +161,7 @@ exports.findFarms = async (req,res) => {
         return res.send(searchRes)
     }catch(err){
         console.log(err);
+        return res.send(errResponse2(baseResponse.SERVER_ERROR))
     }
 
 }
@@ -196,7 +186,7 @@ exports.filter = async(req,res) => {
 
     }catch (e) {
         console.log(e);
-        res.send(errResponse(resStatus.SERVER_ERROR));
+        return res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
 
@@ -213,7 +203,7 @@ exports.deletePhoto = async(req,res) => {
 
     }catch (e) {
         console.log(e);
-        res.send(errResponse(resStatus.SERVER_ERROR));
+        return res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
 
@@ -227,7 +217,7 @@ exports.getPhoneNumber = async(req,res) => {
         return res.send(Owner)
     }catch(e){
         console.log(e);
-        res.send(errResponse(resStatus.INACCURATE_OWNER));
+        return res.send(errResponse(resStatus.INACCURATE_OWNER));
     }
 }
 
@@ -249,7 +239,7 @@ exports.getLikes = async(req,res) =>{
         return res.send(baseResponse.SUCCESS)
     }catch(e){
         console.log(e);
-        res.send(errResponse(resStatus.SERVER_ERROR));
+        return res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
 
@@ -262,6 +252,6 @@ exports.getMyFarm = async(req,res)=>{
         return res.send(farms)
     }catch(e){
         console.log(e);
-        res.send(errResponse(resStatus.SERVER_ERROR));
+        return res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }

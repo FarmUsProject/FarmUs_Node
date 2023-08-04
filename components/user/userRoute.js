@@ -28,11 +28,6 @@ module.exports = function(app){
     //회원 탈퇴
     app.delete('/user/withdrawal',user.withdrawal)
 
-    //user CurUse_farm 가져오기
-    app.get("farm/get_befoArray:userid", user.getBefoFarmUsed_Array);
-
-    app.get("farm/get_curArray:userid", user.getCurFarmUse_Array);
-
     // 8. 농장 찜하기 API
     app.post('/user/likes', user.likes)
 

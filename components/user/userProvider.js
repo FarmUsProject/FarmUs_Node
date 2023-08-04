@@ -12,6 +12,7 @@ exports.retrieveUser = withConnection(async (connection, phoneNumber) =>{
 });
 
 exports.usersbyEmail= withConnection(async (connection, email)=>{
+    console.log(email);
     const [userInfo] = await userDao.selectUserbyEmail(connection, email);
     return userInfo;
 });
