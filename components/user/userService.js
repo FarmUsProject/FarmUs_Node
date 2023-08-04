@@ -12,6 +12,7 @@ const encryptedPassword = require('../../helpers/encrypt');
 const jwtLogin = require('./../../config/jwtLogin');
 const { pool } = require('../../config/database');
 const setDate = require('./../../helpers/setDate');
+const withConnection = require('../../config/connection')
 
 exports.login = async(email, password) =>{
 
@@ -32,12 +33,12 @@ exports.login = async(email, password) =>{
 };
 
 
-exports.signUp = async(email, password, phoneNumber, nickName, name, role) =>{
+exports.signUp = withConnection(async (connection, email, password, phoneNumber, nickName, name, role) => {
     const userInfo = await userProvider.usersbyEmail(email);
     if (userInfo.length >= 1) return errResponse(resStatus.SIGNUP_REDUNDANT_EMAIL);
 
     const user = await userProvider.retrieveUser(phoneNumber);
-    if (user) return errResponse(baseResponse.ALREADY_USER)
+    if (user) return errResponse(baseResponse.ALREADY_USER);
 
     const encryptedData = await encryptedPassword.createHashedPassword(password);
     const hashedPassword = encryptedData.hashedPassword;
@@ -45,74 +46,54 @@ exports.signUp = async(email, password, phoneNumber, nickName, name, role) =>{
     const now = await setDate.now();
     const newUserInfo = [email, hashedPassword, salt, phoneNumber, nickName, name, role, now, now];
 
-    const connection = await pool.getConnection(async conn => conn);
     const newUser = await userDao.insertUser(connection, newUserInfo);
 
-    connection.release();
+    return response(resStatus_5000.USER_SIGNUP_SUCCESS, { "email": email, "role": role });
+});
 
-    return response(resStatus_5000.USER_SIGNUP_SUCCESS, {"email" : email, "role" : role});
-};
-
-exports.addLike= async(email, farmId) =>{
+exports.addLike = withConnection(async (connection, email, farmId) => {
     const userInfo = await userProvider.usersbyEmail(email);
     const farmInfo = await farmProvider.farmbyfarmID(farmId);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
-    if (!farmInfo)  return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
+    if (!farmInfo) return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
 
     let newstarList;
     const userStarList = await userProvider.starListbyEmail(email);
     if (userStarList[0].LikeFarmIDs && userStarList[0].LikeFarmIDs.length > 0) {
         let startListString = userStarList[0].LikeFarmIDs;
         const existedArr = startListString.split(",");
-        existedArr
         for (let e of existedArr) {
             e = e.trim();
-            if(e.localeCompare(farmId) === 0 ) return errResponse(resStatus_5000.USER_REDUNDANT_STAR);
+            if (e.localeCompare(farmId) === 0) return errResponse(resStatus_5000.USER_REDUNDANT_STAR);
         }
         newstarList = userStarList[0].LikeFarmIDs + ", " + farmId;
+    } else {
+        newstarList = farmId;
     }
-    else newstarList = farmId;
     console.log("newstarList", newstarList);
 
     const starRequest = [newstarList, email];
 
-    const connection = await pool.getConnection(async conn => conn);
     const starList = await userDao.updateUserLikes(connection, starRequest);
 
     /**
      * PLUS # OF FARM Like
-    */
+     */
     let updatedStarNumber = farmInfo.Likes + 1;
     try {
-
-/*
-        if (farmInfo.Likes && farmInfo.Likes > 0) {
-            //updatedStarNumber += farmInfo.Likes;
-
-        }
-        else updatedStarNumber = 1;
-        */
-        // console.log("updatedStarNumber", updatedStarNumber);
-
-        const updatedStarNumberInfo = [updatedStarNumber, farmId]
+        const updatedStarNumberInfo = [updatedStarNumber, farmId];
         const updatedStar = await farmDao.updateFarmLikes(connection, updatedStarNumberInfo);
-
-        connection.release();
-
-    }
-    catch (e) {
+    } catch (e) {
         return errResponse(resStatus_5000.FARM_UPDATE_STAR_ERROR);
     }
 
     return response(baseResponse.SUCCESS);
-}
-exports.updateUserLikes = async(likeFarms, email) => {
-    const connection = await pool.getConnection(async conn => conn);
-    const [updateUser] = await userDao.updateUserLikes(connection, [likeFarms, email]);
-    connection.release();
+});
 
-    return updateUser
-}
+exports.updateUserLikes = withConnection(async (connection, likeFarms, email) => {
+    const [updateUser] = await userDao.updateUserLikes(connection, [likeFarms, email]);
+    return updateUser;
+});
 
 exports.unLike = async(email, farmID) =>{
     try{
@@ -138,24 +119,20 @@ exports.unLike = async(email, farmID) =>{
     }
 }
 
-exports.editBirth = async(email, birth) =>{
+exports.editBirth = withConnection(async (connection, email, birth) => {
     const userInfo = await userProvider.usersbyEmail(email);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
 
     const now = await setDate.now();
     const newUserInfo = [birth, now, email];
 
-    const connection = await pool.getConnection(async conn => conn);
-
     const editBirthResult = await userDao.updateUserBirth(connection, newUserInfo);
 
-    connection.release();
+    return response(resStatus_5000.USER_BIRTH_EDIT_SUCCESS, { "birth": birth });
+});
 
-    return response(resStatus_5000.USER_BIRTH_EDIT_SUCCESS, {"birth" : birth})
-}
-
-
-exports.editPassword = async (email,password) =>{
+exports.editPassword = withConnection(async (connection, email, password) => {
+    console.log(email);
     const userInfo = await userProvider.usersbyEmail(email);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
 
@@ -164,85 +141,37 @@ exports.editPassword = async (email,password) =>{
     const salt = encryptedData.salt;
     const newUserInfo = [hashedPassword, salt, email];
 
-    const connection = await pool.getConnection(async conn => conn);
-
     const editPasswordResult = await userDao.updatePassword(connection, newUserInfo);
+    if (editPasswordResult.affectedRows) return true;
+    else return false;
+});
 
-    connection.release();
+exports.editNickName = withConnection(async (connection, email, nickname) => {
+    const res = await userDao.updateNickName(connection, email, nickname);
+    if (res.affectedRows) return true;
+    else return false;
+});
 
-    return response(resStatus_5000.USER_PASSWORD_EDIT_SUCCESS)
-}
+exports.editName = withConnection(async (connection, email, name) => {
+    const res = await userDao.updateName(connection, email, name);
+    if (res.affectedRows) return true;
+    else return false;
+});
 
-exports.editNickName = async (email,nickname) =>{
-    try{
-        const connection = await pool.getConnection(async (conn)=>conn)
-        const res = await userDao.updateNickName(connection, email, nickname)
-        connection.release()
-        if (res)
-            return response2(baseResponse.SUCCESS)
+exports.editPhoneNumber = withConnection(async (connection, email, phoneNumber) => {
+    const res = await userDao.updatePhoneNum(connection, email, phoneNumber);
+    if (res.affectedRows) return true;
+    else return false;
+});
 
-    }catch(err){
-        console.log(err);
-        return errResponse2(baseResponse.DB_ERROR)
-    }
-}
+exports.deleteUser = withConnection(async (connection, email) => {
+    const res = await userDao.withdrawalUser(connection, email);
+    if (res.affectedRows) return true;
+    else return false;
+});
 
-exports.editName = async (email,name) =>{
-    try{
-        console.log(name);
-        const connection = await pool.getConnection(async (conn)=>conn)
-        const res = await userDao.updateName(connection, email, name)
-        console.log(res);
-        connection.release()
-        if (res)
-            return response2(baseResponse.SUCCESS)
-
-    }catch(err){
-        console.log(err);
-        return errResponse2(baseResponse.DB_ERROR)
-    }
-}
-
-exports.editPhoneNumber = async (email,phoneNumber) =>{
-    try{
-        const connection = await pool.getConnection(async (conn)=>conn)
-        const res = await userDao.updatePhoneNum(connection, email, phoneNumber)
-        connection.release()
-        if (res)
-            return response2(baseResponse.SUCCESS)
-
-    }catch(err){
-        console.log(err);
-        return errResponse2(baseResponse.DB_ERROR)
-    }
-}
-
-exports.deleteUser = async (email) => {
-    try{
-        const connection = await pool.getConnection(async (conn)=>conn)
-        const res = await userDao.withdrawalUser(connection, email)
-
-        connection.release()
-
-        if (res) return response2(baseResponse.SUCCESS)
-
-    }catch(err){
-        console.log(err);
-        return errResponse2(baseResponse.DB_ERROR)
-    }
-}
-
-exports.eidtProfileImg = async(email, img, key) => {
-    try{
-        const connection = await pool.getConnection(async (conn)=>conn)
-        const res = await userDao.eidtProfileImg(connection, email, img, key)
-
-        connection.release()
-
-        if (res) return response2(baseResponse.SUCCESS)
-    }catch(err){
-        console.log(err);
-        return errResponse2(baseResponse.DB_ERROR)
-    }
-}
-
+exports.eidtProfileImg = withConnection(async (connection, email, img, key) => {
+    const res = await userDao.eidtProfileImg(connection, email, img, key);
+    if (res.affectedRows) return true;
+    else return false;
+});

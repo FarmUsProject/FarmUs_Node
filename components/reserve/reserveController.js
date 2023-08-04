@@ -2,6 +2,7 @@ const { response, errResponse } = require('./../../config/response');
 const validator = require('../../helpers/validator');
 const resStatus = require("../../config/resStatus");
 const reserveService = require("./reserveService");
+const reserveProvider = require('./reserveProvider')
 const resStatus_5000 = require('../../config/resStatus_5000');
 const dateAvailability = require('../../helpers/DateAvailability');
 
@@ -38,7 +39,7 @@ exports.clientsList = async function (req, res) {
 
     if (invalidation) return(res.send(response(invalidation)));
 
-    const clientsListResponse = await reserveService.clientsList(farmid);
+    const clientsListResponse = await reserveProvider.clientsList(farmid);
 
     return(res.send(clientsListResponse));
 
@@ -59,7 +60,7 @@ exports.farmsList = async function (req, res) {
 
         if (invalidation) return(res.send(response(invalidation)));
 
-        const farmsListResponse = await reserveService.farmsList(userEmail);
+        const farmsListResponse = await reserveProvider.farmsList(userEmail);
 
         return(res.send(farmsListResponse));
 
@@ -141,11 +142,12 @@ exports.currentUse = async function (req, res) {
         if(validator.isValidEmail(userEmail) == false)
             return res.send(errResponse(resStatus.SIGNIN_EMAIL_ERROR_TYPE));
 
-        const currentUseResult = await reserveService.currentUse(userEmail);
+        const currentUseResult = await reserveProvider.currentUse(userEmail);
 
         return(res.send(currentUseResult));
     }
     catch (e) {
+        console.log(e);
         return(res.send(errResponse(resStatus.SERVER_ERROR)));
     }
 
@@ -163,7 +165,7 @@ exports.pastUse = async function (req, res) {
         if(validator.isValidEmail(userEmail) == false)
             return res.send(errResponse(resStatus.SIGNIN_EMAIL_ERROR_TYPE));
 
-        const pastUseResult = await reserveService.pastUse(userEmail);
+        const pastUseResult = await reserveProvider.pastUse(userEmail);
 
         return(res.send(pastUseResult));
     }
@@ -182,7 +184,7 @@ exports.unbookablePeriods = async function (req, res) {
         // const invalidation = await validator.oneParams(farmID);
         // if (invalidation) return (res.send(errResponse(invalidation)));
 
-        const unbookablePeriodsResult = await reserveService.unbookablePeriods(farmID);
+        const unbookablePeriodsResult = await reserveProvider.unbookablePeriods(farmID);
 
         return(res.send(unbookablePeriodsResult));
     }
