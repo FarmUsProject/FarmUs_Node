@@ -82,8 +82,15 @@ exports.farmPictureUrl = withConnection(async (connection) => {
     return farmPicturesInfo[0];
 });
 
+exports.getOwnerPhoneNumber = withConnection(async (connection, farmID) => {
+    const Owner = await farmDao.getOwnerbyFarmID(connection, farmID);
+    delete Owner.Email
+    return Owner;
+});
+
 exports.getOwner = withConnection(async (connection, farmID) => {
     const Owner = await farmDao.getOwnerbyFarmID(connection, farmID);
+    delete Owner.PhoneNumber
     return Owner;
 });
 

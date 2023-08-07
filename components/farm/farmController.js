@@ -72,10 +72,16 @@ exports.postFarmer = async (req, res) =>{
 }
 
 exports.editFarm = async(req, res) =>{
-    try{
-        const {farmId} = req.query;
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
+    if(decoded.role != 'F') return res.send(errResponse2(baseResponse.WRONG_FARMER))
 
-        if (!farmId) return res.send(errResponse2(baseResponse.FARMID_EMPTY))
+    const {farmId} = req.query;
+    if (!farmId) return res.send(errResponse2(baseResponse.FARMID_EMPTY))
+
+    try{
+        const farmer = await farmProvider.getOwner(farmId)
+        if (farmer.Email != decoded.email) return res.send(errResponse2(baseResponse.WRONG_FARMER))
 
         const eidtFarmInfoRes = await farmService.editFarmInfo(farmId, req.body)
         console.log(eidtFarmInfoRes);
@@ -212,7 +218,7 @@ exports.getPhoneNumber = async(req,res) => {
         const {farmID} = req.query
         if (!farmID) return res.send(errResponse2(baseResponse.FARMID_EMPTY))
 
-        const Owner = await farmProvider.getOwner(farmID)
+        const Owner = await farmProvider.getOwnerPhoneNumber(farmID)
         Owner.result = true
         return res.send(Owner)
     }catch(e){
@@ -222,11 +228,11 @@ exports.getPhoneNumber = async(req,res) => {
 }
 
 exports.getLikes = async(req,res) =>{
-    try{
-        const {email} = req.query
-        if (!email) return res.send(errResponse2(baseResponse.SIGNUP_EMAIL_EMPTY))
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
 
-        const user = await userProvider.retrieveUserEmail(email)
+    try{
+        const user = await userProvider.retrieveUserEmail(decoded.email)
         console.log(user);
         if (!user.LikeFarmIDs) return res.send({"result":false})
 

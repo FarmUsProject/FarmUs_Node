@@ -57,11 +57,12 @@ exports.request = withConnection(async (connection, userEmail, farmid, startAt, 
     return response(resStatus_5000.RESERVE_REQUEST_SUCCESS, { "reserveID": newReserveID.toString() });
 });
 
-exports.cancel = withConnection(async (connection, reserveId) => {
+exports.cancel = withConnection(async (connection, reserveId, email) => {
     const reservedItem = await reserveProvider.itembyReserveId(reserveId);
     if (reservedItem.length < 1) return errResponse(resStatus_5000.RESERVE_RESERVEID_NOT_EXIST);
 
     if (reservedItem[0].Status == "A") return errResponse(resStatus_5000.RESERVE_CANCEL_NOT_ALLOWED);
+    if (reservedItem[0].UserEmail != email) return errResponse(resStatus.WRONG_RESERVE_USER);
 
     const canceledReservation = await reserveDao.cancelReservation(connection, reserveId);
 

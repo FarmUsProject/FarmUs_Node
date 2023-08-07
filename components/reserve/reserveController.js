@@ -5,21 +5,28 @@ const reserveService = require("./reserveService");
 const reserveProvider = require('./reserveProvider')
 const resStatus_5000 = require('../../config/resStatus_5000');
 const dateAvailability = require('../../helpers/DateAvailability');
+const { errResponse2 } = require('../../config/response2');
+const baseResponse = require('../../config/resStatus');
+const jwt = require('jsonwebtoken');
+const { secretKey } = require('./../../config/secret');
+const farmProvider = require('./../farm/farmProvider')
 
 /**
  * [POST] /reserve/request
  */
 exports.request = async function (req, res) {
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
     try {
-        const { email, farmid, startDate, endDate } = req.body;
-        const invalidation = await validator.newReservation(email, farmid, startDate, endDate);
+        const { farmid, startDate, endDate } = req.body;
+        const invalidation = await validator.newReservation(decoded.email, farmid, startDate, endDate);
 
         if (invalidation) return(res.send(errResponse(invalidation)));
 
         if(dateAvailability.isValidDatetype(startDate) == false || dateAvailability.isValidDatetype(endDate) == false)
             return(res.send(errResponse(resStatus_5000.DATE_TYPE_WEIRD)));
 
-        const reserveRequest_result = await reserveService.request(email, farmid, startDate, endDate);
+        const reserveRequest_result = await reserveService.request(decoded.email, farmid, startDate, endDate);
 
         return(res.send(reserveRequest_result));
 
@@ -53,9 +60,11 @@ exports.clientsList = async function (req, res) {
  * [GET] /reserve/client/list/:email
 */
 exports.farmsList = async function (req, res) {
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
     try {
 
-        const userEmail = req.params.email;
+        const userEmail = decoded.email;
         const invalidation = await validator.oneParams(userEmail);
 
         if (invalidation) return(res.send(response(invalidation)));
@@ -74,6 +83,8 @@ exports.farmsList = async function (req, res) {
  * [PUT] /reserve/cancel/:reserveid
 */
 exports.cancel = async function (req, res) {
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
     try {
 
         const reserveId = req.params.reserveid;
@@ -81,7 +92,7 @@ exports.cancel = async function (req, res) {
 
         if (invalidation) return(res.send(response(invalidation)));
 
-        const cancelReservation = await reserveService.cancel(reserveId);
+        const cancelReservation = await reserveService.cancel(reserveId, decoded.email);
 
         return(res.send(cancelReservation));
 
@@ -95,11 +106,18 @@ exports.cancel = async function (req, res) {
  *  [PUT] /reserve/:status/:reserveid
  */
 exports.editStatus = async function (req, res) {
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
     try {
         let status = req.params.status;
         status = status.toUpperCase();
 
         const reserveId = req.params.reserveid;
+        console.log(reserveId);
+        const reservedItem = await reserveProvider.itembyReserveId(reserveId);
+        console.log(reservedItem);
+        if (reservedItem.length < 1) return errResponse(resStatus_5000.RESERVE_RESERVEID_NOT_EXIST);
+        if (reservedItem[0].OwnerEmail != decoded.email) return res.send(errResponse(baseResponse.WRONG_RESERVE_USER));
 
         switch (status) {
             case "ACCEPT":
@@ -134,8 +152,11 @@ exports.editStatus = async function (req, res) {
  *  [GET] /reserve/current/list/:email
  */
 exports.currentUse = async function (req, res) {
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
+
     try {
-        let userEmail = req.params.email;
+        let userEmail = decoded.email;
         // const invalidation = await validator.oneParams(userEmail);
         // if (invalidation) return (res.send(errResponse(invalidation)));
 
@@ -157,8 +178,10 @@ exports.currentUse = async function (req, res) {
  *  [GET] /reserve/past/list/:email
  */
 exports.pastUse = async function (req, res) {
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
     try {
-        let userEmail = req.params.email;
+        let userEmail = decoded.email;
         // const invalidation = await validator.oneParams(userEmail);
         // if (invalidation) return (res.send(errResponse(invalidation)));
 

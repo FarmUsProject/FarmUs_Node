@@ -8,7 +8,7 @@ module.exports = function(app){
     app.get('/reserve/farm/list/:farmid', reserve.clientsList);
 
     // 3. 유저 예약현황 API : 한 유저가 예약한 농장 명단
-    app.get('/reserve/client/list/:email', reserve.farmsList);
+    app.get('/reserve/client/list', reserve.farmsList);
 
     // 4. 예약 취소
     app.put('/reserve/cancel/:reserveid', reserve.cancel);
@@ -17,10 +17,10 @@ module.exports = function(app){
     app.put('/reserve/:status/:reserveid', reserve.editStatus);
 
     // 6. 유저 별 현재 이용중인 농장 목록
-    app.get('/reserve/current/list/:email', reserve.currentUse);
+    app.get('/reserve/current/list', reserve.currentUse);
 
     // 7. 유저 별 과거 이용중인 농장 목록
-    app.get('/reserve/past/list/:email', reserve.pastUse);
+    app.get('/reserve/past/list', reserve.pastUse);
 
     // 8. 농장별 예약 불가 기간 조회
     app.get('/reserve/unbookable/:farmid', reserve.unbookablePeriods);

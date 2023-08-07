@@ -232,7 +232,7 @@ exports.selectFarmPicturesUrlKey = async(connection) =>{
 
 exports.getOwnerbyFarmID = async(connection,farmID) =>{
     const getOwnerbyFarmIDQuery = `
-    SELECT PhoneNumber
+    SELECT PhoneNumber, Email
     FROM User
     WHERE Email = (
         SELECT Owner
@@ -240,9 +240,8 @@ exports.getOwnerbyFarmID = async(connection,farmID) =>{
         WHERE FarmID = ?
     );
     `
-
-    const [phoneNumber] = await connection.query(getOwnerbyFarmIDQuery, farmID)
-    return phoneNumber[0];
+    const [OwnerInfo] = await connection.query(getOwnerbyFarmIDQuery, farmID)
+    return OwnerInfo[0];
 }
 
 exports.getFarmsbyFarmIDs = async(connection, farmIds) =>{
