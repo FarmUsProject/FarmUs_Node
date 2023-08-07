@@ -17,6 +17,9 @@ const sharp = require('sharp');
 const fs = require('fs');
 const resStatus_5000 = require('../../config/resStatus_5000');
 const jwtLogin = require('./../../config/jwtLogin');
+const jwt = require('jsonwebtoken');
+const { secretKey } = require('./../../config/secret');
+
 
 /**
  * [POST] /user/login
@@ -62,13 +65,16 @@ exports.signup = async function (req, res) {
 }
 
 exports.likes = async function (req, res) {
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
+
     try {
-        const { email, farmid } = req.body;
-        const invalidation = await validator.twoParams(email, farmid);
+        const { farmid } = req.body;
+        const invalidation = await validator.twoParams(decoded.email, farmid);
 
         if (invalidation) return(res.send(errResponse(invalidation)));
 
-        const starResponse = await userService.addLike(email, farmid);
+        const starResponse = await userService.addLike(decoded.email, farmid);
 
         return(res.send(starResponse));
     }
@@ -78,12 +84,15 @@ exports.likes = async function (req, res) {
 }
 
 exports.unliked = async(req,res)=>{
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
+
     try{
-        const { email, farmid } = req.query;
-        const invalidation = await validator.twoParams(email, farmid);
+        const { farmid } = req.query;
+        const invalidation = await validator.twoParams(decoded.email, farmid);
         if (invalidation) return(res.send(errResponse(invalidation)));
 
-        const result = await userService.unLike(email, farmid)
+        const result = await userService.unLike(decoded.email, farmid)
         return res.send(result)
     }catch(e){
         res.send(errResponse(resStatus.SERVER_ERROR))
@@ -291,17 +300,17 @@ exports.findPassword = async(req,res) => {
 }
 
 exports.editUserNickName = async(req,res) =>{
-    const {email}  = req.query;
-    const {nickname} = req.body
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
 
-    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
+    const {nickname} = req.body
     if (!nickname) return res.send(errResponse2(baseResponse.USER_NICKNAME_EMPTY))
 
     try{
-        const editUser = await userService.editNickName(email, nickname)
+        const editUser = await userService.editNickName(decoded.email, nickname)
         if (!editUser) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
 
-        const userInfo = await userProvider.retrieveUserEmail(email);
+        const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
 
         baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
@@ -313,17 +322,17 @@ exports.editUserNickName = async(req,res) =>{
 }
 
 exports.editUserName = async(req,res) =>{
-    const {email}  = req.query;
-    const {name} = req.body
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
 
-    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
+    const {name} = req.body
     if (!name) return res.send(response2(baseResponse.USER_NAME_EMPTY))
 
     try{
-        const editUser = await userService.editName(email, name)
+        const editUser = await userService.editName(decoded.email, name)
         if (!editUser) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
 
-        const userInfo = await userProvider.retrieveUserEmail(email);
+        const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
 
         baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
@@ -334,19 +343,18 @@ exports.editUserName = async(req,res) =>{
 }
 
 exports.editUserPhoneNumber = async(req,res) =>{
-    const {email}  = req.query;
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
+
     const {phoneNumber} = req.body
-
-    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
     if (!phoneNumber) return res.send(response2(baseResponse.SIGNUP_PHONENUMBER_EMPTY))
-
     if (phoneNumber.length != 11) return res.send(response2(baseResponse.SIGNUP_PHONENUMBER_LENGTH))
 
     try{
-        const editUser = await userService.editPhoneNumber(email, phoneNumber)
+        const editUser = await userService.editPhoneNumber(decoded.email, phoneNumber)
         if (!editUser) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
 
-        const userInfo = await userProvider.retrieveUserEmail(email);
+        const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
 
         baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
@@ -357,14 +365,16 @@ exports.editUserPhoneNumber = async(req,res) =>{
 }
 
 exports.editUserPassword = async(req,res) =>{
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
+
     try {
-        const {email}  = req.query;
         const {password} = req.body
 
-        const invalidation = await validator.login(email, password);
+        const invalidation = await validator.login(decoded.email, password);
         if (invalidation) return res.send(errResponse(invalidation));
 
-        const editPasswordResponse = await userService.editPassword(email, password);
+        const editPasswordResponse = await userService.editPassword(decoded.email, password);
         if(!editPasswordResponse) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
 
         return res.send(baseResponse.SUCCESS);}
@@ -374,9 +384,8 @@ exports.editUserPassword = async(req,res) =>{
 }
 
 exports.editUserProfileImg = async(req,res)=> {
-    const {email}  = req.query;
-
-    if (!email) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
 
     try{
         //sharp(req.file.path)
@@ -402,10 +411,10 @@ exports.editUserProfileImg = async(req,res)=> {
         //const {id} = req.decoded
         //console.log(id);
 
-        const eidtImage = await userService.eidtProfileImg(email, req.file.location, req.file.key)
+        const eidtImage = await userService.eidtProfileImg(decoded.email, req.file.location, req.file.key)
         if (!eidtImage) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
 
-        const userInfo = await userProvider.retrieveUserEmail(email);
+        const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
 
         baseResponse.SUCCESS.photoUrl = req.file.location
@@ -419,15 +428,14 @@ exports.editUserProfileImg = async(req,res)=> {
 }
 
 exports.withdrawal = async(req,res) => {
-    const {userEmail}  = req.query;
-    if (!userEmail) return res.send(errResponse2(baseResponse.USER_EDITINFO_EMPTYEMAIL))
-    console.log(userEmail);
+    if (!req.headers.token) return res.send(errResponse2(baseResponse.TOKEN_EMPTY))
+    const decoded = jwt.verify(req.headers.token, secretKey);
+
     try{
         console.log("TEST");
-        const userWithdrawFarm = await farmService.deleteUserFarm(userEmail)
-        const userWithdraw = await userService.deleteUser(userEmail)
+        const userWithdrawFarm = await farmService.deleteUserFarm(decoded.email)
+        const userWithdraw = await userService.deleteUser(decoded.email)
         if (!userWithdraw) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
-
 
         return res.send(baseResponse.SUCCESS)
     }catch(e){

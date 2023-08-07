@@ -74,6 +74,8 @@ module.exports = {
     SET_REGION : {'result': false, 'code': 6014, "message": "지역을 설정해 주세요"},
 
     INACCURATE_OWNER: {'result': false, 'code': 6015, "message": "FarmID가 잘못되었거나 농장주가 존재하지 않습니다."},
+    WRONG_FARMER: {'result': false, 'code': 6016, "message": "해당 농장의 농장주만 권한이 있습니다."},
+    WRONG_RESERVE_USER: {'result': false, 'code': 6017, "message": "예약자가 일치하지 않습니다."},
 
     REDIS_ERROR : {'result': false, 'code':6900, 'message': "REDIS 에러"}
 
