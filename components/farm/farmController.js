@@ -255,7 +255,8 @@ exports.getMyFarm = async(req,res)=>{
         const decoded = jwt.verify(req.headers.token, secretKey);
 
         const farms = await farmProvider.getOwnerFarms(decoded.email)
-        return res.send(farms)
+        baseResponse.SUCCESS.myFarmList = farms
+        return res.send(baseResponse.SUCCESS)
     }catch(e){
         console.log(e);
         return res.send(errResponse(resStatus.SERVER_ERROR));
