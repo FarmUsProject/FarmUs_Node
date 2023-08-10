@@ -108,7 +108,7 @@ exports.newFarm = async function (req, res) {
         const { name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description} = req.body;
         //console.log(req);
         console.log(req.body);
-        const invalidation = await validator.newFarm(name, owner, Number(price), Number(squaredMeters), locationBig, locationMid);
+        const invalidation = await validator.newFarm(name, owner, price, squaredMeters, locationBig, locationMid);
 
         if (invalidation) return res.send(errResponse(invalidation))
 
@@ -131,7 +131,7 @@ exports.newFarm = async function (req, res) {
 
         const districtCode = districtClarityResponse.result;
 
-        let newFarmResponse = await farmService.newFarm(name, owner, price, squaredMeters, locationBig, locationMid, locationSmall, description);
+        let newFarmResponse = await farmService.newFarm(name, owner, Number(price), Number(squaredMeters), locationBig, locationMid, locationSmall, description);
         for (let i = 0; i < req.files.length; i++) {
             const file = req.files[i];
             const location = file.location;
