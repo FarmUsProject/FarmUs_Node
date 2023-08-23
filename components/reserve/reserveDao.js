@@ -122,6 +122,12 @@ async function pastUseList(connection, email) {
     return reservedPeriodsResult;
  }
 
+ async function deleteReservation(connection, email){
+    const deleteReservationQuery = `DELETE FROM Reservation WHERE UserEmail = ?;`;
+    const deleteReservationResult = await connection.query(deleteReservationQuery, email);
+    return deleteReservationResult;
+ }
+
 module.exports = {
     insertReservation,
     selectReservedClients,
@@ -132,4 +138,5 @@ module.exports = {
     currentUseList,
     pastUseList,
     reservedPeriods,
+    deleteReservation,
 }

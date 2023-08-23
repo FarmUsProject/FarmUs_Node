@@ -4,6 +4,7 @@ const redis = require('redis')
 const nodemailer = require("nodemailer");
 const userService = require("./userService");
 const farmService = require("../farm/farmService");
+const reserveService = require("../reserve/reserveService")
 const userProvider = require("./userProvider");
 const { response, errResponse } = require('./../../config/response');
 const { response2, errResponse2 } = require('../../config/response2');
@@ -436,7 +437,7 @@ exports.withdrawal = async(req,res) => {
     const decoded = jwt.verify(req.headers.token, secretKey);
 
     try{
-        console.log("TEST");
+        const userWithdrawReservation = await reserveService.removeReservation(decoded.email)
         const userWithdrawFarm = await farmService.deleteUserFarm(decoded.email)
         const userWithdraw = await userService.deleteUser(decoded.email)
         if (!userWithdraw) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))
