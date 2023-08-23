@@ -313,8 +313,9 @@ exports.editUserNickName = async(req,res) =>{
         const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
 
-        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
-        return res.send(baseResponse.SUCCESS)
+        const response = {"result" : true}
+        response.accesstoken = newJwtResponse.accesstoken
+        return res.send(response)
     }catch(e){
         return res.send(errResponse2(baseResponse.SERVER_ERROR))
     }
@@ -335,8 +336,9 @@ exports.editUserName = async(req,res) =>{
         const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
 
-        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
-        return res.send(baseResponse.SUCCESS)
+        const response = {"result" : true}
+        response.accesstoken = newJwtResponse.accesstoken
+        return res.send(response)
     }catch(e){
         return res.send(errResponse2(baseResponse.SERVER_ERROR))
     }
@@ -357,8 +359,9 @@ exports.editUserPhoneNumber = async(req,res) =>{
         const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
 
-        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
-        return res.send(baseResponse.SUCCESS)
+        const response = {"result" : true}
+        response.accesstoken = newJwtResponse.accesstoken
+        return res.send(response)
     }catch(e){
         return res.send(errResponse2(baseResponse.SERVER_ERROR))
     }
@@ -417,9 +420,10 @@ exports.editUserProfileImg = async(req,res)=> {
         const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
 
-        baseResponse.SUCCESS.photoUrl = req.file.location
-        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
-        return res.send(baseResponse.SUCCESS)
+        const response = {"result" : true}
+        response.photoUrl = req.file.location
+        response.accesstoken = newJwtResponse.accesstoken
+        return res.send(response)
 
     } catch(err){
         console.log(err);
