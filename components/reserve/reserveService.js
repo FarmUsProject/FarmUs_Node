@@ -89,3 +89,8 @@ exports.editStatus = withConnection(async (connection, reserveId, status) => {
 
     return errResponse(resStatus.DB_ERROR);
 });
+
+exports.removeReservation = withConnection(async (connection, email) => {
+    const deleteReservation = await reserveDao.deleteReservation(connection, email);
+    return response(resStatus.SUCCESS)
+});

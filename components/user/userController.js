@@ -4,6 +4,7 @@ const redis = require('redis')
 const nodemailer = require("nodemailer");
 const userService = require("./userService");
 const farmService = require("../farm/farmService");
+const reserveService = require("../reserve/reserveService")
 const userProvider = require("./userProvider");
 const { response, errResponse } = require('./../../config/response');
 const { response2, errResponse2 } = require('../../config/response2');
@@ -313,8 +314,9 @@ exports.editUserNickName = async(req,res) =>{
         const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
 
-        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
-        return res.send(baseResponse.SUCCESS)
+        const response = {"result" : true}
+        response.accesstoken = newJwtResponse.accesstoken
+        return res.send(response)
     }catch(e){
         return res.send(errResponse2(baseResponse.SERVER_ERROR))
     }
@@ -335,8 +337,9 @@ exports.editUserName = async(req,res) =>{
         const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
 
-        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
-        return res.send(baseResponse.SUCCESS)
+        const response = {"result" : true}
+        response.accesstoken = newJwtResponse.accesstoken
+        return res.send(response)
     }catch(e){
         return res.send(errResponse2(baseResponse.SERVER_ERROR))
     }
@@ -357,8 +360,9 @@ exports.editUserPhoneNumber = async(req,res) =>{
         const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
 
-        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
-        return res.send(baseResponse.SUCCESS)
+        const response = {"result" : true}
+        response.accesstoken = newJwtResponse.accesstoken
+        return res.send(response)
     }catch(e){
         return res.send(errResponse2(baseResponse.SERVER_ERROR))
     }
@@ -417,9 +421,10 @@ exports.editUserProfileImg = async(req,res)=> {
         const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
 
-        baseResponse.SUCCESS.photoUrl = req.file.location
-        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
-        return res.send(baseResponse.SUCCESS)
+        const response = {"result" : true}
+        response.photoUrl = req.file.location
+        response.accesstoken = newJwtResponse.accesstoken
+        return res.send(response)
 
     } catch(err){
         console.log(err);
@@ -432,7 +437,7 @@ exports.withdrawal = async(req,res) => {
     const decoded = jwt.verify(req.headers.token, secretKey);
 
     try{
-        console.log("TEST");
+        const userWithdrawReservation = await reserveService.removeReservation(decoded.email)
         const userWithdrawFarm = await farmService.deleteUserFarm(decoded.email)
         const userWithdraw = await userService.deleteUser(decoded.email)
         if (!userWithdraw) return res.send(errResponse2(baseResponse.USER_USEREMAIL_NOT_EXIST))

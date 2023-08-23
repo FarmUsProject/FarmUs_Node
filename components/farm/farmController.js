@@ -61,9 +61,9 @@ exports.postFarmer = async (req, res) =>{
         const userInfo = await userProvider.retrieveUserEmail(decoded.email);
         const newJwtResponse = await jwtLogin(userInfo)
 
-        baseResponse.SUCCESS.accesstoken = newJwtResponse.accesstoken
-
-        return res.send(baseResponse.SUCCESS);
+        const response = {"result" : true}
+        response.accesstoken = newJwtResponse.accesstoken
+        return res.send(response);
     }catch(err){
         console.log(err);
         return res.send(errResponse2(baseResponse.NOT_LOGIN));
@@ -239,10 +239,11 @@ exports.getLikes = async(req,res) =>{
         const likesArray = user.LikeFarmIDs.split(',').map(item => item.trim());
         const likeFarms = await farmProvider.getFarmArray(likesArray)
 
-        baseResponse.SUCCESS.farmSize = likeFarms.length
-        baseResponse.SUCCESS.farmList = likeFarms
+        const response = {"result" : true}
+        response.farmSize = likeFarms.length
+        response.farmList = likeFarms
 
-        return res.send(baseResponse.SUCCESS)
+        return res.send(response)
     }catch(e){
         console.log(e);
         return res.send(errResponse(resStatus.SERVER_ERROR));
@@ -255,8 +256,10 @@ exports.getMyFarm = async(req,res)=>{
         const decoded = jwt.verify(req.headers.token, secretKey);
 
         const farms = await farmProvider.getOwnerFarms(decoded.email)
-        baseResponse.SUCCESS.myFarmList = farms
-        return res.send(baseResponse.SUCCESS)
+
+        const response = {"result" : true}
+        response.myFarmList = farms
+        return res.send(response)
     }catch(e){
         console.log(e);
         return res.send(errResponse(resStatus.SERVER_ERROR));
