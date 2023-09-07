@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require("cors");
 const { corsOptions } = require('./config/cors');
-
+const fs = require('fs');
 const app = express();
 
 app.use(cors(corsOptions))
@@ -17,7 +17,20 @@ if (process.env.NODE_ENV === "production") {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(express.static('src'));
+/*
+app.get('/chat', function(req, res){
+  fs.readFile('./src/index.html', (err, data) => {
+      if(err) throw err;
 
+      res.writeHead(200, {
+          'Content-Type' : 'text/html'
+      })
+      res.write(data)
+      res.end();
+  });
+});
+*/
 require('./components/user/userRoute')(app);
 require('./components/farm/farmRoute')(app);
 require('./components/reserve/reserveRoute')(app);
