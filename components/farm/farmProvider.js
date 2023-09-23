@@ -98,3 +98,10 @@ exports.getOwnerFarms = withConnection(async (connection, email) => {
     const farms = await farmDao.getFarmsbyOwner(connection, email);
     return farms;
 });
+
+/* farmDate */
+exports.isSameFarmDate = withConnection(async (connection, farmDateInfo) => {
+    const [sameFarmDate] = await farmDao.selectFarmbyFarmDate(connection, farmDateInfo);
+    if (sameFarmDate.length > 0) return true;
+    else return false;
+});

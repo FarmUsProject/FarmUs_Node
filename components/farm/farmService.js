@@ -157,3 +157,24 @@ exports.deletePhoto = withConnection(async (connection, key) => {
     const deleteFarmPicture = await farmDao.deletePhoto(connection, key);
     return deleteFarmPicture;
 });
+
+/* farmDate */
+exports.addFarmDate = withConnection(async (connection, farmID, unavailableStartDate, unavailableEndDate) => {
+    
+    let FarmDateInfo = [farmID, unavailableStartDate, unavailableEndDate];
+
+    const isSameFarmDate = await FarmProvider.isSameFarmDate(FarmDateInfo); //중복체크
+    if (isSameFarmDate) return errResponse(resStatus_5000.FARM_DATE_DUPLICATED_EXISTS);
+
+    const newFarmDate = await farmDao.insertFarmDate(connection, FarmDateInfo);
+
+    // console.log(newFarmDate, "newFarmDate");
+
+    return response(resStatus_5000.FARM_UNAVAILABLE_DATE_SUCCESS, { "farmDateID": newFarmDate });
+});
+
+//farmDate - delete
+/* farmDate */
+
+//farmDate - list
+/* farmDate */

@@ -265,3 +265,47 @@ exports.getMyFarm = async(req,res)=>{
         return res.send(errResponse(resStatus.SERVER_ERROR));
     }
 }
+
+/* farmDate */
+exports.addFarmDate = async(req, res) => {
+    try {
+        const { farmID, unavailableStartDate, unavailableEndDate } = req.body;
+
+        if (!farmID) return res.send(errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST));
+
+        // Date Availability 유효성 검사
+        if (dateAvailability.isValidDatetype(unavailableStartDate) == false || dateAvailability.isValidDatetype(unavailableEndDate) == false)
+            return res.send(errResponse(resStatus_5000.DATE_TYPE_WEIRD));
+
+        const farmDateResponse = await farmService.addFarmDate(farmID, unavailableStartDate, unavailableEndDate);
+
+        return res.send(farmDateResponse)
+
+    }
+    catch (e) {
+        // console.log(e);
+        return res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}
+
+/* farmDate */
+exports.deleteFarmDate = async(req, res) => {
+    try {
+
+    }
+    catch (e) {
+        // console.log(e);
+        return res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}
+
+/* farmDate */
+exports.getFarmDate = async(req, res) => {
+    try {
+
+    }
+    catch (e) {
+        // console.log(e);
+        return res.send(errResponse(resStatus.SERVER_ERROR));
+    }
+}

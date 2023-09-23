@@ -285,3 +285,28 @@ exports.getFarmsbyOwner = async(connection, owner) =>{
     const [farms] = await connection.query(getFarmsbyOwnerQuery, owner)
     return farms;
 }
+
+/* farmDate */
+exports.insertFarmDate = async(connection, FarmDateInfo) => {
+    //FarmDateInfo [farmID, unavailableStartDate, unavailableEndDate]
+    const insertFarmDateQuery =`
+    INSERT INTO FarmDate(FarmID, UnavailableStartDate, UnavailableEndDate)
+    VALUES (?, ?, ?);
+    `;
+    const insertFarmDateResult = await connection.query(insertFarmDateQuery, FarmDateInfo);
+
+    return insertFarmDateResult[0].insertId;
+}
+
+/* farmDate */
+exports.selectFarmbyFarmDate = async(connection, FarmDateInfo) => {
+    //FarmDateInfo [farmID, unavailableStartDate, unavailableEndDate]
+    const selectFarmDateQuery =`
+    SELECT *
+    FROM FarmDate
+    WHERE FarmID = ? AND UnavailableStartDate = ? AND UnavailableEndDate = ?;
+    `;
+    const selectFarmDateResult = await connection.query(selectFarmDateQuery, FarmDateInfo);
+
+    return selectFarmDateResult;
+}
