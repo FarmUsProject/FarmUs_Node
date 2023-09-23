@@ -41,7 +41,7 @@ module.exports = function (app) {
     app.post('/farm/unavailableDate', farm.addFarmDate);
 
     //(farmDate) 농장 예약 불가 기간 삭제
-    app.put('/farm/unavailableDate/delete/:farmDateid', farm.deleteFarmDate);
+    app.put('/farm/unavailableDate/delete/:farmDateID', farm.deleteFarmDate);
 
     //(farmDate) 농장 예약 불가 기간 목록
     app.get('/farm/unavailableDate/:farmid', farm.getFarmDate);

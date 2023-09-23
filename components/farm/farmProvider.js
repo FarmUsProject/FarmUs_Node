@@ -101,7 +101,19 @@ exports.getOwnerFarms = withConnection(async (connection, email) => {
 
 /* farmDate */
 exports.isSameFarmDate = withConnection(async (connection, farmDateInfo) => {
-    const [sameFarmDate] = await farmDao.selectFarmbyFarmDate(connection, farmDateInfo);
+    const [sameFarmDate] = await farmDao.selectFarmDatebyDate(connection, farmDateInfo);
     if (sameFarmDate.length > 0) return true;
     else return false;
+});
+
+/* farmDate */
+exports.farmDateByFarmDateId = withConnection(async (connection, farmDateId) => {
+    const [farmDate] = await farmDao.selectFarmDatebyFarmDateId(connection, farmDateId);
+    return farmDate[0];
+});
+
+/* farmDate */
+exports.getFarmDateByFarmId = withConnection(async (connection, farmId) => {
+    const farmDates= await farmDao.selectFarmDatebyFarmId(connection, farmId);
+    return farmDates[0];
 });

@@ -2,13 +2,13 @@ module.exports = {
 
     /**
      * [CODE RULE IN 5000]
-     * common  | 5000 ~ 5099
-     * user    | 5100 ~ 5199
-     * farm    | 5200 ~ 5299
-     * reserve | 5300 ~ 5399
-     * district| 5400 ~ 5499
-     * fail    | ##00 ~ ##49
-     * success | ##50 ~ ##99
+     * common    | 5000 ~ 5099
+     * user      | 5100 ~ 5199
+     * farm(Date)| 5200 ~ 5299
+     * reserve   | 5300 ~ 5399
+     * district  | 5400 ~ 5499
+     * fail      | ##00 ~ ##49
+     * success   | ##50 ~ ##99
      */
 
     //common
@@ -35,14 +35,17 @@ module.exports = {
     FARM_FARMID_NOT_EXIST  : { "isSuccess" : false, "code" : 5200, "message" : "해당 아이디를 가진 농장이 존재하지 않습니다."},
     FARM_NEW_DATA_SHORTAGE : {"isSuccess" : false, "code" : 5201, "message" : "농장을 등록하는 데 필요한 정보가 부족합니다."},
     FARM_UPDATE_STAR_ERROR : {"isSuccess" : false, "code" :  5202, "message" : "농장의 찜 개수를 업데이트 하는 데 실패했습니다."},
-    FARM_DUPLICATED_EXISTS : {"isSuccess" : false, "code" : 5202, "message" : "이미 동일한 정보를 가진 농장이 존재합니다."},
+    FARM_DUPLICATED_EXISTS : {"isSuccess" : false, "code" : 5203, "message" : "이미 동일한 정보를 가진 농장이 존재합니다."},
     FARM_NEW_SAVE_SUCCESS : {"isSuccess" : true, "code" :  5250, "message" : "농장이 등록되었습니다."},
     FARM_LIST_AVAILABLE_FOR_RESERVATION : {"isSuccess" : true, "code" :  5251, "message" : "예약 가능한 농장 목록을 불러왔어요."},
     FARM_DETAIL_GET_SUCCESS : {"isSuccess" : true, "code" :  5252, "message" : "농장 상세 정보를 불러왔어요."},
 
     //farmDate
+    FARM_DATE_DUPLICATED_EXISTS : {"isSuccess" : false, "code" :  5204, "message" : "해당 기간은 이미 등록된 기간입니다."},
+    FARM_DATE_NOT_EXIST : {"isSuccess" : false, "code" :  5205, "message" : "해당 기간은 등록되지 않은 기간입니다."},
     FARM_UNAVAILABLE_DATE_SUCCESS : {"isSuccess" : true, "code" :  5253, "message" : "농장 이용 불가능한 기간을 등록하였습니다."},
-    FARM_DATE_DUPLICATED_EXISTS : {"isSuccess" : true, "code" :  5254, "message" : "해당 기간은 이미 등록된 기간입니다."},
+    FARM_UNAVAILABLE_DATE_DELETE : {"isSuccess" : true, "code" :  5254, "message" : "해당 이용 불가 기간을 삭제하였습니다."},
+    FARM_UNAVAILABLE_DATE : {"isSuccess" : true, "code" :  5255, "message" : "등록된 이용 불가 기간을 모두 불러왔어요."},
     
     //reserve
     RESERVE_REQUEST_DATA_SHORTAGE : { "isSuccess": false, "code": 5300, "message": "농장을 예약하는 데 필요한 정보가 부족합니다." },

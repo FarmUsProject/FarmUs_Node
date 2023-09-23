@@ -291,6 +291,14 @@ exports.addFarmDate = async(req, res) => {
 /* farmDate */
 exports.deleteFarmDate = async(req, res) => {
     try {
+        const farmDateId = req.params.farmDateID;
+
+        const invalidation = await validator.oneParams(farmDateId);
+        if (invalidation) return(res.send(response(invalidation)));
+
+        const deleteFarmDateResponse = await farmService.deleteFarmDate(farmDateId);
+
+        return(res.send(deleteFarmDateResponse));
 
     }
     catch (e) {
@@ -302,6 +310,14 @@ exports.deleteFarmDate = async(req, res) => {
 /* farmDate */
 exports.getFarmDate = async(req, res) => {
     try {
+        const farmId = req.params.farmid;
+
+        const invalidation = await validator.oneParams(farmId);
+        if (invalidation) return(res.send(response(invalidation)));
+
+        const getFarmDateResponse = await farmService.getFarmDate(farmId);
+
+        return(res.send(getFarmDateResponse));
 
     }
     catch (e) {
