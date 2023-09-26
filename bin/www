@@ -21,19 +21,26 @@ app.set('port', port);
 const server = http.createServer(app);
 const io = require('socket.io')(server);
 
-io.on('connection', (socket)=>{
-  require('../components/chat/chatRoute')(io,socket);
-  console.log('user connected');
-})
-
 /**
  * Listen on provided port, on all network interfaces.
  */
 //httpsServer.listen(httpsPort)
 server.listen(port);
+
+io.on('connection', (socket)=>{
+  require('../components/chat/chatRoute')(io,socket);
+  console.log('user connected');
+  socket.on('error', (err)=>{
+    console.log("Socket error: ", err);
+  })
+})
+io.on('error', (err) => {
+  console.log("testtest");
+  console.error("Socket.IO 서버 오류:", err);
+});
+
 server.on('error', onError);
 server.on('listening', onListening);
-
 
 
 /**
