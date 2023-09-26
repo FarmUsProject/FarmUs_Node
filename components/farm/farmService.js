@@ -157,3 +157,45 @@ exports.deletePhoto = withConnection(async (connection, key) => {
     const deleteFarmPicture = await farmDao.deletePhoto(connection, key);
     return deleteFarmPicture;
 });
+
+/* farmDate */
+exports.addFarmDate = withConnection(async (connection, farmID, unavailableStartDate, unavailableEndDate) => {
+
+    const farmInfo = await FarmProvider.retrieveFarmInfo(farmID); //존재여부확인
+    if (farmInfo.length <= 0) return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
+
+    let FarmDateInfo = [farmID, unavailableStartDate, unavailableEndDate];
+
+    const isSameFarmDate = await FarmProvider.isSameFarmDate(FarmDateInfo); //중복체크
+    if (isSameFarmDate) return errResponse(resStatus_5000.FARM_DATE_DUPLICATED_EXISTS);
+
+    const newFarmDate = await farmDao.insertFarmDate(connection, FarmDateInfo);
+
+    // console.log(newFarmDate, "newFarmDate");
+
+    return response(resStatus_5000.FARM_UNAVAILABLE_DATE_SUCCESS, { "farmDateID": newFarmDate });
+});
+
+/* farmDate */
+exports.deleteFarmDate = withConnection(async (connection, farmDateId) => {
+
+    const farmDate = await FarmProvider.farmDateByFarmDateId(farmDateId); //존재여부확인
+    if (!farmDate) return errResponse(resStatus_5000.FARM_DATE_NOT_EXIST);
+
+    // console.log(farmDate, "farmDate");
+
+    const deletedFarmDate = await farmDao.deleteFarmDate(connection, farmDateId);
+
+    return response(resStatus_5000.FARM_UNAVAILABLE_DATE_DELETE, { "farmDateID": farmDateId });
+});
+
+/* farmDate */
+exports.getFarmDate = async (farmId) => {
+
+    const farmInfo = await FarmProvider.retrieveFarmInfo(farmId); //존재여부확인
+    if (farmInfo.length <= 0) return errResponse(resStatus_5000.FARM_FARMID_NOT_EXIST);
+
+    const farmDate = await FarmProvider.getFarmDateByFarmId(farmId);
+
+    return response(resStatus_5000.FARM_UNAVAILABLE_DATE, farmDate);
+};

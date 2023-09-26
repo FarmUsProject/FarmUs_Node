@@ -285,3 +285,60 @@ exports.getFarmsbyOwner = async(connection, owner) =>{
     const [farms] = await connection.query(getFarmsbyOwnerQuery, owner)
     return farms;
 }
+
+/* farmDate */
+exports.insertFarmDate = async(connection, FarmDateInfo) => {
+    //FarmDateInfo [farmID, unavailableStartDate, unavailableEndDate]
+    const insertFarmDateQuery =`
+    INSERT INTO FarmDate(FarmID, UnavailableStartDate, UnavailableEndDate)
+    VALUES (?, ?, ?);
+    `;
+    const insertFarmDateResult = await connection.query(insertFarmDateQuery, FarmDateInfo);
+
+    return insertFarmDateResult[0].insertId;
+}
+
+/* farmDate */
+exports.selectFarmDatebyDate = async(connection, FarmDateInfo) => {
+    //FarmDateInfo [farmID, unavailableStartDate, unavailableEndDate]
+    const selectFarmDateQuery =`
+    SELECT *
+    FROM FarmDate
+    WHERE FarmID = ? AND UnavailableStartDate = ? AND UnavailableEndDate = ?;
+    `;
+    const selectFarmDateResult = await connection.query(selectFarmDateQuery, FarmDateInfo);
+
+    return selectFarmDateResult;
+}
+
+/* farmDate */
+exports.selectFarmDatebyFarmDateId = async(connection, farmDateId) => {
+    const selectFarmDateQuery =`
+    SELECT *
+    FROM FarmDate
+    WHERE FarmDateID = ?;
+    `;
+    const selectFarmDateResult = await connection.query(selectFarmDateQuery, farmDateId);
+
+    return selectFarmDateResult;
+}
+
+exports.selectFarmDatebyFarmId = async(connection, farmId) => {
+    const selectFarmDateQuery =`
+    SELECT FarmDateID, UnavailableStartDate, UnavailableEndDate
+    FROM FarmDate
+    WHERE FarmID = ?;
+    `;
+    const selectFarmDateResult = await connection.query(selectFarmDateQuery, farmId);
+
+    return selectFarmDateResult;
+}
+
+exports.deleteFarmDate = async(connection, farmDateId) => {
+    const deleteFarmDateQuery = `
+    DELETE FROM FarmDate
+    WHERE FarmDateID = ?;
+    `
+    const deleteFarmDateResult = await connection.query(deleteFarmDateQuery, farmDateId);
+    return deleteFarmDateResult;
+}
