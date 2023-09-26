@@ -37,6 +37,10 @@ const KOR_DIST =  {
     SERVICEID : process.env.KOR_DIST_SERVICEID,
     SECRET_KEY : process.env.KOR_DIST_SECRET_KEY
 }
+const DYNAMO_ACCESS = {
+    KEY: process.env.DYNAMO_ACCESS_KEY,
+    SECRET_KEY: process.env.DYNAMO_SECRET_KEY
+}
 
 module.exports = {
     googleSecret,
@@ -46,5 +50,6 @@ module.exports = {
     S3_ACCESS,
     secretKey,
     options,
-    KOR_DIST
+    KOR_DIST,
+    DYNAMO_ACCESS
 }

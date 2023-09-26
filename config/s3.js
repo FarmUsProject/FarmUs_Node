@@ -7,7 +7,6 @@ const s3 = new S3Client({
         accessKeyId: S3_ACCESS.KEY,
         secretAccessKey: S3_ACCESS.SECRET_KEY ,
     }
-
 })
 
 module.exports = s3;

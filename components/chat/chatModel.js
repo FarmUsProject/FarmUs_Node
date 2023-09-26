@@ -1,11 +1,8 @@
 const mongoose = require('mongoose');
 
 const chatSchema = new mongoose.Schema({
-/*
-    chatRoomID:{
-        type: String
-    }*/
-  name: {
+
+  UserEmail:{
     type: String,
     required: true,
   },
@@ -17,6 +14,7 @@ const chatSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+
 });
 
 module.exports = mongoose.model('Chat', chatSchema);
