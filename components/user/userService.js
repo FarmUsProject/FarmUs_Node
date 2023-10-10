@@ -16,7 +16,7 @@ const withConnection = require('../../config/connection')
 
 exports.login = async(email, password) =>{
 
-    const userInfo = await userProvider.retrieveUserEmail(email);
+    const userInfo = await userProvider.usersbyEmail(email);
     if (userInfo.length < 1) return errResponse(resStatus.USER_USEREMAIL_NOT_EXIST);
     console.log(userInfo);
 

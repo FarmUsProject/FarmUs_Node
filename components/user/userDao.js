@@ -19,14 +19,14 @@ const SelectionUseFarmArray = async (connection, userid) => {
 }
 
 async function selectUserbyEmail(connection, email) {
-    console.log(email);
+
     const selectUserbyEmailQuery = `
     SELECT *
     FROM User
     WHERE Email = ?;
     `;
     const userInfo = await connection.query(selectUserbyEmailQuery, email);
-    console.log(userInfo);
+
     return userInfo;
 }
 
